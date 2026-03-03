@@ -1,4 +1,4 @@
-# GridSense-AI: Multi-Agent System for Anomaly Detection & Predictive Maintenance
+# GridSense-AI: Multi-Agent System for Anomaly Detection & Predictive Maintenance(TBC)
 
 <div align="center">
   <h3>National AI Student Challenge 2024 | In partnership with Huawei</h3>
