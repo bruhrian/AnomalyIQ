@@ -72,7 +72,6 @@ ProactiveGuard is an intelligent multi-agent system designed to enhance the reli
 ### Prerequisites
 - Python 3.9+
 - Node.js 16+
-- Docker (optional)
 
 
 ### Installation
