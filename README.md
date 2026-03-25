@@ -4,10 +4,10 @@
 </div>
 
 
-## 🏆 Team [Your Team Name]
-- [Member 1 Name] - [Role, e.g., ML/AI Engineer]
-- [Member 2 Name] - [Role, e.g., Backend/Agent Developer]
-- [Member 3 Name] - [Role, e.g., Frontend/UI/UX Designer]
+## 🏆 Team [Agentic Bunch]
+- [Brian Chua] - [Project Lead and ML & AI agent Engineer]
+- [Ervin Er] - [Backend & MCP server developer, AI agent engineer]
+- [Jiang Xu Yang] - [Frontend developer, UI/UX Designer, AI agent engineer]
 
 
 ## 📋 Overview
