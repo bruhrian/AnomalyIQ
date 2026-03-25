@@ -1,5 +1,3 @@
-<img width="1265" height="708" alt="image" src="https://github.com/user-attachments/assets/b0031a3d-0325-454a-bb3b-7067c7f1fe66" /># GridSense-AI: Multi-Agent System for Anomaly Detection & Predictive Maintenance(TBC)
-
 <div align="center">
   <h3>National AI Student Challenge 2026 | In partnership with Huawei</h3>
   <p><i>Intelligent multi-agent system for critical infrastructure monitoring and predictive maintenance</i></p>
@@ -13,7 +11,7 @@
 
 
 ## 📋 Overview
-ProactiveGuard is an intelligent multi-agent system designed to enhance the reliability and security of critical infrastructure systems (energy grids, water treatment plants, transportation networks, and manufacturing facilities). Our solution leverages autonomous AI agents to:
+AnomalyIQ is an industrial monitoring UI that combines real-time sensor tracking, AI-assisted diagnostics, and system health checks into one unified interface. This helps operators detect issues faster and make better maintenance decisions. Our solution leverages autonomous AI agents to:
 
 - 🔍 **Detect anomalies in real-time** across sensor networks
 - 📈 **Predict equipment failures** before they occur
