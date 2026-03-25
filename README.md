@@ -49,8 +49,8 @@ AnomalyIQ is an industrial monitoring UI that combines real-time sensor tracking
 ### Installation
 ```bash
 # Clone repository
-git clone https://github.com/your-team/ProactiveGuard.git
-cd ProactiveGuard
+git clone https://github.com/your-team/AnomalyIQ.git
+cd AnomalyIQ
 
 # Set up Python environment
 python -m venv venv
