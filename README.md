@@ -76,13 +76,9 @@ npm start
 ```
 
 📊 Sample Datasets
-We're using [specify datasets] for training and testing:
+We're using 'Real-Time IoT-Driven Production System Dataset' for training and testing:
 
-[Dataset 1] - Energy grid sensor data
-
-[Dataset 2] - Water treatment plant SCADA data
-
-[Synthetic data] - Generated for edge cases
+Kaggle link: [https://www.kaggle.com/datasets/programmer3/real-time-iot-driven-production-system-dataset]
 
 
 🧪 Testing
