@@ -1,4 +1,4 @@
-# GridSense-AI: Multi-Agent System for Anomaly Detection & Predictive Maintenance(TBC)
+<img width="1265" height="708" alt="image" src="https://github.com/user-attachments/assets/b0031a3d-0325-454a-bb3b-7067c7f1fe66" /># GridSense-AI: Multi-Agent System for Anomaly Detection & Predictive Maintenance(TBC)
 
 <div align="center">
   <h3>National AI Student Challenge 2026 | In partnership with Huawei</h3>
@@ -30,41 +30,15 @@ ProactiveGuard is an intelligent multi-agent system designed to enhance the reli
 
 
 ## 🏗️ System Architecture
-┌─────────────────────────────────────────────────────────────┐
-│ User Interface Layer │
-│ [Dashboard] [Alert Console] [Visualization Tools] │
-└─────────────────────────────────────────────────────────────┘
-│
-┌─────────────────────────────────────────────────────────────┐
-│ Agent Coordination Layer │
-│ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ │
-│ │Monitor │ │Anomaly │ │Predictive│ │Explain- │ │
-│ │Agent │ │Detection │ │Agent │ │ation │ │
-│ │ │ │Agent │ │ │ │Agent │ │
-│ └──────────┘ └──────────┘ └──────────┘ └──────────┘ │
-│ [Coordinator Agent] │
-└─────────────────────────────────────────────────────────────┘
-│
-┌─────────────────────────────────────────────────────────────┐
-│ Data Processing Layer │
-│ [Data Ingestion] [Preprocessing] [Feature Engineering] │
-└─────────────────────────────────────────────────────────────┘
-│
-┌─────────────────────────────────────────────────────────────┐
-│ Infrastructure Layer │
-│ [Sensor Networks] [SCADA Systems] [IoT Devices] │
-└─────────────────────────────────────────────────────────────┘
-
+<img width="1265" height="708" alt="image" src="https://github.com/user-attachments/assets/d0ecbb76-0d3a-4ca3-8b6b-664f4491db63" />
 
 ## 🛠️ Tech Stack
-- **AI/ML Framework**: PyTorch / TensorFlow / scikit-learn
-- **Agent Framework**: [e.g., LangChain, AutoGen, or custom implementation]
+- **AI/ML Framework**: TensorFlow 
+- **Agent Framework**: MCP & Langchain
 - **Backend**: FastAPI / Python
-- **Frontend**: React / D3.js / Plotly
-- **Database**: InfluxDB (time-series) / PostgreSQL
-- **Message Broker**: RabbitMQ / Kafka
-- **Visualization**: Grafana / Custom dashboards
-- **DevOps**: Docker, GitHub Actions
+- **Frontend**: React 
+- **Database**: Qdrant & PostgreSQL
+- **Visualization**: Matplotlib
 
 
 ## 🚀 Getting Started
