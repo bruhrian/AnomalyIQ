@@ -78,7 +78,7 @@ npm start
 📊 Sample Datasets
 We're using 'Real-Time IoT-Driven Production System Dataset' for training and testing:
 
-Kaggle link: [https://www.kaggle.com/datasets/programmer3/real-time-iot-driven-production-system-dataset]
+Kaggle link: https://www.kaggle.com/datasets/programmer3/real-time-iot-driven-production-system-dataset
 
 
 🧪 Testing
