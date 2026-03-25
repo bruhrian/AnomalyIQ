@@ -5,7 +5,7 @@
 
 
 ## 🏆 Team [Agentic Bunch]
-- [Brian Chua] - [Project Lead and ML & AI agent Engineer]
+- [Brian Chua] - [Project Lead, ML & AI agent Engineer]
 - [Ervin Er] - [Backend & MCP server developer, AI agent engineer]
 - [Jiang Xu Yang] - [Frontend developer, UI/UX Designer, AI agent engineer]
 
