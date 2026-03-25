@@ -5,9 +5,9 @@
 
 
 ## 🏆 Team Agentic Bunch
-- Brian Chua(@bruhrian) - Project Lead, ML & AI agent Engineer
-- Ervin Er - Backend & MCP server developer, AI agent Engineer
-- Jiang Xu Yang - Frontend developer, UI/UX Designer, AI agent Engineer
+- Brian Chua(@bruhrian) - Project Lead, ML & AI Engineer
+- Ervin Er - Backend & MCP server developer, AI Engineer
+- Jiang Xu Yang - Frontend developer, UI/UX Designer, AI Engineer
 
 
 ## 📋 Overview
