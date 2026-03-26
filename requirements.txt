@@ -1,1 +1,11 @@
-
+requests==2.32.5
+python-dotenv==1.1.1
+json
+pydantic
+langchain
+langchain-community
+langchain-openrouter
+ollama
+pandas
+matplotlib
+seaborn
