@@ -1,0 +1,230 @@
+{
+  "multi_step": {
+    "CNC": {
+      "per_target_metrics": {
+        "error_rate": {
+          "mae": 0.06264545768499374,
+          "rmse": 0.06286493318611039
+        },
+        "downtime": {
+          "mae": 197.68930053710938,
+          "rmse": 374.4278969307709
+        },
+        "maintenance_flag": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "auc": NaN
+        },
+        "efficiency_score": {
+          "mae": 172.698486328125,
+          "rmse": 204.33566135161038
+        },
+        "production_status": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "auc": NaN
+        }
+      }
+    },
+    "Conveyor": {
+      "per_target_metrics": {
+        "error_rate": {
+          "mae": 0.07502174377441406,
+          "rmse": 0.07551975359090009
+        },
+        "downtime": {
+          "mae": 237.0775146484375,
+          "rmse": 410.910327048372
+        },
+        "maintenance_flag": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "auc": NaN
+        },
+        "efficiency_score": {
+          "mae": 156.09295654296875,
+          "rmse": 197.50022745240068
+        },
+        "production_status": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "auc": NaN
+        }
+      }
+    },
+    "Drill": {
+      "per_target_metrics": {
+        "error_rate": {
+          "mae": 0.06566644459962845,
+          "rmse": 0.06600927810518262
+        },
+        "downtime": {
+          "mae": 310.3210144042969,
+          "rmse": 471.0506209527804
+        },
+        "maintenance_flag": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "auc": NaN
+        },
+        "efficiency_score": {
+          "mae": 151.92843627929688,
+          "rmse": 186.90154493743492
+        },
+        "production_status": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "auc": NaN
+        }
+      }
+    },
+    "Welder": {
+      "per_target_metrics": {
+        "error_rate": {
+          "mae": 0.06464574486017227,
+          "rmse": 0.06492522403764132
+        },
+        "downtime": {
+          "mae": 250.34481811523438,
+          "rmse": 424.5557052672829
+        },
+        "maintenance_flag": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "auc": NaN
+        },
+        "efficiency_score": {
+          "mae": 176.86529541015625,
+          "rmse": 214.0124759067798
+        },
+        "production_status": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "auc": NaN
+        }
+      }
+    }
+  },
+  "aggregated": {
+    "CNC": {
+      "per_target_metrics": {
+        "max_error_rate": {
+          "mae": 0.05925481393933296,
+          "rmse": 0.06498709842329803
+        },
+        "sum_downtime": {
+          "mae": 63.79581832885742,
+          "rmse": 76.62537915383355
+        },
+        "maintenance_present": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "auc": 0.4975609756097561
+        },
+        "min_efficiency": {
+          "mae": 0.3479894697666168,
+          "rmse": 0.6204964266588847
+        },
+        "last_production_status": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "auc": NaN
+        }
+      }
+    },
+    "Conveyor": {
+      "per_target_metrics": {
+        "max_error_rate": {
+          "mae": 0.03902171179652214,
+          "rmse": 0.058670395154360656
+        },
+        "sum_downtime": {
+          "mae": 29.47274398803711,
+          "rmse": 39.90012402813978
+        },
+        "maintenance_present": {
+          "precision": 0.7142857142857143,
+          "recall": 1.0,
+          "f1": 0.8333333333333334,
+          "auc": 0.39387755102040817
+        },
+        "min_efficiency": {
+          "mae": 0.15125451982021332,
+          "rmse": 0.17539789996107902
+        },
+        "last_production_status": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "auc": NaN
+        }
+      }
+    },
+    "Drill": {
+      "per_target_metrics": {
+        "max_error_rate": {
+          "mae": 0.052954886108636856,
+          "rmse": 0.06786495633814477
+        },
+        "sum_downtime": {
+          "mae": 92.41182708740234,
+          "rmse": 109.86260951183529
+        },
+        "maintenance_present": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "auc": 0.6782407407407408
+        },
+        "min_efficiency": {
+          "mae": 0.32372725009918213,
+          "rmse": 0.33143382459973236
+        },
+        "last_production_status": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "auc": NaN
+        }
+      }
+    },
+    "Welder": {
+      "per_target_metrics": {
+        "max_error_rate": {
+          "mae": 0.0955294817686081,
+          "rmse": 0.10114170898759456
+        },
+        "sum_downtime": {
+          "mae": 38.394775390625,
+          "rmse": 48.115050716680635
+        },
+        "maintenance_present": {
+          "precision": 0.7358490566037735,
+          "recall": 1.0,
+          "f1": 0.8478260869565217,
+          "auc": 0.489010989010989
+        },
+        "min_efficiency": {
+          "mae": 0.05982726067304611,
+          "rmse": 0.06150628600145656
+        },
+        "last_production_status": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "auc": NaN
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,336 @@
+{
+  "mae": [
+    {
+      "max_error_rate": 0.039873771369457245
+    },
+    {
+      "sum_downtime": 45.80190658569336
+    },
+    {
+      "maintenance_present": 0.47461020946502686
+    },
+    {
+      "min_efficiency": 0.050070133060216904
+    },
+    {
+      "last_production_status": 0.03589322417974472
+    },
+    {
+      "max_error_rate": 0.040067438036203384
+    },
+    {
+      "sum_downtime": 45.597434997558594
+    },
+    {
+      "maintenance_present": 0.476716548204422
+    },
+    {
+      "min_efficiency": 0.06735491752624512
+    },
+    {
+      "last_production_status": 0.0406295545399189
+    },
+    {
+      "max_error_rate": 0.040899235755205154
+    },
+    {
+      "sum_downtime": 45.23484802246094
+    },
+    {
+      "maintenance_present": 0.4873485565185547
+    },
+    {
+      "min_efficiency": 0.06999513506889343
+    },
+    {
+      "last_production_status": 0.03961155563592911
+    },
+    {
+      "max_error_rate": 0.04065314307808876
+    },
+    {
+      "sum_downtime": 44.92878723144531
+    },
+    {
+      "maintenance_present": 0.48749610781669617
+    },
+    {
+      "min_efficiency": 0.08309583365917206
+    },
+    {
+      "last_production_status": 0.04254815727472305
+    },
+    {
+      "max_error_rate": 0.04101400822401047
+    },
+    {
+      "sum_downtime": 44.672454833984375
+    },
+    {
+      "maintenance_present": 0.4931025505065918
+    },
+    {
+      "min_efficiency": 0.08671306818723679
+    },
+    {
+      "last_production_status": 0.046480484306812286
+    },
+    {
+      "max_error_rate": 0.04161479324102402
+    },
+    {
+      "sum_downtime": 44.44271469116211
+    },
+    {
+      "maintenance_present": 0.4968693256378174
+    },
+    {
+      "min_efficiency": 0.06340271234512329
+    },
+    {
+      "last_production_status": 0.046827081590890884
+    },
+    {
+      "max_error_rate": 0.04157797619700432
+    },
+    {
+      "sum_downtime": 44.251922607421875
+    },
+    {
+      "maintenance_present": 0.49624577164649963
+    },
+    {
+      "min_efficiency": 0.06435972452163696
+    },
+    {
+      "last_production_status": 0.04919387772679329
+    },
+    {
+      "max_error_rate": 0.041474707424640656
+    },
+    {
+      "sum_downtime": 44.092063903808594
+    },
+    {
+      "maintenance_present": 0.49476486444473267
+    },
+    {
+      "min_efficiency": 0.07242842018604279
+    },
+    {
+      "last_production_status": 0.05290042981505394
+    },
+    {
+      "max_error_rate": 0.041423387825489044
+    },
+    {
+      "sum_downtime": 43.92618179321289
+    },
+    {
+      "maintenance_present": 0.49585801362991333
+    },
+    {
+      "min_efficiency": 0.08263018727302551
+    },
+    {
+      "last_production_status": 0.05704289674758911
+    },
+    {
+      "max_error_rate": 0.04171539843082428
+    },
+    {
+      "sum_downtime": 43.736328125
+    },
+    {
+      "maintenance_present": 0.5004687905311584
+    },
+    {
+      "min_efficiency": 0.08005504310131073
+    },
+    {
+      "last_production_status": 0.05767791345715523
+    },
+    {
+      "max_error_rate": 0.04192229360342026
+    },
+    {
+      "sum_downtime": 43.39154815673828
+    },
+    {
+      "maintenance_present": 0.5027222633361816
+    },
+    {
+      "min_efficiency": 0.07403142005205154
+    },
+    {
+      "last_production_status": 0.0579724982380867
+    }
+  ],
+  "mse": [
+    {
+      "max_error_rate": 0.0018279296346008778
+    },
+    {
+      "sum_downtime": 2751.442626953125
+    },
+    {
+      "maintenance_present": 0.235775887966156
+    },
+    {
+      "min_efficiency": 0.004617299418896437
+    },
+    {
+      "last_production_status": 0.0021573100239038467
+    },
+    {
+      "max_error_rate": 0.0018619459588080645
+    },
+    {
+      "sum_downtime": 2727.6025390625
+    },
+    {
+      "maintenance_present": 0.23415352404117584
+    },
+    {
+      "min_efficiency": 0.008817619644105434
+    },
+    {
+      "last_production_status": 0.002789814956486225
+    },
+    {
+      "max_error_rate": 0.001994568156078458
+    },
+    {
+      "sum_downtime": 2679.56494140625
+    },
+    {
+      "maintenance_present": 0.2418697327375412
+    },
+    {
+      "min_efficiency": 0.009541151113808155
+    },
+    {
+      "last_production_status": 0.0024590466637164354
+    },
+    {
+      "max_error_rate": 0.001988232834264636
+    },
+    {
+      "sum_downtime": 2644.743896484375
+    },
+    {
+      "maintenance_present": 0.24162547290325165
+    },
+    {
+      "min_efficiency": 0.014508724212646484
+    },
+    {
+      "last_production_status": 0.0028997501358389854
+    },
+    {
+      "max_error_rate": 0.0020395354367792606
+    },
+    {
+      "sum_downtime": 2622.86083984375
+    },
+    {
+      "maintenance_present": 0.2469528168439865
+    },
+    {
+      "min_efficiency": 0.015548226423561573
+    },
+    {
+      "last_production_status": 0.003024095669388771
+    },
+    {
+      "max_error_rate": 0.0021234098821878433
+    },
+    {
+      "sum_downtime": 2598.44091796875
+    },
+    {
+      "maintenance_present": 0.25127026438713074
+    },
+    {
+      "min_efficiency": 0.00809374451637268
+    },
+    {
+      "last_production_status": 0.0030280910432338715
+    },
+    {
+      "max_error_rate": 0.0021159672178328037
+    },
+    {
+      "sum_downtime": 2586.03369140625
+    },
+    {
+      "maintenance_present": 0.2507881224155426
+    },
+    {
+      "min_efficiency": 0.008813978172838688
+    },
+    {
+      "last_production_status": 0.0034546770621091127
+    },
+    {
+      "max_error_rate": 0.0021085103508085012
+    },
+    {
+      "sum_downtime": 2575.3955078125
+    },
+    {
+      "maintenance_present": 0.24953924119472504
+    },
+    {
+      "min_efficiency": 0.01213084813207388
+    },
+    {
+      "last_production_status": 0.003907345235347748
+    },
+    {
+      "max_error_rate": 0.0020980099216103554
+    },
+    {
+      "sum_downtime": 2554.2041015625
+    },
+    {
+      "maintenance_present": 0.25080642104148865
+    },
+    {
+      "min_efficiency": 0.01623079553246498
+    },
+    {
+      "last_production_status": 0.004570067394524813
+    },
+    {
+      "max_error_rate": 0.002137459348887205
+    },
+    {
+      "sum_downtime": 2532.529541015625
+    },
+    {
+      "maintenance_present": 0.2558802664279938
+    },
+    {
+      "min_efficiency": 0.015311645343899727
+    },
+    {
+      "last_production_status": 0.004735779948532581
+    },
+    {
+      "max_error_rate": 0.0021486503537744284
+    },
+    {
+      "sum_downtime": 2519.65966796875
+    },
+    {
+      "maintenance_present": 0.25878915190696716
+    },
+    {
+      "min_efficiency": 0.012452603317797184
+    },
+    {
+      "last_production_status": 0.004889543168246746
+    }
+  ]
+}

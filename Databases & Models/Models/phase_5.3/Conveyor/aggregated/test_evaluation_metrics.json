@@ -1,0 +1,42 @@
+{
+  "per_target_metrics": {
+    "max_error_rate": {
+      "mae": 0.03902171179652214,
+      "rmse": 0.058670395154360656,
+      "mape": 4.303501605987549
+    },
+    "sum_downtime": {
+      "mae": 29.47274398803711,
+      "rmse": 39.90012402813978,
+      "mape": 14.962614059448242
+    },
+    "maintenance_present": {
+      "precision": 0.7142857142857143,
+      "recall": 1.0,
+      "f1": 0.8333333333333334,
+      "auc": 0.39387755102040817,
+      "threshold": 0.5
+    },
+    "min_efficiency": {
+      "mae": 0.15125451982021332,
+      "rmse": 0.17539789996107902,
+      "mape": 129680498688.0
+    },
+    "last_production_status": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "auc": NaN,
+      "threshold": 0.5
+    }
+  },
+  "model_path": "C:\\Users\\HUAWEI\\School\\SP\\NAISC x Huawei Hackathon\\AnomalyIQ\\AnomalyIQ\\Databases & Models\\Models\\phase_5.3\\Conveyor\\aggregated\\best_model.h5",
+  "num_samples": 49,
+  "target_names": [
+    "max_error_rate",
+    "sum_downtime",
+    "maintenance_present",
+    "min_efficiency",
+    "last_production_status"
+  ]
+}

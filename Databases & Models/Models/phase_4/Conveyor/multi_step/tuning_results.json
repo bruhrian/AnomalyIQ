@@ -1,0 +1,322 @@
+[
+  {
+    "params": {
+      "filters": 64,
+      "kernel_size": 3,
+      "dense_units": 64,
+      "dropout_rate": 0.2,
+      "learning_rate": 0.001
+    },
+    "best_val_loss": 0.7192966341972351
+  },
+  {
+    "params": {
+      "filters": 64,
+      "kernel_size": 3,
+      "dense_units": 64,
+      "dropout_rate": 0.2,
+      "learning_rate": 0.0005
+    },
+    "best_val_loss": 0.7197305560112
+  },
+  {
+    "params": {
+      "filters": 64,
+      "kernel_size": 3,
+      "dense_units": 64,
+      "dropout_rate": 0.3,
+      "learning_rate": 0.001
+    },
+    "best_val_loss": 0.7194574475288391
+  },
+  {
+    "params": {
+      "filters": 64,
+      "kernel_size": 3,
+      "dense_units": 64,
+      "dropout_rate": 0.3,
+      "learning_rate": 0.0005
+    },
+    "best_val_loss": 0.7185611724853516
+  },
+  {
+    "params": {
+      "filters": 64,
+      "kernel_size": 3,
+      "dense_units": 128,
+      "dropout_rate": 0.2,
+      "learning_rate": 0.001
+    },
+    "best_val_loss": 0.7193946838378906
+  },
+  {
+    "params": {
+      "filters": 64,
+      "kernel_size": 3,
+      "dense_units": 128,
+      "dropout_rate": 0.2,
+      "learning_rate": 0.0005
+    },
+    "best_val_loss": 0.7190058827400208
+  },
+  {
+    "params": {
+      "filters": 64,
+      "kernel_size": 3,
+      "dense_units": 128,
+      "dropout_rate": 0.3,
+      "learning_rate": 0.001
+    },
+    "best_val_loss": 0.7194042205810547
+  },
+  {
+    "params": {
+      "filters": 64,
+      "kernel_size": 3,
+      "dense_units": 128,
+      "dropout_rate": 0.3,
+      "learning_rate": 0.0005
+    },
+    "best_val_loss": 0.719012439250946
+  },
+  {
+    "params": {
+      "filters": 64,
+      "kernel_size": 5,
+      "dense_units": 64,
+      "dropout_rate": 0.2,
+      "learning_rate": 0.001
+    },
+    "best_val_loss": 0.7191161513328552
+  },
+  {
+    "params": {
+      "filters": 64,
+      "kernel_size": 5,
+      "dense_units": 64,
+      "dropout_rate": 0.2,
+      "learning_rate": 0.0005
+    },
+    "best_val_loss": 0.718863308429718
+  },
+  {
+    "params": {
+      "filters": 64,
+      "kernel_size": 5,
+      "dense_units": 64,
+      "dropout_rate": 0.3,
+      "learning_rate": 0.001
+    },
+    "best_val_loss": 0.7188739776611328
+  },
+  {
+    "params": {
+      "filters": 64,
+      "kernel_size": 5,
+      "dense_units": 64,
+      "dropout_rate": 0.3,
+      "learning_rate": 0.0005
+    },
+    "best_val_loss": 0.718768298625946
+  },
+  {
+    "params": {
+      "filters": 64,
+      "kernel_size": 5,
+      "dense_units": 128,
+      "dropout_rate": 0.2,
+      "learning_rate": 0.001
+    },
+    "best_val_loss": 0.7193460464477539
+  },
+  {
+    "params": {
+      "filters": 64,
+      "kernel_size": 5,
+      "dense_units": 128,
+      "dropout_rate": 0.2,
+      "learning_rate": 0.0005
+    },
+    "best_val_loss": 0.718576192855835
+  },
+  {
+    "params": {
+      "filters": 64,
+      "kernel_size": 5,
+      "dense_units": 128,
+      "dropout_rate": 0.3,
+      "learning_rate": 0.001
+    },
+    "best_val_loss": 0.7179656028747559
+  },
+  {
+    "params": {
+      "filters": 64,
+      "kernel_size": 5,
+      "dense_units": 128,
+      "dropout_rate": 0.3,
+      "learning_rate": 0.0005
+    },
+    "best_val_loss": 0.7192084789276123
+  },
+  {
+    "params": {
+      "filters": 128,
+      "kernel_size": 3,
+      "dense_units": 64,
+      "dropout_rate": 0.2,
+      "learning_rate": 0.001
+    },
+    "best_val_loss": 0.7177667021751404
+  },
+  {
+    "params": {
+      "filters": 128,
+      "kernel_size": 3,
+      "dense_units": 64,
+      "dropout_rate": 0.2,
+      "learning_rate": 0.0005
+    },
+    "best_val_loss": 0.7188937067985535
+  },
+  {
+    "params": {
+      "filters": 128,
+      "kernel_size": 3,
+      "dense_units": 64,
+      "dropout_rate": 0.3,
+      "learning_rate": 0.001
+    },
+    "best_val_loss": 0.7187169194221497
+  },
+  {
+    "params": {
+      "filters": 128,
+      "kernel_size": 3,
+      "dense_units": 64,
+      "dropout_rate": 0.3,
+      "learning_rate": 0.0005
+    },
+    "best_val_loss": 0.7187633514404297
+  },
+  {
+    "params": {
+      "filters": 128,
+      "kernel_size": 3,
+      "dense_units": 128,
+      "dropout_rate": 0.2,
+      "learning_rate": 0.001
+    },
+    "best_val_loss": 0.7178847193717957
+  },
+  {
+    "params": {
+      "filters": 128,
+      "kernel_size": 3,
+      "dense_units": 128,
+      "dropout_rate": 0.2,
+      "learning_rate": 0.0005
+    },
+    "best_val_loss": 0.7188124060630798
+  },
+  {
+    "params": {
+      "filters": 128,
+      "kernel_size": 3,
+      "dense_units": 128,
+      "dropout_rate": 0.3,
+      "learning_rate": 0.001
+    },
+    "best_val_loss": 0.7190475463867188
+  },
+  {
+    "params": {
+      "filters": 128,
+      "kernel_size": 3,
+      "dense_units": 128,
+      "dropout_rate": 0.3,
+      "learning_rate": 0.0005
+    },
+    "best_val_loss": 0.7190468311309814
+  },
+  {
+    "params": {
+      "filters": 128,
+      "kernel_size": 5,
+      "dense_units": 64,
+      "dropout_rate": 0.2,
+      "learning_rate": 0.001
+    },
+    "best_val_loss": 0.7183567881584167
+  },
+  {
+    "params": {
+      "filters": 128,
+      "kernel_size": 5,
+      "dense_units": 64,
+      "dropout_rate": 0.2,
+      "learning_rate": 0.0005
+    },
+    "best_val_loss": 0.7191228866577148
+  },
+  {
+    "params": {
+      "filters": 128,
+      "kernel_size": 5,
+      "dense_units": 64,
+      "dropout_rate": 0.3,
+      "learning_rate": 0.001
+    },
+    "best_val_loss": 0.7190665602684021
+  },
+  {
+    "params": {
+      "filters": 128,
+      "kernel_size": 5,
+      "dense_units": 64,
+      "dropout_rate": 0.3,
+      "learning_rate": 0.0005
+    },
+    "best_val_loss": 0.7191793322563171
+  },
+  {
+    "params": {
+      "filters": 128,
+      "kernel_size": 5,
+      "dense_units": 128,
+      "dropout_rate": 0.2,
+      "learning_rate": 0.001
+    },
+    "best_val_loss": 0.7192251682281494
+  },
+  {
+    "params": {
+      "filters": 128,
+      "kernel_size": 5,
+      "dense_units": 128,
+      "dropout_rate": 0.2,
+      "learning_rate": 0.0005
+    },
+    "best_val_loss": 0.7188184261322021
+  },
+  {
+    "params": {
+      "filters": 128,
+      "kernel_size": 5,
+      "dense_units": 128,
+      "dropout_rate": 0.3,
+      "learning_rate": 0.001
+    },
+    "best_val_loss": 0.7188777327537537
+  },
+  {
+    "params": {
+      "filters": 128,
+      "kernel_size": 5,
+      "dense_units": 128,
+      "dropout_rate": 0.3,
+      "learning_rate": 0.0005
+    },
+    "best_val_loss": 0.7188447117805481
+  }
+]

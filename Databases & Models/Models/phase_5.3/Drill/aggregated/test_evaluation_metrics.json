@@ -1,0 +1,42 @@
+{
+  "per_target_metrics": {
+    "max_error_rate": {
+      "mae": 0.052954886108636856,
+      "rmse": 0.06786495633814477,
+      "mape": 5.8831963539123535
+    },
+    "sum_downtime": {
+      "mae": 92.41182708740234,
+      "rmse": 109.86260951183529,
+      "mape": 32.59696578979492
+    },
+    "maintenance_present": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "auc": 0.6782407407407408,
+      "threshold": 0.5
+    },
+    "min_efficiency": {
+      "mae": 0.32372725009918213,
+      "rmse": 0.33143382459973236,
+      "mape": 323727261696.0
+    },
+    "last_production_status": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "auc": NaN,
+      "threshold": 0.5
+    }
+  },
+  "model_path": "C:\\Users\\HUAWEI\\School\\SP\\NAISC x Huawei Hackathon\\AnomalyIQ\\AnomalyIQ\\Databases & Models\\Models\\phase_5.3\\Drill\\aggregated\\best_model.h5",
+  "num_samples": 43,
+  "target_names": [
+    "max_error_rate",
+    "sum_downtime",
+    "maintenance_present",
+    "min_efficiency",
+    "last_production_status"
+  ]
+}

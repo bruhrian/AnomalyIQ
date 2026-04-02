@@ -1,0 +1,42 @@
+{
+  "per_target_metrics": {
+    "max_error_rate": {
+      "mae": 0.09500327706336975,
+      "rmse": 0.09507829705303489,
+      "mape": 8.991472244262695
+    },
+    "sum_downtime": {
+      "mae": 18044.0,
+      "rmse": 19282.340936722387,
+      "mape": 98.93051147460938
+    },
+    "maintenance_present": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "auc": 0.23658536585365852,
+      "threshold": 0.5
+    },
+    "min_efficiency": {
+      "mae": 0.2809053957462311,
+      "rmse": 0.588405219158453,
+      "mape": 57379115008.0
+    },
+    "last_production_status": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "auc": NaN,
+      "threshold": 0.5
+    }
+  },
+  "model_path": "C:\\Users\\HUAWEI\\School\\SP\\NAISC x Huawei Hackathon\\AnomalyIQ\\AnomalyIQ\\Databases & Models\\Models\\phase_4.1\\CNC\\aggregated\\best_model.h5",
+  "num_samples": 51,
+  "target_names": [
+    "max_error_rate",
+    "sum_downtime",
+    "maintenance_present",
+    "min_efficiency",
+    "last_production_status"
+  ]
+}

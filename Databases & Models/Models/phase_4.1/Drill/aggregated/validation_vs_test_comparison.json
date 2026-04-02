@@ -1,0 +1,30 @@
+{
+  "max_error_rate": {
+    "val_mae": null,
+    "test_mae": 0.10830546170473099,
+    "mae_gap": null,
+    "test_rmse": 0.10960806130065857
+  },
+  "sum_downtime": {
+    "val_mae": null,
+    "test_mae": 28311.642578125,
+    "mae_gap": null,
+    "test_rmse": 29378.90726354539
+  },
+  "maintenance_present": {
+    "val_f1": null,
+    "test_f1": 0.0,
+    "f1_gap": null
+  },
+  "min_efficiency": {
+    "val_mae": null,
+    "test_mae": 0.37071171402931213,
+    "mae_gap": null,
+    "test_rmse": 0.40921996289423423
+  },
+  "last_production_status": {
+    "val_f1": null,
+    "test_f1": 0.0,
+    "f1_gap": null
+  }
+}

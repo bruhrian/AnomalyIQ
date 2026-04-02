@@ -1,0 +1,501 @@
+{
+  "per_target_metrics": {
+    "error_rate": {
+      "mae": 0.06464574486017227,
+      "rmse": 0.06492522403764132,
+      "mape": 7.532224178314209
+    },
+    "downtime": {
+      "mae": 250.34481811523438,
+      "rmse": 424.5557052672829,
+      "mape": 35.705020904541016
+    },
+    "maintenance_flag": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "auc": NaN,
+      "threshold": 0.5
+    },
+    "efficiency_score": {
+      "mae": 176.86529541015625,
+      "rmse": 214.0124759067798,
+      "mape": 75.34252166748047
+    },
+    "production_status": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "auc": NaN,
+      "threshold": 0.5
+    }
+  },
+  "per_timestep_metrics": {
+    "timestep_1": {
+      "error_rate": {
+        "mae": 0.0665455162525177,
+        "rmse": 0.06682353533368976,
+        "mape": 7.751101970672607
+      },
+      "downtime": {
+        "mae": 254.9668731689453,
+        "rmse": 426.995078279598,
+        "mape": 35.79205322265625
+      },
+      "maintenance_flag": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      },
+      "efficiency_score": {
+        "mae": 170.24691772460938,
+        "rmse": 207.97466417210535,
+        "mape": 75.84770202636719
+      },
+      "production_status": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      }
+    },
+    "timestep_2": {
+      "error_rate": {
+        "mae": 0.06278368085622787,
+        "rmse": 0.06304458940184852,
+        "mape": 7.3153204917907715
+      },
+      "downtime": {
+        "mae": 255.00473022460938,
+        "rmse": 427.0178933604539,
+        "mape": 35.99263000488281
+      },
+      "maintenance_flag": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      },
+      "efficiency_score": {
+        "mae": 173.35494995117188,
+        "rmse": 210.65454169682647,
+        "mape": 75.92317199707031
+      },
+      "production_status": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      }
+    },
+    "timestep_3": {
+      "error_rate": {
+        "mae": 0.06441865116357803,
+        "rmse": 0.06467865370301966,
+        "mape": 7.5064697265625
+      },
+      "downtime": {
+        "mae": 241.51556396484375,
+        "rmse": 415.28471031931815,
+        "mape": 35.48196029663086
+      },
+      "maintenance_flag": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      },
+      "efficiency_score": {
+        "mae": 178.25601196289062,
+        "rmse": 213.86937456073508,
+        "mape": 76.94364929199219
+      },
+      "production_status": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      }
+    },
+    "timestep_4": {
+      "error_rate": {
+        "mae": 0.06403574347496033,
+        "rmse": 0.06429629318650794,
+        "mape": 7.46309757232666
+      },
+      "downtime": {
+        "mae": 241.64756774902344,
+        "rmse": 415.6583257316037,
+        "mape": 34.80411911010742
+      },
+      "maintenance_flag": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      },
+      "efficiency_score": {
+        "mae": 179.96739196777344,
+        "rmse": 215.49339280764502,
+        "mape": 77.00799560546875
+      },
+      "production_status": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      }
+    },
+    "timestep_5": {
+      "error_rate": {
+        "mae": 0.0665254220366478,
+        "rmse": 0.06676972015725496,
+        "mape": 7.751843452453613
+      },
+      "downtime": {
+        "mae": 257.12200927734375,
+        "rmse": 430.76877135535256,
+        "mape": 36.21630096435547
+      },
+      "maintenance_flag": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      },
+      "efficiency_score": {
+        "mae": 175.78521728515625,
+        "rmse": 213.3131134623467,
+        "mape": 75.27657318115234
+      },
+      "production_status": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      }
+    },
+    "timestep_6": {
+      "error_rate": {
+        "mae": 0.06622643768787384,
+        "rmse": 0.0664748160419415,
+        "mape": 7.7170634269714355
+      },
+      "downtime": {
+        "mae": 257.2392578125,
+        "rmse": 430.85442001910576,
+        "mape": 36.75457763671875
+      },
+      "maintenance_flag": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      },
+      "efficiency_score": {
+        "mae": 176.23049926757812,
+        "rmse": 213.75430368474454,
+        "mape": 75.4334945678711
+      },
+      "production_status": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      }
+    },
+    "timestep_7": {
+      "error_rate": {
+        "mae": 0.06567715853452682,
+        "rmse": 0.06591904250789235,
+        "mape": 7.656946659088135
+      },
+      "downtime": {
+        "mae": 257.0321044921875,
+        "rmse": 430.4930313024823,
+        "mape": 36.81244659423828
+      },
+      "maintenance_flag": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      },
+      "efficiency_score": {
+        "mae": 181.505126953125,
+        "rmse": 218.96991624136407,
+        "mape": 75.61737060546875
+      },
+      "production_status": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      }
+    },
+    "timestep_8": {
+      "error_rate": {
+        "mae": 0.06410623341798782,
+        "rmse": 0.0643588626701799,
+        "mape": 7.4745378494262695
+      },
+      "downtime": {
+        "mae": 243.5925750732422,
+        "rmse": 419.10058085738797,
+        "mape": 35.548099517822266
+      },
+      "maintenance_flag": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      },
+      "efficiency_score": {
+        "mae": 186.6786346435547,
+        "rmse": 222.67494000504414,
+        "mape": 76.3158950805664
+      },
+      "production_status": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      }
+    },
+    "timestep_9": {
+      "error_rate": {
+        "mae": 0.06326864659786224,
+        "rmse": 0.06354192156558164,
+        "mape": 7.372994899749756
+      },
+      "downtime": {
+        "mae": 243.90980529785156,
+        "rmse": 419.5980591590004,
+        "mape": 35.804542541503906
+      },
+      "maintenance_flag": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      },
+      "efficiency_score": {
+        "mae": 181.3579864501953,
+        "rmse": 217.5135681831136,
+        "mape": 75.98868560791016
+      },
+      "production_status": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      }
+    },
+    "timestep_10": {
+      "error_rate": {
+        "mae": 0.06444476544857025,
+        "rmse": 0.06471139285756239,
+        "mape": 7.510010242462158
+      },
+      "downtime": {
+        "mae": 243.78903198242188,
+        "rmse": 419.5404852335469,
+        "mape": 35.08771896362305
+      },
+      "maintenance_flag": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      },
+      "efficiency_score": {
+        "mae": 181.3085174560547,
+        "rmse": 217.42256164552012,
+        "mape": 76.17589569091797
+      },
+      "production_status": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      }
+    },
+    "timestep_11": {
+      "error_rate": {
+        "mae": 0.06579983979463577,
+        "rmse": 0.06606184833745646,
+        "mape": 7.667069911956787
+      },
+      "downtime": {
+        "mae": 243.5955352783203,
+        "rmse": 419.39519325452454,
+        "mape": 34.19881820678711
+      },
+      "maintenance_flag": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      },
+      "efficiency_score": {
+        "mae": 179.82005310058594,
+        "rmse": 215.60305141915316,
+        "mape": 76.01829528808594
+      },
+      "production_status": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      }
+    },
+    "timestep_12": {
+      "error_rate": {
+        "mae": 0.06349644809961319,
+        "rmse": 0.06376356386126526,
+        "mape": 7.397483825683594
+      },
+      "downtime": {
+        "mae": 257.58111572265625,
+        "rmse": 431.43512330940325,
+        "mape": 36.726200103759766
+      },
+      "maintenance_flag": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      },
+      "efficiency_score": {
+        "mae": 174.4718475341797,
+        "rmse": 212.05471729013718,
+        "mape": 74.24836730957031
+      },
+      "production_status": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      }
+    },
+    "timestep_13": {
+      "error_rate": {
+        "mae": 0.06442325562238693,
+        "rmse": 0.06473460289668491,
+        "mape": 7.50216007232666
+      },
+      "downtime": {
+        "mae": 257.4618225097656,
+        "rmse": 431.38200878108023,
+        "mape": 36.01787185668945
+      },
+      "maintenance_flag": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      },
+      "efficiency_score": {
+        "mae": 170.8333740234375,
+        "rmse": 210.37304106336916,
+        "mape": 72.71067810058594
+      },
+      "production_status": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      }
+    },
+    "timestep_14": {
+      "error_rate": {
+        "mae": 0.06359472125768661,
+        "rmse": 0.06388781911333279,
+        "mape": 7.405413627624512
+      },
+      "downtime": {
+        "mae": 257.35162353515625,
+        "rmse": 431.2718835027389,
+        "mape": 35.63650894165039
+      },
+      "maintenance_flag": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      },
+      "efficiency_score": {
+        "mae": 170.11871337890625,
+        "rmse": 209.47001575404533,
+        "mape": 72.49009704589844
+      },
+      "production_status": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      }
+    },
+    "timestep_15": {
+      "error_rate": {
+        "mae": 0.06433971971273422,
+        "rmse": 0.06465381746869468,
+        "mape": 7.491837501525879
+      },
+      "downtime": {
+        "mae": 243.36276245117188,
+        "rmse": 418.87106458909284,
+        "mape": 34.70151901245117
+      },
+      "maintenance_flag": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      },
+      "efficiency_score": {
+        "mae": 173.04420471191406,
+        "rmse": 210.51673775498233,
+        "mape": 74.1397933959961
+      },
+      "production_status": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "auc": NaN,
+        "threshold": 0.5
+      }
+    }
+  },
+  "model_path": "C:\\Users\\HUAWEI\\School\\SP\\NAISC x Huawei Hackathon\\AnomalyIQ\\AnomalyIQ\\Databases & Models\\Models\\phase_5.3\\Welder\\multi_step\\best_model.h5"
+}

@@ -1,0 +1,58 @@
+{
+  "CNC": {
+    "multi_step": {
+      "best_val_loss": 0.9736186265945435,
+      "best_val_mae": 0.6399258971214294,
+      "total_epochs": 14,
+      "scaler": "standard"
+    },
+    "aggregated": {
+      "best_val_loss": 2.154700517654419,
+      "best_val_mae": 0.7032989263534546,
+      "total_epochs": 36,
+      "scaler": "robust"
+    }
+  },
+  "Conveyor": {
+    "multi_step": {
+      "best_val_loss": 0.7194655537605286,
+      "best_val_mae": 0.5965107083320618,
+      "total_epochs": 14,
+      "scaler": "standard"
+    },
+    "aggregated": {
+      "best_val_loss": 0.1383167952299118,
+      "best_val_mae": 0.21049080789089203,
+      "total_epochs": 14,
+      "scaler": "robust"
+    }
+  },
+  "Drill": {
+    "multi_step": {
+      "best_val_loss": 0.9789484739303589,
+      "best_val_mae": 0.6332839727401733,
+      "total_epochs": 14,
+      "scaler": "standard"
+    },
+    "aggregated": {
+      "best_val_loss": 0.2791101038455963,
+      "best_val_mae": 0.358382910490036,
+      "total_epochs": 11,
+      "scaler": "robust"
+    }
+  },
+  "Welder": {
+    "multi_step": {
+      "best_val_loss": 0.814100444316864,
+      "best_val_mae": 0.6056899428367615,
+      "total_epochs": 13,
+      "scaler": "standard"
+    },
+    "aggregated": {
+      "best_val_loss": 0.17696979641914368,
+      "best_val_mae": 0.2693830132484436,
+      "total_epochs": 12,
+      "scaler": "robust"
+    }
+  }
+}
