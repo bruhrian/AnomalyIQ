@@ -25,20 +25,20 @@ T_out = 15 # number of future rows to predict
 
 MACHINE_CONFIG = {
     'CNC': {
-        'use_weighted_loss': False,   # Test: weighted loss helps with extreme downtime?
-        'use_class_weights': True    # Test: class weights help with maintenance?
+        'use_weighted_loss': False,   
+        'use_class_weights': True   
     },
     'Conveyor': {
-        'use_weighted_loss': False,  # Conveyor already performs well with standard
-        'use_class_weights': True    # Keep class weights (helped in Option D)
+        'use_weighted_loss': False, 
+        'use_class_weights': True   
     },
     'Drill': {
-        'use_weighted_loss': False,   # Test if weighted loss helps Drill
-        'use_class_weights': False   # Class weights hurt Drill in Option D
+        'use_weighted_loss': False,  
+        'use_class_weights': False   
     },
     'Welder': {
-        'use_weighted_loss': False,  # Weighted loss hurt Welder in previous test
-        'use_class_weights': False    # Keep class weights (Welder needs maintenance help)
+        'use_weighted_loss': False,  
+        'use_class_weights': False   
     }
 }
 
@@ -147,16 +147,7 @@ def extract_machine_type(csv_path):
     return machine_type
 
 def calculate_maintenance_class_weights(y_train):
-    """
-    Calculate class weights for maintenance_present to handle imbalance
-    
-    Args:
-        y_train: Training aggregated targets (shape: n_samples, n_features)
-    
-    Returns:
-        Dictionary with class weights for binary classification
-    """
-    maintenance_labels = y_train[:, 2]  # maintenance_present is at index 2
+    maintenance_labels = y_train[:, 2]  
     
     neg_count = np.sum(maintenance_labels == 0)
     pos_count = np.sum(maintenance_labels == 1)
@@ -175,10 +166,6 @@ def calculate_maintenance_class_weights(y_train):
     return {0: weight_for_0, 1: weight_for_1}
 
 def weighted_mse(y_true, y_pred):
-    """
-    Weighted MSE that gives higher weight to larger sum_downtime values
-    This helps the model pay more attention to extreme downtime events
-    """
     y_true_downtime = y_true[:, 1:2]
     y_pred_downtime = y_pred[:, 1:2]
     
@@ -258,9 +245,6 @@ def build_aggregated_cnn(input_shape, num_aggregated_features, use_weighted_loss
     return model
 
 class PerTargetMetricCallback(Callback):
-    """
-    Custom callback to track per-target metrics during validation
-    """
     def __init__(self, validation_data, target_names, scaler_y=None, is_sequence=False):
         super().__init__()
         self.validation_data = validation_data
@@ -292,26 +276,21 @@ class PerTargetMetricCallback(Callback):
                 y_pred = self.scaler_y.inverse_transform(y_pred)
                 y_val = self.scaler_y.inverse_transform(y_val)
         
-        # Calculate per-target metrics
         for i, target_name in enumerate(self.target_names):
             if self.is_sequence:
-                # For sequence prediction, aggregate over timesteps
                 y_pred_target = y_pred[:, :, i].flatten()
                 y_val_target = y_val[:, :, i].flatten()
             else:
-                # For aggregated prediction
                 y_pred_target = y_pred[:, i]
                 y_val_target = y_val[:, i]
             
             mae = mean_absolute_error(y_val_target, y_pred_target)
             mse = mean_squared_error(y_val_target, y_pred_target)
             
-            # Store metrics
             if f'val_{target_name}_mae' not in logs:
                 logs[f'val_{target_name}_mae'] = mae
                 logs[f'val_{target_name}_mse'] = mse
             
-            # Track in callback storage
             if target_name not in self.val_per_target_metrics['mae']:
                 self.val_per_target_metrics['mae'].append({})
                 self.val_per_target_metrics['mse'].append({})
@@ -326,9 +305,6 @@ class PerTargetMetricCallback(Callback):
             self.val_per_target_metrics['mse'][epoch_idx][target_name] = mse
 
 class BinaryMetricCallback(Callback):
-    """
-    Custom callback to track binary classification metrics during validation
-    """
     def __init__(self, validation_data, binary_target_names, threshold=0.5, scaler_y=None, is_sequence=False):
         super().__init__()
         self.validation_data = validation_data
@@ -341,10 +317,8 @@ class BinaryMetricCallback(Callback):
     def on_epoch_end(self, epoch, logs=None):
         X_val, y_val = self.validation_data
         
-        # Get predictions
         y_pred = self.model.predict(X_val, verbose=0)
         
-        # Inverse transform if scaler exists
         if self.scaler_y is not None:
             if self.is_sequence:
                 original_shape = y_pred.shape
@@ -360,7 +334,6 @@ class BinaryMetricCallback(Callback):
                 y_pred = self.scaler_y.inverse_transform(y_pred)
                 y_val = self.scaler_y.inverse_transform(y_val)
         
-        # Calculate per-target binary metrics
         epoch_metrics = {}
         for target_name in self.binary_target_names:
             # Find index of this target
@@ -374,20 +347,16 @@ class BinaryMetricCallback(Callback):
                 continue
             
             if self.is_sequence:
-                # For sequence, take last timestep or aggregate?
-                # Using last timestep for production_status, presence for maintenance_flag
                 if target_name == 'maintenance_flag':
-                    # Any maintenance in sequence
                     y_pred_target = (y_pred[:, :, target_idx] > self.threshold).any(axis=1).astype(int)
                     y_val_target = (y_val[:, :, target_idx] > 0.5).any(axis=1).astype(int)
-                else:  # production_status
+                else:  
                     y_pred_target = (y_pred[:, -1, target_idx] > self.threshold).astype(int)
                     y_val_target = (y_val[:, -1, target_idx] > 0.5).astype(int)
             else:
                 y_pred_target = (y_pred[:, target_idx] > self.threshold).astype(int)
                 y_val_target = (y_val[:, target_idx] > 0.5).astype(int)
-            
-            # Calculate metrics
+     
             precision = precision_score(y_val_target, y_pred_target, zero_division=0)
             recall = recall_score(y_val_target, y_pred_target, zero_division=0)
             f1 = f1_score(y_val_target, y_pred_target, zero_division=0)
@@ -401,19 +370,16 @@ class BinaryMetricCallback(Callback):
             epoch_metrics[f'val_{target_name}_recall'] = recall
             epoch_metrics[f'val_{target_name}_f1'] = f1
             epoch_metrics[f'val_{target_name}_auc'] = auc
-            
-            # Update logs
+    
             for key, value in epoch_metrics.items():
                 logs[key] = value
-            
-            # Store in callback
+           
             self.val_binary_metrics['precision'].append(epoch_metrics.get(f'val_{target_name}_precision', 0))
             self.val_binary_metrics['recall'].append(epoch_metrics.get(f'val_{target_name}_recall', 0))
             self.val_binary_metrics['f1'].append(epoch_metrics.get(f'val_{target_name}_f1', 0))
             self.val_binary_metrics['auc'].append(epoch_metrics.get(f'val_{target_name}_auc', 0))
 
 def save_scaler(scaler, save_path):
-    """Save scaler to disk"""
     with open(save_path, 'wb') as f:
         pickle.dump(scaler, f)
     print(f"  Scaler saved to {save_path}")
@@ -449,11 +415,9 @@ def train_multi_step_model(X_train, y_train, X_val, y_val, machine_type, save_di
     model = build_multi_step_cnn(input_shape, output_shape)
     model.summary()
 
-    # Target names for per-target metrics
     target_names = ['error_rate', 'downtime', 'maintenance_flag', 'efficiency_score', 'production_status']
     binary_targets = ['maintenance_flag', 'production_status']
     
-    # Custom callbacks for per-target metrics
     per_target_callback = PerTargetMetricCallback(
         validation_data=(X_val_scaled, y_val_scaled),
         target_names=target_names,
@@ -522,7 +486,6 @@ def train_aggregated_model(X_train, y_train, X_val, y_val, machine_type, save_di
     print(f"Training AGGREGATED model for {machine_type}")
     print(f"{'='*60}")
     
-    # Get configuration for this machine type
     config = MACHINE_CONFIG.get(machine_type, {'use_weighted_loss': False, 'use_class_weights': False})
     use_weighted_loss = config['use_weighted_loss']
     use_class_weights = config['use_class_weights']
@@ -553,7 +516,6 @@ def train_aggregated_model(X_train, y_train, X_val, y_val, machine_type, save_di
     model = build_aggregated_cnn(input_shape, num_features, use_weighted_loss=use_weighted_loss)
     model.summary()
     
-    # Calculate class weights only if enabled
     class_weights = None
     if use_class_weights:
         class_weights = calculate_maintenance_class_weights(y_train)
@@ -622,7 +584,6 @@ def train_aggregated_model(X_train, y_train, X_val, y_val, machine_type, save_di
     with open(os.path.join(model_dir, 'per_target_metrics.json'), 'w') as f:
         json.dump(per_target_callback.val_per_target_metrics, f, indent=2)
     
-    # Save configuration used for this model
     config_path = os.path.join(model_dir, 'training_config.json')
     with open(config_path, 'w') as f:
         json.dump(config, f, indent=2)
