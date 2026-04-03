@@ -1,3 +1,6 @@
+# TODO list
+# - Will need to see which embedding model to switch to
+
 import ollama
 import os
 from dotenv import load_dotenv
