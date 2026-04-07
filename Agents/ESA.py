@@ -1,20 +1,15 @@
-# TODO list:
-# - Test initial agent
-
-from langchain_openrouter import ChatOpenRouter
+from langchain_ollama import ChatOllama
 from dotenv import load_dotenv
 from pydantic import BaseModel
 import os, time
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_classic.agents import AgentExecutor, create_tool_calling_agent
-from Agents.init import search_tool, RAG_soln_tool
-from typing import Dict, Optional 
+from typing import Optional 
 
 load_dotenv()
-api_key = os.getenv('OPENROUTER_KEY')
 ESA_prompt = os.getenv('ESA_prompt_template')
-model="qwen/qwen3.6-plus:free"
+model="gemma4:e4b"
 
 class ESA_Response(BaseModel):
     Impact_analysis: str
@@ -23,11 +18,9 @@ class ESA_Response(BaseModel):
     tools_used: list[str]
     sources: list[str]
     
-
 def ESA_response(coordinator_input: str, context: Optional[str] = None):
-    llm = ChatOpenRouter(
-        model=model,
-        api_key=api_key
+    llm = ChatOllama(
+        model=model
     )
 
     with open(ESA_prompt, 'r') as f:
@@ -45,7 +38,7 @@ def ESA_response(coordinator_input: str, context: Optional[str] = None):
         ]
     ).partial(format_instructions=parser.get_format_instructions())
 
-    tools = [search_tool, RAG_soln_tool]
+    tools = []
 
     agent = create_tool_calling_agent(
         llm=llm,
@@ -65,7 +58,7 @@ def ESA_response(coordinator_input: str, context: Optional[str] = None):
             {
                 "context": context or "No additional context provided",
                 "coordinator_input": coordinator_input
-             },
+            },
         )
         output = raw_res.get("output", "")
         parsed_res = parser.parse(output)
