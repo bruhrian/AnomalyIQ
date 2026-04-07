@@ -14,7 +14,7 @@ from typing import Dict, Optional
 load_dotenv()
 api_key = os.getenv('OPENROUTER_KEY')
 ESA_prompt = os.getenv('ESA_prompt_template')
-model="qwen/qwen3-vl-30b-a3b-thinking"
+model="qwen/qwen3.6-plus:free"
 
 class ESA_Response(BaseModel):
     Impact_analysis: str
