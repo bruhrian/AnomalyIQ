@@ -7,7 +7,7 @@ import time
 import sys
 from datetime import datetime
 
-CSV_PATH = "Production System Dataset.csv"
+CSV_PATH = "../Data/Datasets/main dataset/Production System Dataset.csv"
 INTERVAL_SECONDS = 1 # Change to 10 or 3 for faster streaming
 
 app = FastAPI()
