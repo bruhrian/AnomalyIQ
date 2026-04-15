@@ -20,10 +20,10 @@ DB_PATH = str(Path(_raw_db_path))
 
 DEFAULT_SESSION_ID = "ca-default-session"
 
-if not os.getenv('orc_memory_db'):
+if not os.getenv('ca_memory_db'):
     print(f"⚠️  Warning: ca_memory_db not set, using default: {DB_PATH}")
 else:
-    print(f"✅ orc_memory_db resolved to: {DB_PATH}")
+    print(f"✅ ca_memory_db resolved to: {DB_PATH}")
 
 def init_sqlite_db(db_path: str = DB_PATH) -> bool:
     try:
