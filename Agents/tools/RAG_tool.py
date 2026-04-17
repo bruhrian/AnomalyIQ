@@ -1,177 +1,110 @@
-# TODO list
-# - Will need to see which embedding model to switch to
-
-import ollama
-import os
+import asyncio, io, base64, os, pdfplumber, ollama  
+from lightrag import LightRAG, QueryParam
+from lightrag.llm.ollama import ollama_model_complete, ollama_embed
+from lightrag.utils import EmbeddingFunc
+from sentence_transformers import CrossEncoder
+from lightrag.kg.shared_storage import initialize_pipeline_status
+from lightrag.utils import setup_logger
+from huggingface_hub import login
+import neo4j
 from dotenv import load_dotenv
-from qdrant_client import QdrantClient, models
-import time
 
 load_dotenv()
+HF_TOKEN = os.getenv('HF_TOKEN')
 
-qdrantClient = QdrantClient(path=os.getenv('VectorStoreDB'))
-collection_name = "anomaly_soln_storage"
-search_limit = 3
-view_limit = 100
 
-model = 'qwen3-embedding:0.6b'
-model_dims=1024
+WORKING_DIR = r"D:\brian\2pdf"
+setup_logger("lightrag", level="INFO")
+os.makedirs(WORKING_DIR, exist_ok=True)
 
-def create_vDB():
-    qdrantClient.create_collection(
-        collection_name=collection_name,
-        vectors_config=models.VectorParams(
-            size=model_dims,
-            distance=models.Distance.COSINE,
+# Storage Mode (for querying, e.g., "hybrid")
+MODE = "hybrid" 
+COMPLETION_MODEL = "gemma4:e4b"
+EMBEDDING_MODEL = "nomic-embed-text"
+RERANK_MODEL = "BAAI/bge-reranker-v2-m3"
+
+FOLDER_PATH = r"D:\brian\2pdf"
+
+
+os.environ["POSTGRES_HOST"] = os.getenv('PG_HOST')  
+os.environ["POSTGRES_PORT"] = os.getenv('PG_PORT')
+os.environ["POSTGRES_USER"] = os.getenv('PG_USER')
+os.environ["POSTGRES_PASSWORD"] = os.getenv('PG_PASSWORD')
+os.environ["POSTGRES_DATABASE"] = os.getenv('PG_LIGHTRAG')
+POSTGRES_WORKSPACE = "default" # Make sure js give lightrag an abt empty db for it to generate its things in postgres
+
+os.environ["NEO4J_URI"] = os.getenv('NEO4J_URI')
+os.environ["NEO4J_USERNAME"] = os.getenv('NEO4J_USER')
+os.environ["NEO4J_PASSWORD"] = os.getenv('NEO4J_PASS')
+os.environ["NEO4J_DATABASE"] = os.getenv('NEO4J_DB')
+
+reranker = CrossEncoder(RERANK_MODEL, device="cuda")
+
+def rerank_func(query: str, documents: list[str]) -> list[float]:
+    pairs = [(query, doc) for doc in documents]
+    scores = reranker.predict(pairs)
+    return scores.tolist()
+
+rag = LightRAG(
+    working_dir=WORKING_DIR,
+    llm_model_func=ollama_model_complete,
+    llm_model_name=COMPLETION_MODEL,                      
+    llm_model_kwargs={"options": {"num_ctx": 32768}},
+    embedding_func=EmbeddingFunc(
+        embedding_dim=768,
+        max_token_size=8192,
+        func=lambda texts: ollama_embed(
+            texts,
+            embed_model=EMBEDDING_MODEL
         )
+    ),
+    rerank_model_func=rerank_func,
+
+    kv_storage="PGKVStorage",
+    vector_storage="PGVectorStorage",
+    doc_status_storage="PGDocStatusStorage",
+    graph_storage="Neo4JStorage", 
+)
+
+def page_to_base64(page) -> str:
+    img = page.to_image(resolution=150).original
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+    return base64.b64encode(buffer.getvalue()).decode()
+
+def summarize_page(image_b64: str) -> str:
+    response = ollama.chat(
+        model=COMPLETION_MODEL,  
+        messages=[{
+            "role": "user",
+            "content": "Summarise this page in detail. Include tables, diagrams, and key data.",
+            "images": [image_b64]
+        }]
     )
-    print("Database created!")
+    return response["message"]["content"]
 
-class RAG_solution:
-    def __init__(self, anomaly_soln: str, metadata):
-        self.anomaly_soln = anomaly_soln
-        self.metadata = metadata
+def process_pdf(file_path: str) -> str:
+    all_text = []
+    with pdfplumber.open(file_path) as pdf:
+        for i, page in enumerate(pdf.pages, start=1):
+            print(f"Processing page {i}/{len(pdf.pages)}...")
+            image_b64 = page_to_base64(page)
+            summary = summarize_page(image_b64)
+            all_text.append(f"[Page {i}]\n{summary}")
+    return "\n\n".join(all_text)
 
-    def retrieve(self, anomaly: str):
-        anomaly_embed = ollama.embed(
-            model=model,
-            input=anomaly,
-            dimensions=model_dims
-        )
-
-        input_vector = anomaly_embed['embeddings'][0]
-
-        search_results = qdrantClient.query_points(
-            collection_name=collection_name,
-            query=input_vector,
-            limit=search_limit
-        )
-
-        points = search_results.points
-
-        if points:
-            best_match = points[0]
-            solution_text = best_match.payload['anomaly_soln_text']
-            similar_anomaly = best_match.payload['anomaly_soln_text']
-        
-            retAnomalySoln = {
-                "status": "success",
-                "anomaly": anomaly,
-                "referred_pair": similar_anomaly,  
-                "solution": solution_text,          
-                "similarity_score": best_match.score,
-                "metadata": best_match.payload['metadata']
-            }
-        
-        else:
-            retAnomalySoln = {
-                "status": "no match found",
-                "anomaly": anomaly,
-                "referred_pair": None,
-                "solution": None
-            }
-        
-        return retAnomalySoln
-
-    def addEmbeddings(self, anomaly_soln, metadata):
-        anomaly_soln_embed = ollama.embed(
-            model=model,
-            input=anomaly_soln,
-            dimensions=model_dims
-        )
-
-        new_vector = anomaly_soln_embed['embeddings'][0]
-        point_id = int(time.time() * 1000)
-
-        qdrantClient.upsert(
-            collection_name=collection_name,
-            points=[
-                models.PointStruct(
-                    id=point_id,
-                    vector=new_vector,
-                    payload={
-                        "anomaly_soln_text": anomaly_soln,
-                        "metadata": metadata,
-                    }
-                )
-            ]
-        )
-
-        status = {
-            "status": "New vectors added into the database",
-            "point_id": point_id,
-            "anomaly_soln": anomaly_soln,
-            "metadata": metadata,
-        }
-        
-        return status
-
-    def deleteEmbeddings(self, point_id):
-        try:
-            retrieved = qdrantClient.retrieve(
-                collection_name=collection_name,
-                ids=[point_id]
-            )
-            
-            if retrieved:
-                # Get the anomaly solution text from the payload
-                anomaly_soln = retrieved[0].payload.get('anomaly_soln_text', 'Unknown')
-                metadata = retrieved[0].payload.get('metadata', {})
-            else:
-                anomaly_soln = "Entry not found"
-                metadata = {}
-            
-        except Exception as e:
-            anomaly_soln = f"Error retrieving: {e}"
-            metadata = {}
-        
-        qdrantClient.delete(
-            collection_name=collection_name,
-            points_selector=[point_id]
-        )
+async def process_folder(folder_path: str):
+    pdf_files = [f for f in os.listdir(folder_path) if f.lower().endswith('.pdf')]
+    if not pdf_files:
+        print(f"No PDF files found in {folder_path}")
+        return
     
-        status = {
-            "status": "Vectors deleted from the database",
-            "point_id": point_id,
-            "deleted_anomaly_soln": anomaly_soln,
-            "deleted_metadata": metadata
-        }
+    print(f"Found {len(pdf_files)} PDF file(s) in {folder_path}")
+    for pdf_file in pdf_files:
+        file_path = os.path.join(folder_path, pdf_file)
+        print(f"\n--- Processing document: {pdf_file} ---")
+
+        doc_text = process_pdf(file_path)
         
-        return status
-    
-    def viewEntries(self, filter_condition=None, limit=view_limit):
-        if filter_condition:
-            # Scroll with filter
-            entries = qdrantClient.scroll(
-                collection_name=collection_name,
-                scroll_filter=filter_condition,
-                limit=limit,
-                with_payload=True,
-                with_vectors=False  # We don't need to see the vectors
-            )
-        else:
-            # Scroll all entries
-            entries = qdrantClient.scroll(
-                collection_name=collection_name,
-                limit=limit,
-                with_payload=True,
-                with_vectors=False
-            )
-        
-        points = entries[0]  # The actual points
-        
-        if not points:
-            print("No entries found in database")
-            return
-        
-        print(f"Found {len(points)} entries:")
-        print("-" * 80)
-        
-        for point in points:
-            print(f"Point ID: {point.id}")
-            print(f"Solution: {point.payload.get('anomaly_soln_text', 'N/A')[:100]}...")
-            print(f"Metadata: {point.payload.get('metadata', {})}")
-            print(f"Score: {point.score if hasattr(point, 'score') else 'N/A'}")
-            print("-" * 80)
-        
-        return points
+        print(f"Inserting {pdf_file} into LightRAG...")
+        await rag.ainsert(doc_text)
