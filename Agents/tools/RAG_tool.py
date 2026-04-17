@@ -8,6 +8,8 @@ from lightrag.utils import setup_logger
 from huggingface_hub import login
 import neo4j
 from dotenv import load_dotenv
+import nest_asyncio
+nest_asyncio.apply()
 
 load_dotenv()
 HF_TOKEN = os.getenv('HF_TOKEN')
@@ -110,7 +112,8 @@ async def process_folder(folder_path: str):
         await rag.ainsert(doc_text)
 
 def rag_query(query: str) -> str:
-    return asyncio.run(rag.aquery(
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(rag.aquery(
         query=query,
         param=QueryParam(mode=MODE)
     ))
