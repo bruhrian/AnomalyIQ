@@ -108,3 +108,9 @@ async def process_folder(folder_path: str):
         
         print(f"Inserting {pdf_file} into LightRAG...")
         await rag.ainsert(doc_text)
+
+def rag_query(query: str) -> str:
+    return asyncio.run(rag.aquery(
+        query=query,
+        param=QueryParam(mode=MODE)
+    ))
