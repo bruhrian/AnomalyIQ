@@ -6,46 +6,39 @@ from langchain_community.chat_message_histories import SQLChatMessageHistory
 from mcp.client.streamable_http import streamable_http_client
 from mcp import ClientSession
 from dotenv import load_dotenv
-from pathlib import Path
-import os, time, sqlite3
+import os, time, psycopg2
 
 load_dotenv()
 
-CA_PROMPT_PATH = os.getenv('ca_prompt')
+ORCHESTRATOR_PROMPT_PATH = os.getenv('ca_prompt')
 MODEL = "gemma4:e4b"
 MCP_SERVER_IP = os.getenv('mcp_server_ip')
+DEFAULT_SESSION_ID = "orchestrator-default-session"
 
-_raw_db_path = os.getenv('ca_memory_db') or './data/conversations.db'
-DB_PATH = str(Path(_raw_db_path))
-
-DEFAULT_SESSION_ID = "ca-default-session"
-
-if not os.getenv('ca_memory_db'):
-    print(f"⚠️  Warning: ca_memory_db not set, using default: {DB_PATH}")
+DB_CONN = os.getenv('agents_memory_db')
+if not DB_CONN:
+    raise ValueError("❌ agents_memory_db not set. Please add a PostgreSQL connection string to your .env")
 else:
-    print(f"✅ ca_memory_db resolved to: {DB_PATH}")
+    print(f"✅ Postgres connection string loaded.")
 
-def init_sqlite_db(db_path: str = DB_PATH) -> bool:
+def init_postgres_db(conn_string: str = DB_CONN) -> bool:
     try:
-        Path(db_path).parent.mkdir(parents=True, exist_ok=True)
-        conn = sqlite3.connect(str(db_path))
-        conn.execute("SELECT 1")
+        conn = psycopg2.connect(conn_string)
         conn.close()
-        print(f"✅ SQLite DB ready at: {db_path}")
+        print(f"✅ Postgres DB connection verified.")
         return True
     except Exception as e:
-        print(f"❌ Failed to initialise SQLite DB at '{db_path}': {e}")
+        print(f"❌ Failed to connect to Postgres: {e}")
         return False
 
-def get_session_history(session_id: str, db_path: str = DB_PATH) -> SQLChatMessageHistory:
+def get_session_history(session_id: str, conn_string: str = DB_CONN) -> SQLChatMessageHistory:
     return SQLChatMessageHistory(
         session_id=session_id,
-        connection_string=f"sqlite:///{db_path}"
+        connection_string=conn_string
     )
 
-
-def log_session_history(session_id: str, db_path: str = DB_PATH) -> None:
-    history = get_session_history(session_id, db_path)
+def log_session_history(session_id: str, conn_string: str = DB_CONN) -> None:
+    history = get_session_history(session_id, conn_string)
     messages: list[BaseMessage] = history.messages
     print(f"\n🔍 Chat history for session [{session_id}]:")
     if not messages:
@@ -58,13 +51,13 @@ def log_session_history(session_id: str, db_path: str = DB_PATH) -> None:
             preview += "..."
         print(f"   [{i}] {type(msg).__name__}: {preview}")
 
-async def ca_response(
+async def orchestrator_response(
     query: str,
     session_id: str | None = None,
-    db_path: str = DB_PATH
+    conn_string: str = DB_CONN
 ) -> dict:
 
-    if not init_sqlite_db(db_path):
+    if not init_postgres_db(conn_string):
         return {
             "result": "Agent could not start: memory database failed to initialise.",
             "error": "DB init failure",
@@ -77,9 +70,9 @@ async def ca_response(
     else:
         print(f"🔄 Resuming session: [{session_id}]")
 
-    log_session_history(session_id, db_path)
+    log_session_history(session_id, conn_string)
 
-    with open(CA_PROMPT_PATH, 'r', encoding='utf-8') as f:
+    with open(ORCHESTRATOR_PROMPT_PATH, 'r', encoding='utf-8') as f:
         system_prompt = f.read()
 
     llm = ChatOllama(model=MODEL)
@@ -95,7 +88,7 @@ async def ca_response(
                 prompt=system_prompt,
             )
 
-            history = get_session_history(session_id, db_path)
+            history = get_session_history(session_id, conn_string)
             messages_in = history.messages + [HumanMessage(content=query)]
 
             print(f"📨 Sending {len(messages_in)} message(s) to agent "f"({len(history.messages)} from history + 1 new)")
