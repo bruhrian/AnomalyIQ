@@ -1,9 +1,10 @@
+import sys
+sys.path.insert(0, r"C:\Users\jiang\AnomalyIQ")
 from fastmcp import FastMCP
 import asyncio
 from langchain_community.tools import DuckDuckGoSearchRun
 from dotenv import load_dotenv
 from Agents.ESA import ESA_response
-
 load_dotenv()
 
 agent_mcp = FastMCP(
