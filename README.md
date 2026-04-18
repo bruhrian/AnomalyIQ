@@ -35,7 +35,7 @@ AnomalyIQ is an industrial monitoring UI that combines real-time sensor tracking
 - **Agent Framework**: MCP & Langchain
 - **Backend**: FastAPI / Python
 - **Frontend**: React 
-- **Database**: Qdrant & PostgreSQL
+- **Database**: Neo4j & PostgreSQL
 - **Visualization**: Matplotlib
 
 
