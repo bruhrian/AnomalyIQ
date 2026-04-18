@@ -49,7 +49,7 @@ AnomalyIQ is an industrial monitoring UI that combines real-time sensor tracking
 ### Installation
 ```bash
 # Clone repository
-git clone https://github.com/your-team/AnomalyIQ.git
+git clone https://github.com/bruhrian/AnomalyIQ.git
 cd AnomalyIQ
 
 # Set up Python environment
@@ -68,10 +68,10 @@ cp .env.example .env
 
 Running the System
 # Start backend services
-python scripts/run_agents.py
+python MCP & Backend/main.py
 
 # Start frontend development server
-cd frontend
+cd Frontend
 npm start
 ```
 
@@ -90,24 +90,12 @@ pytest tests/
 pytest tests/integration_tests/
 ```
 
-🤝 Contributing
-Team members, please follow our contribution guidelines:
-
-Create feature branches (git checkout -b feature/AmazingFeature)
-
-Commit changes (git commit -m 'Add AmazingFeature')
-
-Push to branch (git push origin feature/AmazingFeature)
-
-Open a Pull Request
-
-
 📚 Documentation
 System Architecture
 
-Agent Communication Protocol
+MCP client server
 
-API Documentation
+FastAPIs for backend
 
 Setup Guide
 
