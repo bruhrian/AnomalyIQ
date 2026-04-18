@@ -28,7 +28,7 @@ AnomalyIQ is an industrial monitoring UI that combines real-time sensor tracking
 
 
 ## 🏗️ System Architecture
-<img width="1265" height="708" alt="image" src="https://github.com/user-attachments/assets/d0ecbb76-0d3a-4ca3-8b6b-664f4491db63" />
+<img width="1554" height="808" alt="image" src="https://github.com/user-attachments/assets/610224c8-d06a-4335-8450-038945e51e13" />
 
 ## 🛠️ Tech Stack
 - **AI/ML Framework**: TensorFlow 
