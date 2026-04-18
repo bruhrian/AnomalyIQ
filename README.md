@@ -21,7 +21,7 @@ AnomalyIQ is an industrial monitoring UI that combines real-time sensor tracking
 
 ## 🎯 Key Features
 1. **Multi-Agent Architecture**: Specialized agents collaborate to monitor, detect, predict, and explain system behaviors
-2. **Real-Time Anomaly Detection**: Advanced pattern recognition for cyber-physical threats
+2. **Real-Time Anomaly Detection**: Advanced pattern recognition for IoT production lines
 3. **Predictive Maintenance**: ML models forecasting equipment degradation and failure probabilities
 4. **Human-in-the-Loop Decision Support**: Explainable AI insights with actionable recommendations
 5. **Interactive Dashboard**: Intuitive visualization for situational awareness
