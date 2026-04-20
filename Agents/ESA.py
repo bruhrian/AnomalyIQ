@@ -6,6 +6,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_classic.agents import AgentExecutor, create_tool_calling_agent
 from typing import Optional 
+import asyncio
 
 load_dotenv()
 ESA_prompt = os.getenv('ESA_prompt_template')
@@ -18,7 +19,7 @@ class ESA_Response(BaseModel):
     tools_used: list[str]
     sources: list[str]
     
-def ESA_response(coordinator_input: str, context: Optional[str] = None):
+async def ESA_response(coordinator_input: str, context: Optional[str] = None):
     llm = ChatOllama(
         model=model
     )
@@ -54,12 +55,12 @@ def ESA_response(coordinator_input: str, context: Optional[str] = None):
 
     try:
         start_time = time.time()
-        raw_res=agent_exe.invoke(
-            {
-                "context": context or "No additional context provided",
-                "coordinator_input": coordinator_input
-            },
-        )
+        loop = asyncio.get_event_loop()
+        raw_res = await loop.run_in_executor(None, lambda: agent_exe.invoke({
+            "context": context or "No additional context provided",
+            "coordinator_input": coordinator_input
+        }))
+
         output = raw_res.get("output", "")
         parsed_res = parser.parse(output)
         final_res={
