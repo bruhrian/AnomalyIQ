@@ -450,10 +450,143 @@ nav {
       </div>
 
       <!-- Additional views (livefeed, analytics, status, profile) - add as needed -->
-      <div id="view-livefeed" class="view"><div class="vscroll"><div class="sec-label">📡 LIVE TELEMETRY</div><div style="color:var(--muted);padding:20px;">Real-time data stream</div></div></div>
-      <div id="view-analytics" class="view"><div class="vscroll"><div class="sec-label">📊 ANALYTICS</div><div style="color:var(--muted);padding:20px;">Predictive models</div></div></div>
-      <div id="view-status" class="view"><div class="vscroll"><div class="sec-label">🖥️ SYSTEM STATUS</div><div style="color:var(--muted);padding:20px;">All systems operational</div></div></div>
-      <div id="view-profile" class="view"><div class="vscroll"><div class="sec-label">👤 PROFILE</div><div style="color:var(--muted);padding:20px;">User settings</div></div></div>
+      <div id="view-livefeed" class="view">
+        <div class="vscroll" style="gap:14px;">
+          <div class="sec-label" style="margin-bottom:4px">📡 Live Telemetry — Real-time sensor data</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 14px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:10px;">
+              <span style="color:var(--muted)">Machine:</span>
+              <select id="chartMachine" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:10px;padding:3px 8px;border-radius:5px;outline:none;">
+                <option value="M001">M001 — CNC Machine</option>
+                <option value="M002">M002 — Conveyor</option>
+                <option value="M003">M003 — Drill</option>
+                <option value="M004">M004 — Welder</option>
+              </select>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 14px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:10px;">
+              <span style="color:var(--muted)">Field:</span>
+              <select id="chartField" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:10px;padding:3px 8px;border-radius:5px;outline:none;">
+                <option value="temperature">Temperature °C</option>
+                <option value="vibration_level">Vibration</option>
+                <option value="power_consumption">Power kW</option>
+                <option value="pressure">Pressure Pa</option>
+                <option value="material_flow_rate">Flow Rate</option>
+                <option value="cycle_time">Cycle Time s</option>
+              </select>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 14px;font-family:var(--font-mono);font-size:10px;color:var(--muted);">
+              Points: <span id="chartCount" style="color:var(--accent)">0</span> / 60
+            </div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:16px;flex-shrink:0;">
+            <canvas id="liveChart" height="220"></canvas>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:12px 16px;">
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Current</div>
+              <div id="statCurrent" style="font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--accent)">--</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:12px 16px;">
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Min</div>
+              <div id="statMin" style="font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--ok)">--</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:12px 16px;">
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Max</div>
+              <div id="statMax" style="font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--accent2)">--</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="view-analytics" class="view">
+        <div class="vscroll" style="gap:14px;">
+          <div class="sec-label" style="margin-bottom:4px">📊 Anomaly Analytics</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 16px;">
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Total Anomalies</div>
+              <div id="an-total" style="font-family:var(--font-mono);font-size:26px;font-weight:600;color:var(--accent)">0</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 16px;">
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Alerts</div>
+              <div id="an-alert" style="font-family:var(--font-mono);font-size:26px;font-weight:600;color:var(--accent2)">0</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 16px;">
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Warnings</div>
+              <div id="an-warn" style="font-family:var(--font-mono);font-size:26px;font-weight:600;color:var(--warn)">0</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 16px;">
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Normal</div>
+              <div id="an-ok" style="font-family:var(--font-mono);font-size:26px;font-weight:600;color:var(--ok)">0</div>
+            </div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:16px;">
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Anomalies by Machine</div>
+            <canvas id="barChart" height="180"></canvas>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:16px;">
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Recent Anomaly Events</div>
+            <div id="an-list" style="display:flex;flex-direction:column;gap:6px;font-family:var(--font-mono);font-size:10px;">
+              <div style="color:var(--muted);padding:8px 0;">Loading...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="view-status" class="view">
+        <div class="vscroll" style="gap:10px;">
+          <div class="sec-label" style="margin-bottom:4px">🖥️ System Status</div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 18px;display:flex;align-items:center;gap:12px;">
+            <div id="sys-dot" style="width:10px;height:10px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);flex-shrink:0;animation:pulse 2s infinite;"></div>
+            <div>
+              <div id="sys-overall" style="font-size:13px;font-weight:500;">Checking...</div>
+              <div id="sys-detail" style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px;">Fetching system health from backend</div>
+            </div>
+            <div style="margin-left:auto;">
+              <a href="4-system-status.html" style="font-family:var(--font-mono);font-size:10px;color:var(--accent);text-decoration:none;border:1px solid rgba(0,212,255,.3);padding:4px 12px;border-radius:6px;">View Details →</a>
+            </div>
+          </div>
+          <div id="sys-components" style="display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+      </div>
+      <div id="view-profile" class="view">
+        <div class="vscroll" style="gap:14px;">
+          <div class="sec-label" style="margin-bottom:4px">👤 Operator Profile</div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:20px;display:flex;align-items:center;gap:16px;">
+            <div style="width:52px;height:52px;background:linear-gradient(135deg,var(--accent),#0077ff);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px;">👤</div>
+            <div>
+              <div id="prof-name" style="font-size:15px;font-weight:600;">Operator</div>
+              <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px;">AnomalyIQ System User</div>
+            </div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;overflow:hidden;">
+            <div style="padding:10px 16px;background:var(--surface2);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:.05em;">SETTINGS</div>
+            <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-size:12px;font-weight:500;">Display Name</div>
+                <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px;">Shown in chat messages</div>
+              </div>
+              <input id="inp-name" type="text" value="Operator" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:11px;padding:5px 10px;border-radius:6px;outline:none;width:140px;" oninput="document.getElementById('prof-name').textContent=this.value||'Operator'"/>
+            </div>
+            <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-size:12px;font-weight:500;">Backend URL</div>
+                <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px;">main.py address</div>
+              </div>
+              <input id="inp-url" type="text" value="http://localhost:8005" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:11px;padding:5px 10px;border-radius:6px;outline:none;width:200px;"/>
+            </div>
+            <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-size:12px;font-weight:500;">Alert Notifications</div>
+                <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px;">Show anomaly alerts in chat</div>
+              </div>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" id="inp-notif" checked style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;"/>
+                <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted);">Enabled</span>
+              </label>
+            </div>
+          </div>
+          <button onclick="saveProfile()" style="background:var(--accent);border:none;color:#0f1117;font-family:var(--font-mono);font-size:11px;font-weight:600;padding:10px 24px;border-radius:8px;cursor:pointer;width:fit-content;">Save Settings</button>
+          <div id="prof-saved" style="font-family:var(--font-mono);font-size:10px;color:var(--ok);display:none;">✓ Settings saved</div>
+        </div>
+      </div>
     </div>
 
     <!-- CHATBOT PANEL — ORIGINAL LOGIC (job polling) RESTORED -->
@@ -757,6 +890,229 @@ function startStream() {
 }
 
 startStream();
+
+// ==================== LIVE CHART ====================
+const MAX_POINTS = 60;
+const chartBuffers = {};
+['M001','M002','M003','M004'].forEach(id => {
+  chartBuffers[id] = {};
+  ['temperature','vibration_level','power_consumption','pressure','material_flow_rate','cycle_time'].forEach(f => {
+    chartBuffers[id][f] = [];
+  });
+});
+
+let liveChart = null;
+
+function initChart() {
+  const canvas = document.getElementById('liveChart');
+  if (!canvas || !window.Chart) return;
+  const ctx = canvas.getContext('2d');
+  liveChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Temperature °C',
+        data: [],
+        borderColor: '#00d4ff',
+        backgroundColor: 'rgba(0,212,255,0.08)',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.3,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { display: false },
+        y: {
+          grid: { color: 'rgba(42,48,72,0.8)' },
+          ticks: { color: '#6b7394', font: { family: 'IBM Plex Mono', size: 10 } }
+        }
+      }
+    }
+  });
+}
+
+function updateChart() {
+  if (!liveChart) return;
+  const machine = document.getElementById('chartMachine')?.value || 'M001';
+  const field   = document.getElementById('chartField')?.value   || 'temperature';
+  const buf = chartBuffers[machine]?.[field] || [];
+
+  liveChart.data.labels   = buf.map((_,i) => i);
+  liveChart.data.datasets[0].data  = buf.map(p => p.v);
+  liveChart.data.datasets[0].label = field;
+
+  const vals = buf.map(p => p.v);
+  const cur = vals[vals.length-1];
+  const mn  = vals.length ? Math.min(...vals) : null;
+  const mx  = vals.length ? Math.max(...vals) : null;
+
+  const fmt = v => v == null ? '--' : (field === 'pressure' ? v.toFixed(0) : v.toFixed(2));
+  document.getElementById('statCurrent').textContent = fmt(cur);
+  document.getElementById('statMin').textContent     = fmt(mn);
+  document.getElementById('statMax').textContent     = fmt(mx);
+  document.getElementById('chartCount').textContent  = buf.length;
+
+  liveChart.update('none');
+}
+
+// Patch updateMachine to also buffer chart data
+const _origUpdate = updateMachine;
+window.updateMachine = function(d) {
+  _origUpdate(d);
+  const id = d.machine_id;
+  if (!chartBuffers[id]) return;
+  ['temperature','vibration_level','power_consumption','pressure','material_flow_rate','cycle_time'].forEach(f => {
+    if (d[f] == null) return;
+    chartBuffers[id][f].push({ v: d[f], t: d.timestamp });
+    if (chartBuffers[id][f].length > MAX_POINTS) chartBuffers[id][f].shift();
+  });
+  const selM = document.getElementById('chartMachine')?.value;
+  const selF = document.getElementById('chartField')?.value;
+  if (id === selM) updateChart();
+};
+
+document.getElementById('chartMachine')?.addEventListener('change', updateChart);
+document.getElementById('chartField')?.addEventListener('change', updateChart);
+
+// ==================== ANALYTICS ====================
+const anomalyStats = { M001:0, M002:0, M003:0, M004:0 };
+let totalAnomalies = 0, alertCount = 0, warnCount = 0, okCount = 0;
+let barChart = null;
+const anomalyLog = [];
+
+function initBarChart() {
+  const canvas = document.getElementById('barChart');
+  if (!canvas || !window.Chart) return;
+  barChart = new Chart(canvas.getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: ['M001 CNC','M002 Conveyor','M003 Drill','M004 Welder'],
+      datasets: [{
+        data: [0,0,0,0],
+        backgroundColor: ['rgba(0,212,255,.5)','rgba(255,107,53,.5)','rgba(0,232,122,.5)','rgba(255,184,0,.5)'],
+        borderColor:      ['#00d4ff','#ff6b35','#00e87a','#ffb800'],
+        borderWidth: 1.5, borderRadius: 5,
+      }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false, animation:false,
+      plugins:{ legend:{display:false} },
+      scales:{
+        x:{ ticks:{color:'#6b7394',font:{family:'IBM Plex Mono',size:10}}, grid:{display:false} },
+        y:{ ticks:{color:'#6b7394',font:{family:'IBM Plex Mono',size:10},stepSize:1}, grid:{color:'rgba(42,48,72,.8)'} }
+      }
+    }
+  });
+}
+
+function recordAnomaly(machineId, level) {
+  const ids = ['M001','M002','M003','M004'];
+  const idx = ids.indexOf(machineId);
+  if (idx < 0) return;
+  anomalyStats[machineId] = (anomalyStats[machineId] || 0) + 1;
+  totalAnomalies++;
+  if (level === 'alert') alertCount++;
+  else if (level === 'warn') warnCount++;
+  else okCount++;
+
+  const t = new Date().toLocaleTimeString('en-GB');
+  anomalyLog.unshift({ t, id: machineId, level });
+  if (anomalyLog.length > 20) anomalyLog.pop();
+
+  document.getElementById('an-total').textContent = totalAnomalies;
+  document.getElementById('an-alert').textContent = alertCount;
+  document.getElementById('an-warn').textContent  = warnCount;
+  document.getElementById('an-ok').textContent    = okCount;
+
+  if (barChart) {
+    barChart.data.datasets[0].data = ids.map(id => anomalyStats[id] || 0);
+    barChart.update('none');
+  }
+
+  const colors = { alert:'var(--accent2)', warn:'var(--warn)', ok:'var(--ok)' };
+  document.getElementById('an-list').innerHTML = anomalyLog.slice(0,10).map(e =>
+    `<div style="display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">
+      <span style="color:var(--muted);min-width:60px;">${e.t}</span>
+      <span style="color:${colors[e.level]};min-width:50px;">${e.level.toUpperCase()}</span>
+      <span style="color:var(--text);">${e.id}</span>
+    </div>`
+  ).join('') || '<div style="color:var(--muted);padding:8px 0;">No anomalies recorded yet.</div>';
+}
+
+// Patch updateMachine to record anomalies
+const _origUpdateM = window.updateMachine;
+window.updateMachine = function(d) {
+  const prevRow = document.getElementById('row-' + d.machine_id);
+  const prevLevel = prevRow ? (prevRow.classList.contains('s-alert') ? 'alert' : prevRow.classList.contains('s-warn') ? 'warn' : 'ok') : 'ok';
+  _origUpdateM(d);
+  const newRow = document.getElementById('row-' + d.machine_id);
+  const newLevel = newRow ? (newRow.classList.contains('s-alert') ? 'alert' : newRow.classList.contains('s-warn') ? 'warn' : 'ok') : 'ok';
+  if (newLevel !== 'ok' && newLevel !== prevLevel) recordAnomaly(d.machine_id, newLevel);
+};
+
+// ==================== SYSTEM STATUS (mini) ====================
+async function loadMiniStatus() {
+  try {
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(), 3000);
+    const res = await fetch('http://localhost:8005/system/health', { signal: controller.signal });
+    const data = await res.json();
+    const overall = data.overall || 'unknown';
+    const dot = document.getElementById('sys-dot');
+    const ov  = document.getElementById('sys-overall');
+    const det = document.getElementById('sys-detail');
+    const comp = document.getElementById('sys-components');
+    const colors = { ok:'var(--ok)', degraded:'var(--warn)', error:'var(--accent2)' };
+    const labels = { ok:'All systems operational', degraded:'Some services degraded', error:'Connection errors detected' };
+    if (dot) { dot.style.background = colors[overall]; dot.style.boxShadow = `0 0 8px ${colors[overall]}`; }
+    if (ov)  ov.textContent = labels[overall] || 'Unknown';
+    if (det) {
+      const comps = Object.entries(data.components || {});
+      const errs = comps.filter(([,v]) => v.status !== 'ok');
+      det.textContent = errs.length ? `Issues: ${errs.map(([k])=>k).join(', ')}` : `${comps.length} components checked — all healthy`;
+    }
+    if (comp) {
+      comp.innerHTML = Object.entries(data.components || {}).map(([name, info]) => {
+        const c = colors[info.status] || 'var(--muted)';
+        return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:12px;">${name}</span>
+          <span style="font-family:var(--font-mono);font-size:10px;color:${c};">${info.status.toUpperCase()} — ${info.detail || ''}</span>
+        </div>`;
+      }).join('');
+    }
+  } catch(e) {
+    const ov  = document.getElementById('sys-overall');
+    const det = document.getElementById('sys-detail');
+    const dot = document.getElementById('sys-dot');
+    if (dot) { dot.style.background = 'var(--muted)'; dot.style.boxShadow = 'none'; }
+    if (ov)  ov.textContent = 'Backend offline';
+    if (det) det.textContent = 'Cannot reach main.py — make sure it is running on port 8005';
+  }
+}
+loadMiniStatus();
+setInterval(loadMiniStatus, 30000);
+
+// ==================== PROFILE ====================
+function saveProfile() {
+  const name = document.getElementById('inp-name')?.value || 'Operator';
+  document.getElementById('prof-name').textContent = name;
+  const saved = document.getElementById('prof-saved');
+  if (saved) { saved.style.display = 'block'; setTimeout(() => saved.style.display = 'none', 2000); }
+}
+
+// ==================== INIT BAR CHART ====================
+// Load Chart.js then init
+const chartScript = document.createElement('script');
+chartScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+chartScript.onload = () => { initChart(); initBarChart(); };
+document.head.appendChild(chartScript);
 </script>
 </body>
 </html>
