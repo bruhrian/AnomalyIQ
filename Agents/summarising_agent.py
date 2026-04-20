@@ -5,6 +5,7 @@ from mcp.client.streamable_http import streamable_http_client
 from mcp import ClientSession
 from dotenv import load_dotenv
 import os, time, psycopg2
+from langchain_ollama import ChatOllama
 
 load_dotenv()
 
@@ -13,9 +14,9 @@ MODEL = "gemma4:e4b"
 MCP_SERVER_IP = os.getenv('mcp_server_ip')
 DEFAULT_SESSION_ID = "summary-default-session"
 
-DB_CONN = os.getenv('agents_memory_db')
+DB_CONN = os.getenv('agents_memory')
 if not DB_CONN:
-    raise ValueError("❌ agents_memory_db not set. Please add a PostgreSQL connection string to your .env")
+    raise ValueError("❌ agents_memory not set. Please add a PostgreSQL connection string to your .env")
 else:
     print(f"✅ Postgres connection string loaded.")
 
@@ -77,6 +78,7 @@ async def summary_response(
 
     agent = create_react_agent(
         model=llm,
+        tools=[],
         prompt=system_prompt,
     )
 
