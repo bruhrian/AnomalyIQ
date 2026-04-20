@@ -88,9 +88,9 @@ nav {
   flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0;
 }
 
-/* content views inside center */
-.view { display:none; flex:1; flex-direction:column; overflow:hidden; min-height:0; }
-.view.active { display:flex; }
+/* content views inside center - FIXED: default hidden */
+.view { display: none; flex: 1; flex-direction: column; overflow: hidden; min-height: 0; }
+.view.active { display: flex; }
 
 /* scrollable area inside a view */
 .vscroll {
@@ -175,7 +175,6 @@ nav {
 }
 .audit-row:last-child { border-bottom:none; }
 .audit-row:hover { background:var(--surface2); }
-
 .atime { color:var(--muted); }
 .stage { padding:2px 8px; border-radius:4px; font-size:9px; text-align:center; letter-spacing:.05em; white-space:nowrap; }
 .stage.detect  { background:rgba(255,184,0,.1);  border:1px solid rgba(255,184,0,.3);  color:var(--warn); }
@@ -207,7 +206,6 @@ nav {
 .hok      { font-family:var(--font-mono); font-size:9px; color:var(--ok); }
 .hwarn    { font-family:var(--font-mono); font-size:9px; color:var(--warn); }
 
-/* thread expand */
 .hthread {
   margin-top:12px; padding-top:12px; border-top:1px solid var(--border);
   display:none; flex-direction:column; gap:8px;
@@ -279,9 +277,6 @@ nav {
 .send-btn:hover { background:#00b8e6;transform:scale(1.05); }
 .send-btn svg { width:14px;height:14px;fill:#0f1117; }
 
-/* All views visible by default for Figma (no JS needed) */
-.view { display: flex; flex: 1; flex-direction: column; overflow: hidden; min-height: 0; }
-
 </style>
 </head>
 <body>
@@ -300,33 +295,33 @@ nav {
     </svg>
     <div class="nav-tip">Dashboard</div>
   </button>
-  <button class="nav-btn " id="nb-audit">
+  <button class="nav-btn" id="nb-audit">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
       <path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/>
     </svg>
     <div class="nav-tip">Audit Log</div>
   </button>
-  <button class="nav-btn " id="nb-history">
+  <button class="nav-btn" id="nb-history">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
     </svg>
     <div class="nav-tip">Chat History</div>
   </button>
   <div class="nav-div"></div>
-  <button class="nav-btn">
+  <button class="nav-btn" id="nb-livefeed">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
       <circle cx="12" cy="12" r="3"/>
       <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
     </svg>
     <div class="nav-tip">Live Feed</div>
   </button>
-  <button class="nav-btn">
+  <button class="nav-btn" id="nb-analytics">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
       <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
     </svg>
     <div class="nav-tip">Analytics</div>
   </button>
-  <button class="nav-btn">
+  <button class="nav-btn" id="nb-status">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
       <circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
     </svg>
@@ -334,9 +329,9 @@ nav {
   </button>
   <div class="nav-space"></div>
   <div class="nav-div"></div>
-  <button class="nav-btn">
+  <button class="nav-btn" id="nb-profile">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-      <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/>
+      <circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
     </svg>
     <div class="nav-tip">Profile</div>
   </button>
@@ -345,88 +340,184 @@ nav {
 <div class="main">
   <div class="topbar">
     <span class="tb-title">ANOMALYIQ</span>
-    <span class="tb-crumb">/ Machine Monitor</span>
+    <span class="tb-crumb" id="breadcrumb">/ Machine Monitor</span>
     <div class="tb-space"></div>
     <div class="status-pill"><div class="sdot-live"></div>Monitoring active</div>
     <div class="tb-clock" id="clk">--:--:--</div>
   </div>
   <div class="body">
     <div class="center">
-      <div class="view">
-        
-<div class="vscroll">
-  <div class="sec-label" style="margin-bottom:4px">Machine Fleet — 4 active units</div>
-  <div class="mrow s-alert">
-    <div class="abadge">⚠ ANOMALY</div>
-    <div class="mrow-label"><div class="mrow-id">MCH-001</div><div class="mrow-name">Compressor A</div><div class="mrow-st"><span class="dot alert"></span><span style="color:var(--accent2)">Alert</span></div></div>
-    <div class="mrow-fields">
-      <div class="field"><div class="fn">Timestamp</div><div class="fv warn" id="ts1">--:--:--</div><div class="bar-bg"><div class="bar warn" style="width:100%"></div></div></div>
-      <div class="field"><div class="fn">Temperature °C</div><div class="fv alert">94</div><div class="bar-bg"><div class="bar alert" style="width:94%"></div></div></div>
-      <div class="field"><div class="fn">Vibration</div><div class="fv alert">12.4</div><div class="bar-bg"><div class="bar alert" style="width:88%"></div></div></div>
-      <div class="field"><div class="fn">Power kW</div><div class="fv warn">7.8</div><div class="bar-bg"><div class="bar warn" style="width:65%"></div></div></div>
-      <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok">310200</div><div class="bar-bg"><div class="bar ok" style="width:42%"></div></div></div>
-      <div class="field"><div class="fn">Flow Rate</div><div class="fv warn">0.62</div><div class="bar-bg"><div class="bar warn" style="width:58%"></div></div></div>
-      <div class="field"><div class="fn">Cycle Time s</div><div class="fv alert">184</div><div class="bar-bg"><div class="bar alert" style="width:80%"></div></div></div>
-      <div class="field"><div class="fn">Error Rate</div><div class="fv alert">0.18</div><div class="bar-bg"><div class="bar alert" style="width:72%"></div></div></div>
-      <div class="field"><div class="fn">Downtime min</div><div class="fv alert">22</div><div class="bar-bg"><div class="bar alert" style="width:85%"></div></div></div>
-      <div class="field"><div class="fn">Maint. Flag</div><div class="fv alert">1 — YES</div><div class="bar-bg"><div class="bar alert" style="width:100%"></div></div></div>
-      <div class="field"><div class="fn">Efficiency</div><div class="fv alert">34</div><div class="bar-bg"><div class="bar alert" style="width:34%"></div></div></div>
-      <div class="field"><div class="fn">Prod. Status</div><div class="fv alert">0 — Inefficient</div><div class="bar-bg"><div class="bar alert" style="width:100%"></div></div></div>
-    </div>
-  </div>
-  <div class="mrow s-warn">
-    <div class="mrow-label"><div class="mrow-id">MCH-002</div><div class="mrow-name">Pump B</div><div class="mrow-st"><span class="dot warn"></span><span style="color:var(--warn)">Warning</span></div></div>
-    <div class="mrow-fields">
-      <div class="field"><div class="fn">Timestamp</div><div class="fv warn" id="ts2">--:--:--</div><div class="bar-bg"><div class="bar warn" style="width:100%"></div></div></div>
-      <div class="field"><div class="fn">Temperature °C</div><div class="fv warn">71</div><div class="bar-bg"><div class="bar warn" style="width:67%"></div></div></div>
-      <div class="field"><div class="fn">Vibration</div><div class="fv warn">6.1</div><div class="bar-bg"><div class="bar warn" style="width:55%"></div></div></div>
-      <div class="field"><div class="fn">Power kW</div><div class="fv ok">4.2</div><div class="bar-bg"><div class="bar ok" style="width:38%"></div></div></div>
-      <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok">201000</div><div class="bar-bg"><div class="bar ok" style="width:50%"></div></div></div>
-      <div class="field"><div class="fn">Flow Rate</div><div class="fv ok">1.20</div><div class="bar-bg"><div class="bar ok" style="width:55%"></div></div></div>
-      <div class="field"><div class="fn">Cycle Time s</div><div class="fv warn">135</div><div class="bar-bg"><div class="bar warn" style="width:62%"></div></div></div>
-      <div class="field"><div class="fn">Error Rate</div><div class="fv warn">0.07</div><div class="bar-bg"><div class="bar warn" style="width:40%"></div></div></div>
-      <div class="field"><div class="fn">Downtime min</div><div class="fv ok">4</div><div class="bar-bg"><div class="bar ok" style="width:20%"></div></div></div>
-      <div class="field"><div class="fn">Maint. Flag</div><div class="fv ok">0 — NO</div><div class="bar-bg"><div class="bar ok" style="width:5%"></div></div></div>
-      <div class="field"><div class="fn">Efficiency</div><div class="fv warn">61</div><div class="bar-bg"><div class="bar warn" style="width:61%"></div></div></div>
-      <div class="field"><div class="fn">Prod. Status</div><div class="fv ok">1 — Efficient</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
-    </div>
-  </div>
-  <div class="mrow">
-    <div class="mrow-label"><div class="mrow-id">MCH-003</div><div class="mrow-name">Motor C</div><div class="mrow-st"><span class="dot ok"></span><span style="color:var(--ok)">Normal</span></div></div>
-    <div class="mrow-fields">
-      <div class="field"><div class="fn">Timestamp</div><div class="fv ok" id="ts3">--:--:--</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
-      <div class="field"><div class="fn">Temperature °C</div><div class="fv ok">52</div><div class="bar-bg"><div class="bar ok" style="width:42%"></div></div></div>
-      <div class="field"><div class="fn">Vibration</div><div class="fv ok">1.8</div><div class="bar-bg"><div class="bar ok" style="width:18%"></div></div></div>
-      <div class="field"><div class="fn">Power kW</div><div class="fv ok">3.1</div><div class="bar-bg"><div class="bar ok" style="width:28%"></div></div></div>
-      <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok">150500</div><div class="bar-bg"><div class="bar ok" style="width:35%"></div></div></div>
-      <div class="field"><div class="fn">Flow Rate</div><div class="fv ok">0.95</div><div class="bar-bg"><div class="bar ok" style="width:44%"></div></div></div>
-      <div class="field"><div class="fn">Cycle Time s</div><div class="fv ok">102</div><div class="bar-bg"><div class="bar ok" style="width:45%"></div></div></div>
-      <div class="field"><div class="fn">Error Rate</div><div class="fv ok">0.02</div><div class="bar-bg"><div class="bar ok" style="width:12%"></div></div></div>
-      <div class="field"><div class="fn">Downtime min</div><div class="fv ok">1</div><div class="bar-bg"><div class="bar ok" style="width:8%"></div></div></div>
-      <div class="field"><div class="fn">Maint. Flag</div><div class="fv ok">0 — NO</div><div class="bar-bg"><div class="bar ok" style="width:5%"></div></div></div>
-      <div class="field"><div class="fn">Efficiency</div><div class="fv ok">88</div><div class="bar-bg"><div class="bar ok" style="width:88%"></div></div></div>
-      <div class="field"><div class="fn">Prod. Status</div><div class="fv ok">1 — Efficient</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
-    </div>
-  </div>
-  <div class="mrow">
-    <div class="mrow-label"><div class="mrow-id">MCH-004</div><div class="mrow-name">Conveyor D</div><div class="mrow-st"><span class="dot ok"></span><span style="color:var(--ok)">Normal</span></div></div>
-    <div class="mrow-fields">
-      <div class="field"><div class="fn">Timestamp</div><div class="fv ok" id="ts4">--:--:--</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
-      <div class="field"><div class="fn">Temperature °C</div><div class="fv ok">43</div><div class="bar-bg"><div class="bar ok" style="width:33%"></div></div></div>
-      <div class="field"><div class="fn">Vibration</div><div class="fv ok">2.3</div><div class="bar-bg"><div class="bar ok" style="width:22%"></div></div></div>
-      <div class="field"><div class="fn">Power kW</div><div class="fv ok">2.4</div><div class="bar-bg"><div class="bar ok" style="width:22%"></div></div></div>
-      <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok">101325</div><div class="bar-bg"><div class="bar ok" style="width:25%"></div></div></div>
-      <div class="field"><div class="fn">Flow Rate</div><div class="fv ok">0.80</div><div class="bar-bg"><div class="bar ok" style="width:40%"></div></div></div>
-      <div class="field"><div class="fn">Cycle Time s</div><div class="fv ok">98</div><div class="bar-bg"><div class="bar ok" style="width:43%"></div></div></div>
-      <div class="field"><div class="fn">Error Rate</div><div class="fv ok">0.01</div><div class="bar-bg"><div class="bar ok" style="width:8%"></div></div></div>
-      <div class="field"><div class="fn">Downtime min</div><div class="fv ok">0</div><div class="bar-bg"><div class="bar ok" style="width:2%"></div></div></div>
-      <div class="field"><div class="fn">Maint. Flag</div><div class="fv ok">0 — NO</div><div class="bar-bg"><div class="bar ok" style="width:5%"></div></div></div>
-      <div class="field"><div class="fn">Efficiency</div><div class="fv ok">92</div><div class="bar-bg"><div class="bar ok" style="width:92%"></div></div></div>
-      <div class="field"><div class="fn">Prod. Status</div><div class="fv ok">1 — Efficient</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
-    </div>
-  </div>
-</div>
+      <!-- VIEW: DASHBOARD -->
+      <div id="view-dashboard" class="view active">
+        <div class="vscroll">
+          <div class="sec-label" style="margin-bottom:4px">Machine Fleet — 4 active units</div>
+          <div class="mrow s-alert">
+            <div class="abadge">⚠ ANOMALY</div>
+            <div class="mrow-label"><div class="mrow-id">MCH-001</div><div class="mrow-name">Compressor A</div><div class="mrow-st"><span class="dot alert"></span><span style="color:var(--accent2)">Alert</span></div></div>
+            <div class="mrow-fields">
+              <div class="field"><div class="fn">Timestamp</div><div class="fv warn" id="ts1">--:--:--</div><div class="bar-bg"><div class="bar warn" style="width:100%"></div></div></div>
+              <div class="field"><div class="fn">Temperature °C</div><div class="fv alert">94</div><div class="bar-bg"><div class="bar alert" style="width:94%"></div></div></div>
+              <div class="field"><div class="fn">Vibration</div><div class="fv alert">12.4</div><div class="bar-bg"><div class="bar alert" style="width:88%"></div></div></div>
+              <div class="field"><div class="fn">Power kW</div><div class="fv warn">7.8</div><div class="bar-bg"><div class="bar warn" style="width:65%"></div></div></div>
+              <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok">310200</div><div class="bar-bg"><div class="bar ok" style="width:42%"></div></div></div>
+              <div class="field"><div class="fn">Flow Rate</div><div class="fv warn">0.62</div><div class="bar-bg"><div class="bar warn" style="width:58%"></div></div></div>
+              <div class="field"><div class="fn">Cycle Time s</div><div class="fv alert">184</div><div class="bar-bg"><div class="bar alert" style="width:80%"></div></div></div>
+              <div class="field"><div class="fn">Error Rate</div><div class="fv alert">0.18</div><div class="bar-bg"><div class="bar alert" style="width:72%"></div></div></div>
+              <div class="field"><div class="fn">Downtime min</div><div class="fv alert">22</div><div class="bar-bg"><div class="bar alert" style="width:85%"></div></div></div>
+              <div class="field"><div class="fn">Maint. Flag</div><div class="fv alert">1 — YES</div><div class="bar-bg"><div class="bar alert" style="width:100%"></div></div></div>
+              <div class="field"><div class="fn">Efficiency</div><div class="fv alert">34</div><div class="bar-bg"><div class="bar alert" style="width:34%"></div></div></div>
+              <div class="field"><div class="fn">Prod. Status</div><div class="fv alert">0 — Inefficient</div><div class="bar-bg"><div class="bar alert" style="width:100%"></div></div></div>
+            </div>
+          </div>
+          <div class="mrow s-warn">
+            <div class="mrow-label"><div class="mrow-id">MCH-002</div><div class="mrow-name">Pump B</div><div class="mrow-st"><span class="dot warn"></span><span style="color:var(--warn)">Warning</span></div></div>
+            <div class="mrow-fields">
+              <div class="field"><div class="fn">Timestamp</div><div class="fv warn" id="ts2">--:--:--</div><div class="bar-bg"><div class="bar warn" style="width:100%"></div></div></div>
+              <div class="field"><div class="fn">Temperature °C</div><div class="fv warn">71</div><div class="bar-bg"><div class="bar warn" style="width:67%"></div></div></div>
+              <div class="field"><div class="fn">Vibration</div><div class="fv warn">6.1</div><div class="bar-bg"><div class="bar warn" style="width:55%"></div></div></div>
+              <div class="field"><div class="fn">Power kW</div><div class="fv ok">4.2</div><div class="bar-bg"><div class="bar ok" style="width:38%"></div></div></div>
+              <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok">201000</div><div class="bar-bg"><div class="bar ok" style="width:50%"></div></div></div>
+              <div class="field"><div class="fn">Flow Rate</div><div class="fv ok">1.20</div><div class="bar-bg"><div class="bar ok" style="width:55%"></div></div></div>
+              <div class="field"><div class="fn">Cycle Time s</div><div class="fv warn">135</div><div class="bar-bg"><div class="bar warn" style="width:62%"></div></div></div>
+              <div class="field"><div class="fn">Error Rate</div><div class="fv warn">0.07</div><div class="bar-bg"><div class="bar warn" style="width:40%"></div></div></div>
+              <div class="field"><div class="fn">Downtime min</div><div class="fv ok">4</div><div class="bar-bg"><div class="bar ok" style="width:20%"></div></div></div>
+              <div class="field"><div class="fn">Maint. Flag</div><div class="fv ok">0 — NO</div><div class="bar-bg"><div class="bar ok" style="width:5%"></div></div></div>
+              <div class="field"><div class="fn">Efficiency</div><div class="fv warn">61</div><div class="bar-bg"><div class="bar warn" style="width:61%"></div></div></div>
+              <div class="field"><div class="fn">Prod. Status</div><div class="fv ok">1 — Efficient</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
+            </div>
+          </div>
+          <div class="mrow">
+            <div class="mrow-label"><div class="mrow-id">MCH-003</div><div class="mrow-name">Motor C</div><div class="mrow-st"><span class="dot ok"></span><span style="color:var(--ok)">Normal</span></div></div>
+            <div class="mrow-fields">
+              <div class="field"><div class="fn">Timestamp</div><div class="fv ok" id="ts3">--:--:--</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
+              <div class="field"><div class="fn">Temperature °C</div><div class="fv ok">52</div><div class="bar-bg"><div class="bar ok" style="width:42%"></div></div></div>
+              <div class="field"><div class="fn">Vibration</div><div class="fv ok">1.8</div><div class="bar-bg"><div class="bar ok" style="width:18%"></div></div></div>
+              <div class="field"><div class="fn">Power kW</div><div class="fv ok">3.1</div><div class="bar-bg"><div class="bar ok" style="width:28%"></div></div></div>
+              <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok">150500</div><div class="bar-bg"><div class="bar ok" style="width:35%"></div></div></div>
+              <div class="field"><div class="fn">Flow Rate</div><div class="fv ok">0.95</div><div class="bar-bg"><div class="bar ok" style="width:44%"></div></div></div>
+              <div class="field"><div class="fn">Cycle Time s</div><div class="fv ok">102</div><div class="bar-bg"><div class="bar ok" style="width:45%"></div></div></div>
+              <div class="field"><div class="fn">Error Rate</div><div class="fv ok">0.02</div><div class="bar-bg"><div class="bar ok" style="width:12%"></div></div></div>
+              <div class="field"><div class="fn">Downtime min</div><div class="fv ok">1</div><div class="bar-bg"><div class="bar ok" style="width:8%"></div></div></div>
+              <div class="field"><div class="fn">Maint. Flag</div><div class="fv ok">0 — NO</div><div class="bar-bg"><div class="bar ok" style="width:5%"></div></div></div>
+              <div class="field"><div class="fn">Efficiency</div><div class="fv ok">88</div><div class="bar-bg"><div class="bar ok" style="width:88%"></div></div></div>
+              <div class="field"><div class="fn">Prod. Status</div><div class="fv ok">1 — Efficient</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
+            </div>
+          </div>
+          <div class="mrow">
+            <div class="mrow-label"><div class="mrow-id">MCH-004</div><div class="mrow-name">Conveyor D</div><div class="mrow-st"><span class="dot ok"></span><span style="color:var(--ok)">Normal</span></div></div>
+            <div class="mrow-fields">
+              <div class="field"><div class="fn">Timestamp</div><div class="fv ok" id="ts4">--:--:--</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
+              <div class="field"><div class="fn">Temperature °C</div><div class="fv ok">43</div><div class="bar-bg"><div class="bar ok" style="width:33%"></div></div></div>
+              <div class="field"><div class="fn">Vibration</div><div class="fv ok">2.3</div><div class="bar-bg"><div class="bar ok" style="width:22%"></div></div></div>
+              <div class="field"><div class="fn">Power kW</div><div class="fv ok">2.4</div><div class="bar-bg"><div class="bar ok" style="width:22%"></div></div></div>
+              <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok">101325</div><div class="bar-bg"><div class="bar ok" style="width:25%"></div></div></div>
+              <div class="field"><div class="fn">Flow Rate</div><div class="fv ok">0.80</div><div class="bar-bg"><div class="bar ok" style="width:40%"></div></div></div>
+              <div class="field"><div class="fn">Cycle Time s</div><div class="fv ok">98</div><div class="bar-bg"><div class="bar ok" style="width:43%"></div></div></div>
+              <div class="field"><div class="fn">Error Rate</div><div class="fv ok">0.01</div><div class="bar-bg"><div class="bar ok" style="width:8%"></div></div></div>
+              <div class="field"><div class="fn">Downtime min</div><div class="fv ok">0</div><div class="bar-bg"><div class="bar ok" style="width:2%"></div></div></div>
+              <div class="field"><div class="fn">Maint. Flag</div><div class="fv ok">0 — NO</div><div class="bar-bg"><div class="bar ok" style="width:5%"></div></div></div>
+              <div class="field"><div class="fn">Efficiency</div><div class="fv ok">92</div><div class="bar-bg"><div class="bar ok" style="width:92%"></div></div></div>
+              <div class="field"><div class="fn">Prod. Status</div><div class="fv ok">1 — Efficient</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <!-- VIEW: AUDIT LOG -->
+      <div id="view-audit" class="view">
+        <div class="vscroll">
+          <div class="audit-card">
+            <div class="audit-head">
+              <div class="audit-head-title">🔍 RECENT AI DECISIONS</div>
+              <div class="badge">LLM Context</div>
+            </div>
+            <div class="audit-row">
+              <div class="atime">09:41:05</div>
+              <div class="stage detect">DETECT</div>
+              <div class="adesc">Anomaly on MCH-001: temp 94°C, vibration 12.4</div>
+              <div class="amach">MCH-001</div>
+            </div>
+            <div class="audit-row">
+              <div class="atime">09:42:13</div>
+              <div class="stage answer">ANSWER</div>
+              <div class="adesc">Error rate reported: 0.18, inefficiency status</div>
+              <div class="amach">MCH-001</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: CHAT HISTORY -->
+      <div id="view-history" class="view">
+        <div class="vscroll">
+          <div class="hcard" onclick="toggleThread('thread1')">
+            <div class="hcard-top">
+              <span class="htag">⚙️ MCH-001</span>
+              <span class="htime">09:41:03</span>
+            </div>
+            <div class="hpreview">What's the error rate? → Error rate: 0.18, downtime 22 min</div>
+            <div id="thread1" class="hthread">
+              <div class="hmsg user"><div class="hbubble">What's the error rate on MCH-001?</div><div class="hmeta">OPERATOR · 09:42:11</div></div>
+              <div class="hmsg sys"><div class="hbubble">MCH-001 error rate: 0.18. Downtime: 22 min. Prod. status: Inefficient.</div><div class="hmeta">SYSTEM · 09:42:13</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: LIVE FEED -->
+      <div id="view-livefeed" class="view">
+        <div class="vscroll">
+          <div class="sec-label">📡 REAL-TIME TELEMETRY</div>
+          <div style="background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:20px; text-align:center; color:var(--muted);">
+            Live sensor data stream will appear here.<br>
+            <span style="font-size:10px;">WebSocket connection to MQTT broker</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: ANALYTICS -->
+      <div id="view-analytics" class="view">
+        <div class="vscroll">
+          <div class="sec-label">📊 PREDICTIVE ANALYTICS</div>
+          <div style="background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:20px; color:var(--muted);">
+            Failure probability next 24h:<br>
+            • MCH-001: <span style="color:var(--accent2);">87%</span><br>
+            • MCH-002: <span style="color:var(--warn);">34%</span><br>
+            • MCH-003: 12%<br>
+            • MCH-004: 8%
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: SYSTEM STATUS -->
+      <div id="view-status" class="view">
+        <div class="vscroll">
+          <div class="sec-label">🖥️ INFRASTRUCTURE HEALTH</div>
+          <div style="background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:20px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:12px;"><span>CNN Service (8001)</span><span style="color:var(--ok);">● Online</span></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:12px;"><span>CA Service (8005)</span><span style="color:var(--ok);">● Online</span></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:12px;"><span>Database</span><span style="color:var(--ok);">● Connected</span></div>
+            <div style="display:flex; justify-content:space-between;"><span>Uptime</span><span>99.97% (30d)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: PROFILE -->
+      <div id="view-profile" class="view">
+        <div class="vscroll">
+          <div class="sec-label">👤 USER PROFILE</div>
+          <div style="background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:20px;">
+            <div style="text-align:center; margin-bottom:16px;">
+              <div style="width:60px; height:60px; background:var(--accent); border-radius:50%; margin:0 auto 12px;"></div>
+              <div style="font-weight:600;">Maintenance Engineer</div>
+              <div style="font-size:11px; color:var(--muted);">admin@anomalyiq.com</div>
+            </div>
+            <div style="border-top:1px solid var(--border); padding-top:12px;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Role</span><span style="color:var(--accent);">Administrator</span></div>
+              <div style="display:flex; justify-content:space-between;"><span>MFA Status</span><span style="color:var(--ok);">Enabled</span></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -456,17 +547,9 @@ nav {
           <div class="bubble">Maintenance flag active. Failure window <strong>6–10h</strong>. Root cause: bearing wear.</div>
           <div class="msg-meta">SYSTEM · 09:41:05</div>
         </div>
-        <div class="msg user">
-          <div class="bubble">What's the error rate?</div>
-          <div class="msg-meta">OPERATOR · 09:42:11</div>
-        </div>
-        <div class="msg sys">
-          <div class="bubble">MCH-001 error rate: <strong>0.18</strong>. Downtime: 22 min. Prod. status: 0 — Inefficient.</div>
-          <div class="msg-meta">SYSTEM · 09:42:13</div>
-        </div>
       </div>
       <div class="chat-input-row">
-        <textarea class="chat-input" id="chatInput" placeholder="Ask about any machine…" rows="1" onkeydown="handleKey(event)"></textarea>
+        <textarea class="chat-input" id="chatInput" placeholder="Ask about any machine…" rows="1"></textarea>
         <button class="send-btn" onclick="sendMsg()">
           <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
         </button>
@@ -478,6 +561,7 @@ nav {
 </div>
 
 <script>
+// ==================== CLOCK ====================
 function tick() {
   const t = new Date().toLocaleTimeString('en-GB');
   const el = document.getElementById('clk'); if(el) el.textContent = t;
@@ -485,24 +569,70 @@ function tick() {
 }
 tick(); setInterval(tick, 1000);
 
-function setTab(el) {
-  el.closest('.tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
+// ==================== NAVIGATION SWITCHING (FIXED) ====================
+const viewMap = {
+  'nb-dashboard': 'view-dashboard',
+  'nb-audit': 'view-audit',
+  'nb-history': 'view-history',
+  'nb-livefeed': 'view-livefeed',
+  'nb-analytics': 'view-analytics',
+  'nb-status': 'view-status',
+  'nb-profile': 'view-profile'
+};
+
+const breadcrumbMap = {
+  'nb-dashboard': '/ Machine Monitor',
+  'nb-audit': '/ Audit Log',
+  'nb-history': '/ Chat History',
+  'nb-livefeed': '/ Live Feed',
+  'nb-analytics': '/ Analytics',
+  'nb-status': '/ System Status',
+  'nb-profile': '/ Profile'
+};
+
+function switchToView(buttonId) {
+  // Remove active class from all nav buttons
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  // Add active class to clicked button
+  const clickedBtn = document.getElementById(buttonId);
+  if (clickedBtn) clickedBtn.classList.add('active');
+  
+  // Hide all views
+  document.querySelectorAll('.view').forEach(view => {
+    view.classList.remove('active');
+  });
+  
+  // Show selected view
+  const targetViewId = viewMap[buttonId];
+  if (targetViewId) {
+    const targetView = document.getElementById(targetViewId);
+    if (targetView) targetView.classList.add('active');
+  }
+  
+  // Update breadcrumb
+  const breadcrumb = document.getElementById('breadcrumb');
+  if (breadcrumb && breadcrumbMap[buttonId]) {
+    breadcrumb.textContent = breadcrumbMap[buttonId];
+  }
 }
-function toggleThread(id) {
-  document.getElementById(id).classList.toggle('open');
-}
 
-// ── Config ──────────────────────────────────────────────────────────────────
-const CA_URL       = 'http://localhost:8005';
-const POLL_MS      = 1500;   // how often to check job status
-const POLL_TIMEOUT = 60000;  // give up after 60s
+// Attach click event listeners to all nav buttons
+Object.keys(viewMap).forEach(btnId => {
+  const btn = document.getElementById(btnId);
+  if (btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      switchToView(btnId);
+    });
+  }
+});
 
-// Track which machine the operator is asking about
-// Updated whenever an anomaly row is clicked (future hook)
-let currentMachineId = 'M001';
+// ==================== CHAT FUNCTIONS ====================
+const CA_URL = 'http://localhost:8005';
+let currentMachineId = 'MCH-001';
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
 function nowStr() {
   return new Date().toLocaleTimeString('en-GB', {
     hour: '2-digit', minute: '2-digit', second: '2-digit'
@@ -529,140 +659,39 @@ function appendTyping() {
   return el;
 }
 
-// ── Format the CA result into readable HTML ──────────────────────────────────
-function formatResult(result) {
-  // result could be a string (error) or the ESA_Response object
-  if (typeof result === 'string') return result;
-
-  let html = '';
-
-  if (result.Impact_analysis) {
-    html += `<strong>Impact Analysis</strong><br>${result.Impact_analysis}<br><br>`;
-  }
-  if (result.cascade_effects && result.cascade_effects.length) {
-    html += `<strong>Cascade Effects</strong><br>`;
-    result.cascade_effects.forEach((e, i) => {
-      const labels = ['Immediate', 'Short-term', 'Long-term'];
-      html += `• ${labels[i] || i+1}: ${e}<br>`;
-    });
-    html += '<br>';
-  }
-  if (result.solutions) {
-    html += `<strong>Recommended Action</strong><br>${result.solutions}`;
-  }
-  if (result.sources && result.sources.length) {
-    html += `<br><br><span style="font-size:10px;color:var(--muted);">Sources: ${result.sources.join(', ')}</span>`;
-  }
-  return html || JSON.stringify(result, null, 2);
-}
-
-// ── Poll /jobs/{job_id} until done or timeout ────────────────────────────────
-async function pollJob(jobId, typingEl) {
-  const deadline = Date.now() + POLL_TIMEOUT;
-
-  while (Date.now() < deadline) {
-    await new Promise(r => setTimeout(r, POLL_MS));
-
-    try {
-      const res  = await fetch(`${CA_URL}/jobs/${jobId}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-
-      if (data.status === 'done') {
-        typingEl.remove();
-        const result  = data.result;
-        // result is whatever handle_qa_question returns
-        const html    = formatResult(result?.result ?? result);
-        appendMsg('sys', html, `SYSTEM · ${nowStr()}`);
-        return;
-      }
-
-      if (data.status === 'error') {
-        typingEl.remove();
-        appendMsg('sys',
-          `<span style="color:var(--accent2)">⚠ Error: ${data.detail || 'Unknown error from CA'}</span>`,
-          `SYSTEM · ${nowStr()}`
-        );
-        return;
-      }
-
-      // still queued / processing — keep polling
-    } catch (err) {
-      typingEl.remove();
-      appendMsg('sys',
-        `<span style="color:var(--accent2)">⚠ Lost connection to backend: ${err.message}</span>`,
-        `SYSTEM · ${nowStr()}`
-      );
-      return;
-    }
-  }
-
-  // Timed out
-  typingEl.remove();
-  appendMsg('sys',
-    `<span style="color:var(--warn)">⏱ Request timed out after ${POLL_TIMEOUT/1000}s. The backend may still be processing.</span>`,
-    `SYSTEM · ${nowStr()}`
-  );
-}
-
-// ── Main send function ───────────────────────────────────────────────────────
 async function sendMsg() {
   const input = document.getElementById('chatInput');
-  const text  = input.value.trim();
+  const text = input.value.trim();
   if (!text) return;
-
-  // Disable input while waiting
+  
   input.disabled = true;
   document.querySelector('.send-btn').disabled = true;
-
-  // Show user message
-  appendMsg('user', text, `OPERATOR · ${nowStr()}`);
+  
+  appendMsg('user', text.replace(/</g, '&lt;'), `OPERATOR · ${nowStr()}`);
   input.value = '';
-
-  // Show typing indicator
+  
   const typingEl = appendTyping();
-
+  
   try {
     const res = await fetch(`${CA_URL}/chat`, {
-      method:  'POST',
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({
-        machine_id: currentMachineId,
-        question:   text,
-      }),
+      body: JSON.stringify({ machine_id: currentMachineId, question: text })
     });
-
+    
+    typingEl.remove();
+    
     if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      typingEl.remove();
-      appendMsg('sys',
-        `<span style="color:var(--accent2)">⚠ Backend error ${res.status}: ${err.detail || res.statusText}</span>`,
-        `SYSTEM · ${nowStr()}`
-      );
-      return;
+      const errText = await res.text();
+      appendMsg('sys', `<span style="color:var(--accent2)">⚠ Backend error ${res.status}: ${errText.substring(0, 100)}</span>`, `SYSTEM · ${nowStr()}`);
+    } else {
+      const data = await res.json();
+      let reply = data.answer || data.result || JSON.stringify(data);
+      appendMsg('sys', reply, `SYSTEM · ${nowStr()}`);
     }
-
-    const data  = await res.json();
-    const jobId = data.job_id;
-
-    if (!jobId) {
-      typingEl.remove();
-      appendMsg('sys',
-        `<span style="color:var(--accent2)">⚠ No job_id returned from backend.</span>`,
-        `SYSTEM · ${nowStr()}`
-      );
-      return;
-    }
-
-    // Poll for result
-    await pollJob(jobId, typingEl);
-
   } catch (err) {
     typingEl.remove();
-    appendMsg('sys',
-      `<span style="color:var(--accent2)">⚠ Cannot reach backend at ${CA_URL}. Is it running?<br><span style="font-size:10px;color:var(--muted);">${err.message}</span></span>`,
-      `SYSTEM · ${nowStr()}`
-    );
+    appendMsg('sys', `<span style="color:var(--accent2)">⚠ Cannot reach backend at ${CA_URL}. Demo mode — your question was: "${text.replace(/</g, '&lt;')}"</span>`, `SYSTEM · ${nowStr()}`);
   } finally {
     input.disabled = false;
     document.querySelector('.send-btn').disabled = false;
@@ -670,8 +699,24 @@ async function sendMsg() {
   }
 }
 
-function handleKey(e) { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } }
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMsg();
+  }
+}
 
+document.getElementById('chatInput').addEventListener('keydown', handleKey);
+
+// ==================== THREAD TOGGLE ====================
+function toggleThread(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.toggle('open');
+  }
+}
+
+console.log('✅ Navigation fixed — all buttons are clickable!');
 </script>
 </body>
 </html>
