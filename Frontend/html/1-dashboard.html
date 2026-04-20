@@ -347,34 +347,83 @@ nav {
   </div>
   <div class="body">
     <div class="center">
-      <!-- VIEW: DASHBOARD (original content - truncated for brevity, same as your original) -->
+      <!-- VIEW: DASHBOARD -->
       <div id="view-dashboard" class="view active">
         <div class="vscroll">
           <div class="sec-label" style="margin-bottom:4px">Machine Fleet — 4 active units</div>
-          <div class="mrow s-alert">
-            <div class="abadge">⚠ ANOMALY</div>
-            <div class="mrow-label"><div class="mrow-id">MCH-001</div><div class="mrow-name">Compressor A</div><div class="mrow-st"><span class="dot alert"></span><span style="color:var(--accent2)">Alert</span></div></div>
+
+          <!-- M001 CNC -->
+          <div class="mrow" id="row-M001" data-machine-id="M001">
+            <div class="mrow-label">
+              <div class="mrow-id">M001</div>
+              <div class="mrow-name">CNC Machine</div>
+              <div class="mrow-st"><span class="dot ok" id="dot-M001"></span><span id="status-M001" style="color:var(--ok)">Normal</span></div>
+            </div>
             <div class="mrow-fields">
-              <div class="field"><div class="fn">Timestamp</div><div class="fv warn" id="ts1">--:--:--</div><div class="bar-bg"><div class="bar warn" style="width:100%"></div></div></div>
-              <div class="field"><div class="fn">Temperature °C</div><div class="fv alert">94</div><div class="bar-bg"><div class="bar alert" style="width:94%"></div></div></div>
-              <div class="field"><div class="fn">Vibration</div><div class="fv alert">12.4</div><div class="bar-bg"><div class="bar alert" style="width:88%"></div></div></div>
-              <div class="field"><div class="fn">Power kW</div><div class="fv warn">7.8</div><div class="bar-bg"><div class="bar warn" style="width:65%"></div></div></div>
-              <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok">310200</div><div class="bar-bg"><div class="bar ok" style="width:42%"></div></div></div>
-              <div class="field"><div class="fn">Flow Rate</div><div class="fv warn">0.62</div><div class="bar-bg"><div class="bar warn" style="width:58%"></div></div></div>
-              <div class="field"><div class="fn">Cycle Time s</div><div class="fv alert">184</div><div class="bar-bg"><div class="bar alert" style="width:80%"></div></div></div>
-              <div class="field"><div class="fn">Error Rate</div><div class="fv alert">0.18</div><div class="bar-bg"><div class="bar alert" style="width:72%"></div></div></div>
-              <div class="field"><div class="fn">Downtime min</div><div class="fv alert">22</div><div class="bar-bg"><div class="bar alert" style="width:85%"></div></div></div>
-              <div class="field"><div class="fn">Maint. Flag</div><div class="fv alert">1 — YES</div><div class="bar-bg"><div class="bar alert" style="width:100%"></div></div></div>
-              <div class="field"><div class="fn">Efficiency</div><div class="fv alert">34</div><div class="bar-bg"><div class="bar alert" style="width:34%"></div></div></div>
-              <div class="field"><div class="fn">Prod. Status</div><div class="fv alert">0 — Inefficient</div><div class="bar-bg"><div class="bar alert" style="width:100%"></div></div></div>
+              <div class="field"><div class="fn">Timestamp</div><div class="fv ok" id="M001-timestamp">--:--:--</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
+              <div class="field"><div class="fn">Temperature °C</div><div class="fv ok" id="M001-temperature">--</div><div class="bar-bg"><div class="bar ok" id="M001-temperature-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Vibration</div><div class="fv ok" id="M001-vibration_level">--</div><div class="bar-bg"><div class="bar ok" id="M001-vibration_level-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Power kW</div><div class="fv ok" id="M001-power_consumption">--</div><div class="bar-bg"><div class="bar ok" id="M001-power_consumption-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok" id="M001-pressure">--</div><div class="bar-bg"><div class="bar ok" id="M001-pressure-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Flow Rate</div><div class="fv ok" id="M001-material_flow_rate">--</div><div class="bar-bg"><div class="bar ok" id="M001-material_flow_rate-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Cycle Time s</div><div class="fv ok" id="M001-cycle_time">--</div><div class="bar-bg"><div class="bar ok" id="M001-cycle_time-bar" style="width:0%"></div></div></div>
             </div>
           </div>
-          <div class="mrow s-warn">
-            <div class="mrow-label"><div class="mrow-id">MCH-002</div><div class="mrow-name">Pump B</div><div class="mrow-st"><span class="dot warn"></span><span style="color:var(--warn)">Warning</span></div></div>
-            <div class="mrow-fields"><!-- fields truncated for brevity, same as your original --></div>
+
+          <!-- M002 Conveyor -->
+          <div class="mrow" id="row-M002" data-machine-id="M002">
+            <div class="mrow-label">
+              <div class="mrow-id">M002</div>
+              <div class="mrow-name">Conveyor</div>
+              <div class="mrow-st"><span class="dot ok" id="dot-M002"></span><span id="status-M002" style="color:var(--ok)">Normal</span></div>
+            </div>
+            <div class="mrow-fields">
+              <div class="field"><div class="fn">Timestamp</div><div class="fv ok" id="M002-timestamp">--:--:--</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
+              <div class="field"><div class="fn">Temperature °C</div><div class="fv ok" id="M002-temperature">--</div><div class="bar-bg"><div class="bar ok" id="M002-temperature-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Vibration</div><div class="fv ok" id="M002-vibration_level">--</div><div class="bar-bg"><div class="bar ok" id="M002-vibration_level-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Power kW</div><div class="fv ok" id="M002-power_consumption">--</div><div class="bar-bg"><div class="bar ok" id="M002-power_consumption-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok" id="M002-pressure">--</div><div class="bar-bg"><div class="bar ok" id="M002-pressure-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Flow Rate</div><div class="fv ok" id="M002-material_flow_rate">--</div><div class="bar-bg"><div class="bar ok" id="M002-material_flow_rate-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Cycle Time s</div><div class="fv ok" id="M002-cycle_time">--</div><div class="bar-bg"><div class="bar ok" id="M002-cycle_time-bar" style="width:0%"></div></div></div>
+            </div>
           </div>
-          <div class="mrow"><div class="mrow-label"><div class="mrow-id">MCH-003</div><div class="mrow-name">Motor C</div><div class="mrow-st"><span class="dot ok"></span><span style="color:var(--ok)">Normal</span></div></div><div class="mrow-fields">...</div></div>
-          <div class="mrow"><div class="mrow-label"><div class="mrow-id">MCH-004</div><div class="mrow-name">Conveyor D</div><div class="mrow-st"><span class="dot ok"></span><span style="color:var(--ok)">Normal</span></div></div><div class="mrow-fields">...</div></div>
+
+          <!-- M003 Drill -->
+          <div class="mrow" id="row-M003" data-machine-id="M003">
+            <div class="mrow-label">
+              <div class="mrow-id">M003</div>
+              <div class="mrow-name">Drill</div>
+              <div class="mrow-st"><span class="dot ok" id="dot-M003"></span><span id="status-M003" style="color:var(--ok)">Normal</span></div>
+            </div>
+            <div class="mrow-fields">
+              <div class="field"><div class="fn">Timestamp</div><div class="fv ok" id="M003-timestamp">--:--:--</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
+              <div class="field"><div class="fn">Temperature °C</div><div class="fv ok" id="M003-temperature">--</div><div class="bar-bg"><div class="bar ok" id="M003-temperature-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Vibration</div><div class="fv ok" id="M003-vibration_level">--</div><div class="bar-bg"><div class="bar ok" id="M003-vibration_level-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Power kW</div><div class="fv ok" id="M003-power_consumption">--</div><div class="bar-bg"><div class="bar ok" id="M003-power_consumption-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok" id="M003-pressure">--</div><div class="bar-bg"><div class="bar ok" id="M003-pressure-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Flow Rate</div><div class="fv ok" id="M003-material_flow_rate">--</div><div class="bar-bg"><div class="bar ok" id="M003-material_flow_rate-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Cycle Time s</div><div class="fv ok" id="M003-cycle_time">--</div><div class="bar-bg"><div class="bar ok" id="M003-cycle_time-bar" style="width:0%"></div></div></div>
+            </div>
+          </div>
+
+          <!-- M004 Welder -->
+          <div class="mrow" id="row-M004" data-machine-id="M004">
+            <div class="mrow-label">
+              <div class="mrow-id">M004</div>
+              <div class="mrow-name">Welder</div>
+              <div class="mrow-st"><span class="dot ok" id="dot-M004"></span><span id="status-M004" style="color:var(--ok)">Normal</span></div>
+            </div>
+            <div class="mrow-fields">
+              <div class="field"><div class="fn">Timestamp</div><div class="fv ok" id="M004-timestamp">--:--:--</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
+              <div class="field"><div class="fn">Temperature °C</div><div class="fv ok" id="M004-temperature">--</div><div class="bar-bg"><div class="bar ok" id="M004-temperature-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Vibration</div><div class="fv ok" id="M004-vibration_level">--</div><div class="bar-bg"><div class="bar ok" id="M004-vibration_level-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Power kW</div><div class="fv ok" id="M004-power_consumption">--</div><div class="bar-bg"><div class="bar ok" id="M004-power_consumption-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok" id="M004-pressure">--</div><div class="bar-bg"><div class="bar ok" id="M004-pressure-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Flow Rate</div><div class="fv ok" id="M004-material_flow_rate">--</div><div class="bar-bg"><div class="bar ok" id="M004-material_flow_rate-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Cycle Time s</div><div class="fv ok" id="M004-cycle_time">--</div><div class="bar-bg"><div class="bar ok" id="M004-cycle_time-bar" style="width:0%"></div></div></div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -617,6 +666,97 @@ function toggleThread(id) {
 }
 
 console.log('✅ Navigation fixed, AI chatbot original logic restored!');
+
+// ==================== LIVE SSE DATA ====================
+const STREAM_URL = 'http://localhost:8005/machines/stream';
+
+const FIELD_RANGES = {
+  temperature:        { min: 20,  max: 120 },
+  vibration_level:    { min: 0,   max: 20  },
+  power_consumption:  { min: 0,   max: 15  },
+  pressure:           { min: 80000, max: 400000 },
+  material_flow_rate: { min: 0,   max: 3   },
+  cycle_time:         { min: 50,  max: 250 },
+};
+
+const THRESHOLDS = {
+  temperature:        { warn: 70,     alert: 90     },
+  vibration_level:    { warn: 5,      alert: 10     },
+  power_consumption:  { warn: 8,      alert: 12     },
+  pressure:           { warn: 300000, alert: 350000 },
+  material_flow_rate: { warn: 0.5,    alert: 0.3    },
+  cycle_time:         { warn: 150,    alert: 180    },
+};
+
+function getLevel(field, val) {
+  const t = THRESHOLDS[field];
+  if (!t) return 'ok';
+  if (field === 'material_flow_rate') {
+    if (val <= t.alert) return 'alert';
+    if (val <= t.warn)  return 'warn';
+    return 'ok';
+  }
+  if (val >= t.alert) return 'alert';
+  if (val >= t.warn)  return 'warn';
+  return 'ok';
+}
+
+function getPct(field, val) {
+  const r = FIELD_RANGES[field];
+  if (!r) return 0;
+  return Math.min(100, Math.max(0, ((val - r.min) / (r.max - r.min)) * 100));
+}
+
+function updateMachine(d) {
+  const id = d.machine_id;
+  const row = document.getElementById(`row-${id}`);
+  if (!row) return;
+
+  const fields = ['temperature','vibration_level','power_consumption','pressure','material_flow_rate','cycle_time'];
+  let worstLevel = 'ok';
+
+  fields.forEach(f => {
+    const val = d[f];
+    if (val == null) return;
+    const el  = document.getElementById(`${id}-${f}`);
+    const bar = document.getElementById(`${id}-${f}-bar`);
+    const lvl = getLevel(f, val);
+    if (lvl === 'alert' || (lvl === 'warn' && worstLevel === 'ok')) worstLevel = lvl;
+    if (el)  { el.textContent = typeof val === 'number' ? val.toFixed(f==='pressure'?0:2) : val; el.className = `fv ${lvl}`; }
+    if (bar) { bar.style.width = getPct(f, val) + '%'; bar.className = `bar ${lvl}`; }
+  });
+
+  const tsEl = document.getElementById(`${id}-timestamp`);
+  if (tsEl) tsEl.textContent = d.timestamp || new Date().toLocaleTimeString('en-GB');
+
+  const dot    = document.getElementById(`dot-${id}`);
+  const status = document.getElementById(`status-${id}`);
+  const colors = { ok:'var(--ok)', warn:'var(--warn)', alert:'var(--accent2)' };
+  const labels = { ok:'Normal', warn:'Warning', alert:'Alert' };
+  row.className = `mrow${worstLevel !== 'ok' ? ` s-${worstLevel}` : ''}`;
+  if (dot)    dot.className    = `dot ${worstLevel}`;
+  if (status) { status.textContent = labels[worstLevel]; status.style.color = colors[worstLevel]; }
+
+  const badge = row.querySelector('.abadge');
+  if (worstLevel === 'alert') {
+    if (!badge) { const b = document.createElement('div'); b.className = 'abadge'; b.textContent = '⚠ ANOMALY'; row.appendChild(b); }
+  } else {
+    if (badge) badge.remove();
+  }
+}
+
+function startStream() {
+  const es = new EventSource(STREAM_URL);
+  es.onmessage = e => {
+    try { updateMachine(JSON.parse(e.data)); } catch(_) {}
+  };
+  es.onerror = () => {
+    es.close();
+    setTimeout(startStream, 5000);
+  };
+}
+
+startStream();
 </script>
 </body>
 </html>
