@@ -22,6 +22,7 @@ import psycopg2.extras
 from typing import Optional
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from langchain_ollama import ChatOllama
 
 from llama_index.core import SQLDatabase, Settings
 from llama_index.core.query_engine import NLSQLTableQueryEngine
@@ -32,11 +33,11 @@ load_dotenv()
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 DB_CONFIG = {
-    "host":     os.getenv("POSTGRES_HOST",     "localhost"),
-    "port":     int(os.getenv("POSTGRES_PORT", "5432")),
-    "dbname":   os.getenv("PG_AUDIT",       "audit_db"),
-    "user":     os.getenv("POSTGRES_USER",     "postgres"),
-    "password": os.getenv("POSTGRES_PASSWORD", ""),
+    "host":     os.getenv("POSTGRES_HOST"),
+    "port":     int(os.getenv("POSTGRES_PORT")),
+    "dbname":   os.getenv("PG_AUDIT"),
+    "user":     os.getenv("POSTGRES_USER"),
+    "password": os.getenv("POSTGRES_PASSWORD"),
 }
 
 MODEL = "gemma4:e4b"   # same model as ESA
