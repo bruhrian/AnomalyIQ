@@ -1,21 +1,23 @@
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import HumanMessage, BaseMessage
-from langchain_ollama import ChatOllama
-from langchain_mcp_adapters.client import MultiServerMCPClient
+from langchain_mcp_adapters.tools import load_mcp_tools
 from langchain_community.chat_message_histories import SQLChatMessageHistory
+from mcp.client.sse import sse_client
+from mcp import ClientSession
 from dotenv import load_dotenv
+from langchain_ollama import ChatOllama
 import os, time, psycopg2
 
 load_dotenv()
 
 ORCHESTRATOR_PROMPT_PATH = os.getenv('orc_prompt')
-MODEL = os.getenv('MODEL', 'gemma4:e4b')
+MODEL = "gemma4:e4b"
 MCP_SERVER_IP = os.getenv('mcp_server_ip')
 DEFAULT_SESSION_ID = "orchestrator-default-session"
 
 DB_CONN = os.getenv('agents_memory')
 if not DB_CONN:
-    raise ValueError("❌ agents_memory not set.")
+    raise ValueError("❌ agents_memory_db not set. Please add a PostgreSQL connection string to your .env")
 else:
     print(f"✅ Postgres connection string loaded.")
 
@@ -75,51 +77,47 @@ async def orchestrator_response(
 
     llm = ChatOllama(model=MODEL)
 
-    async with MultiServerMCPClient(
-        {
-            "orchestrator": {
-                "url": MCP_SERVER_IP,
-                "transport": "sse",
-            }
-        }
-    ) as mcp_client:
-        tools = mcp_client.get_tools()
+    async with sse_client(MCP_SERVER_IP) as (read, write):
+        async with ClientSession(read, write) as mcp_session:
+            await mcp_session.initialize()
+            tools = await load_mcp_tools(mcp_session)
 
-        agent = create_react_agent(
-            model=llm,
-            tools=tools,
-            prompt=system_prompt,
-        )
+            agent = create_react_agent(
+                model=llm,
+                tools=tools,
+                prompt=system_prompt,
+            )
 
-        history = get_session_history(session_id, conn_string)
-        messages_in = history.messages + [HumanMessage(content=query)]
+            history = get_session_history(session_id, conn_string)
+            messages_in = history.messages + [HumanMessage(content=query)]
 
-        print(f"📨 Sending {len(messages_in)} message(s) to agent ({len(history.messages)} from history + 1 new)")
+            print(f"📨 Sending {len(messages_in)} message(s) to agent "f"({len(history.messages)} from history + 1 new)")
 
-        try:
-            start_time = time.time()
-            raw_res = await agent.ainvoke({"messages": messages_in})
-            output = raw_res["messages"][-1].content
-            elapsed = time.time() - start_time
+            try:
+                start_time = time.time()
 
-            history.add_user_message(query)
-            history.add_ai_message(output)
-            print(f"💾 Turn saved to DB (session: {session_id})")
+                raw_res = await agent.ainvoke({"messages": messages_in})
+                output = raw_res["messages"][-1].content
+                elapsed = time.time() - start_time
 
-            print(f"\n💬 Response : {output}")
-            print(f"⏱️  Elapsed  : {elapsed:.2f}s")
-            print(f"🗂️  Session  : {session_id}")
+                history.add_user_message(query)
+                history.add_ai_message(output)
+                print(f"💾 Turn saved to DB (session: {session_id})")
 
-            return {
-                "result": output,
-                "session_id": session_id,
-                "elapsed_time": elapsed
-            }
+                print(f"\n💬 Response : {output}")
+                print(f"⏱️  Elapsed  : {elapsed:.2f}s")
+                print(f"🗂️  Session  : {session_id}")
 
-        except Exception as e:
-            print(f"❌ Agent execution error: {e}")
-            return {
-                "result": f"Error processing request: s{str(e)}",
-                "error": str(e),
-                "session_id": session_id
-            }
+                return {
+                    "result": output,
+                    "session_id": session_id, 
+                    "elapsed_time": elapsed
+                }
+
+            except Exception as e:
+                print(f"❌ Agent execution error: {e}")
+                return {
+                    "result": f"Error processing request: {str(e)}",
+                    "error": str(e),
+                    "session_id": session_id
+                }
