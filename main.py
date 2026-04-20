@@ -28,7 +28,7 @@ sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(AGENTS_DIR))
 
 from orchestrator import orchestrator_response
-from audit_agent import query_logs, _get_conn
+from Agents.audit_agent import query_logs, _get_conn
 from langchain_community.chat_message_histories import SQLChatMessageHistory
 
 STREAMING_URL = os.getenv("STREAMING_URL")
@@ -60,7 +60,7 @@ def _start_ingesting():
     global _ingest_running
     _ingest_running = True
 
-    ingest_path = Path(__file__).parent / "Anomaly Detector" / "ingesting.py"
+    ingest_path = Path(os.getenv('ingesting', ''))
     if ingest_path.exists():
         spec = importlib.util.spec_from_file_location("ingesting", str(ingest_path))
         ing  = importlib.util.module_from_spec(spec)
@@ -316,4 +316,4 @@ async def anomalies(limit: int = 20):
 
 
 if __name__ == "__main__":
-    agent_mcp.run(transport="http", host="0.0.0.0", port=8080)
+    uvicorn.run("main:app", host="0.0.0.0", port=8005, reload=False)
