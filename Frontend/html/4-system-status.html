@@ -184,17 +184,17 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
     <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0f1117" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
   </div>
 
-  <button class="nav-btn">
+  <button class="nav-btn" onclick="location.href='1-dashboard.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     <div class="nav-tip">Dashboard</div>
   </button>
 
-  <button class="nav-btn">
+  <button class="nav-btn" onclick="location.href='2-audit-log.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
     <div class="nav-tip">Audit Log</div>
   </button>
 
-  <button class="nav-btn">
+  <button class="nav-btn" onclick="location.href='3-chat-history.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     <div class="nav-tip">Chat History</div>
   </button>
@@ -291,13 +291,13 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
 
             <div style="height:12px"></div>
 
-            <!-- Qdrant -->
+            <!-- Neo4j -->
             <div class="db-row">
               <div class="conn-node">
                 <div class="node-box err">
                   <div class="node-status-dot err"></div>
                   <div class="node-icon">🔍</div>
-                  <div class="node-name">Qdrant</div>
+                  <div class="node-name">Neo4j</div>
                 </div>
               </div>
             </div>
@@ -380,19 +380,19 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
             <div><div class="st-last" id="check-pg">09:41:03</div></div>
           </div>
 
-          <!-- Qdrant -->
+          <!-- Neo4j -->
           <div class="st-row">
             <div>
-              <div class="st-module">Qdrant</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:2px;">Vector Database</div>
+              <div class="st-module">Neo4j</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px;">Graph Database</div>
             </div>
             <div><div class="st-type">Database</div></div>
             <div>
-              <div class="conn-badge err" id="badge-qd"><div class="conn-badge-dot"></div>Disconnected</div>
-              <div class="st-detail err" style="margin-top:4px;">Connection refused on port 6333. Retrying…</div>
+              <div class="conn-badge err" id="badge-neo4j"><div class="conn-badge-dot"></div>Disconnected</div>
+              <div class="st-detail err" style="margin-top:4px;">Check if Neo4j is running on port 7687.</div>
             </div>
             <div><div class="st-latency err">timeout</div></div>
-            <div><div class="st-last" id="check-qd">09:38:47</div></div>
+            <div><div class="st-last" id="check-neo4j">09:38:47</div></div>
           </div>
 
           <!-- Data Simulator -->
@@ -415,8 +415,8 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
 
       <!-- ── RETRY BUTTON ── -->
       <div style="display:flex;gap:10px;align-items:center;">
-        <button onclick="retryQdrant()" style="background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.35);color:var(--accent2);font-family:var(--font-mono);font-size:11px;padding:8px 18px;border-radius:8px;cursor:pointer;transition:all .2s;letter-spacing:.05em;" onmouseover="this.style.background='rgba(255,107,53,.2)'" onmouseout="this.style.background='rgba(255,107,53,.1)'">
-          ↺ Retry Qdrant Connection
+        <button onclick="retryNeo4j()" style="background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.35);color:var(--accent2);font-family:var(--font-mono);font-size:11px;padding:8px 18px;border-radius:8px;cursor:pointer;transition:all .2s;letter-spacing:.05em;" onmouseover="this.style.background='rgba(255,107,53,.2)'" onmouseout="this.style.background='rgba(255,107,53,.1)'">
+          ↺ Retry Neo4j Connection
         </button>
         <button onclick="refreshAll()" style="background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);color:var(--accent);font-family:var(--font-mono);font-size:11px;padding:8px 18px;border-radius:8px;cursor:pointer;transition:all .2s;letter-spacing:.05em;" onmouseover="this.style.background='rgba(0,212,255,.15)'" onmouseout="this.style.background='rgba(0,212,255,.08)'">
           ⟳ Refresh All
@@ -442,15 +442,15 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
       <div class="chat-msgs" id="chatMsgs">
         <div class="msg sys">
           <div class="msg-tag">SYSTEM ALERT</div>
-          <div class="bubble"><strong>Qdrant</strong> connection lost at 09:38:47. Port 6333 not responding. Vector search functionality degraded.</div>
+          <div class="bubble"><strong>Neo4j</strong> connection status unknown. Check if service is running on port 7687.</div>
           <div class="msg-meta">SYSTEM · 09:38:50</div>
         </div>
         <div class="msg sys">
-          <div class="bubble">All other services nominal — UI, MCP, PostgreSQL, Data Simulator all connected. Retrying Qdrant every 30s.</div>
+          <div class="bubble">All other services nominal — UI, MCP, PostgreSQL, Data Simulator all connected.</div>
           <div class="msg-meta">SYSTEM · 09:38:52</div>
         </div>
         <div class="msg user">
-          <div class="bubble">What's affected by Qdrant being down?</div>
+          <div class="bubble">What's affected by Neo4j being down?</div>
           <div class="msg-meta">OPERATOR · 09:40:05</div>
         </div>
         <div class="msg sys">
@@ -494,7 +494,7 @@ const COMPONENT_MAP = {
   UI:            { badge:'badge-ui',  check:'check-ui',  node:'node-ui' },
   MCP:           { badge:'badge-mcp', check:'check-mcp', node:'node-mcp' },
   PostgreSQL:    { badge:'badge-pg',  check:'check-pg',  node:'node-pg' },
-  Qdrant:        { badge:'badge-qd',  check:'check-qd',  node:'node-qd' },
+  Neo4j:         { badge:'badge-neo4j', check:'check-neo4j', node:'node-neo4j' },
   DataSimulator: { badge:'badge-ds',  check:'check-ds',  node:'node-ds' },
   Backend:       { badge:'badge-be',  check:'check-be',  node:'node-be' },
 };
@@ -553,21 +553,21 @@ async function loadHealth() {
 
   } catch(e) {
     // Backend itself is unreachable
-    ['UI','MCP','PostgreSQL','Qdrant','DataSimulator','Backend'].forEach(n => {
+    ['UI','MCP','PostgreSQL','Neo4j','DataSimulator','Backend'].forEach(n => {
       if (n !== 'UI') applyStatus(n, 'error', 'Backend unreachable');
     });
   }
 }
 
 // ── Retry a specific component ──
-async function retryQdrant() {
-  appendSysMsg('Attempting to reconnect Qdrant on port 6333…');
+async function retryNeo4j() {
+  appendSysMsg('Attempting to reconnect Neo4j on port 7687…');
   await loadHealth();
-  const qdrantStatus = document.getElementById('badge-qd')?.textContent || '';
-  if (qdrantStatus.includes('Connected')) {
-    appendSysMsg('✓ Qdrant reconnected successfully.');
+  const neo4jStatus = document.getElementById('badge-neo4j')?.textContent || '';
+  if (neo4jStatus.includes('Connected')) {
+    appendSysMsg('✓ Neo4j reconnected successfully.');
   } else {
-    appendSysMsg('Qdrant still unreachable. Check if service is running on port 6333.');
+    appendSysMsg('Neo4j still unreachable. Check if service is running on port 7687.');
   }
 }
 

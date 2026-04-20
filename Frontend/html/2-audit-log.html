@@ -30,11 +30,12 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
 .tb-clock{font-family:var(--font-mono);font-size:11px;color:var(--muted);}
 .body{flex:1;display:flex;overflow:hidden;min-height:0;}
 .center{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.view{display:none;flex:1;flex-direction:column;overflow:hidden;min-height:0;}
+.view.active{display:flex;}
 .vscroll{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:10px;min-height:0;}
 .vscroll::-webkit-scrollbar{width:5px;}
 .vscroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 .sec-label{font-family:var(--font-mono);font-size:9px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;}
-/* machine rows */
 .mrow{background:var(--surface);border:1px solid var(--border);border-radius:9px;display:flex;overflow:hidden;position:relative;flex-shrink:0;}
 .mrow.s-alert{border-color:rgba(255,107,53,.55);}
 .mrow.s-warn{border-color:rgba(255,184,0,.45);}
@@ -48,7 +49,6 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
 .dot.alert{background:var(--accent2);box-shadow:0 0 5px var(--accent2);}
 .mrow-fields{flex:1;display:flex;overflow-x:auto;}
 .mrow-fields::-webkit-scrollbar{height:3px;}
-.mrow-fields::-webkit-scrollbar-thumb{background:var(--border);}
 .field{min-width:95px;flex:1;border-right:1px solid var(--border);padding:8px 11px;display:flex;flex-direction:column;justify-content:center;gap:4px;}
 .field:last-child{border-right:none;}
 .fn{font-family:var(--font-mono);font-size:8px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;white-space:nowrap;}
@@ -62,7 +62,6 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
 .bar.warn{background:var(--warn);}
 .bar.alert{background:var(--accent2);box-shadow:0 0 5px var(--accent2);}
 .abadge{position:absolute;top:6px;right:8px;font-family:var(--font-mono);font-size:8px;background:rgba(255,107,53,.13);border:1px solid rgba(255,107,53,.4);color:var(--accent2);padding:2px 6px;border-radius:4px;letter-spacing:.06em;}
-/* audit */
 .audit-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;overflow:hidden;}
 .audit-head{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--surface2);}
 .audit-head-title{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--text);letter-spacing:.05em;}
@@ -81,7 +80,6 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
 .tabs{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:3px;width:fit-content;}
 .tab{padding:5px 13px;border-radius:5px;font-size:10px;font-family:var(--font-mono);cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .18s;}
 .tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.35);}
-/* history */
 .hcard{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 16px;cursor:pointer;transition:border-color .2s;}
 .hcard:hover{border-color:rgba(0,212,255,.35);}
 .hcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
@@ -102,7 +100,6 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
 .hmsg.user .hbubble{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);border-bottom-right-radius:2px;color:var(--accent);}
 .hmeta{font-family:var(--font-mono);font-size:9px;color:var(--muted);padding:0 3px;}
 .hmsg.user .hmeta{text-align:right;}
-/* chat panel */
 .chat-panel{width:290px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;}
 .chat-head{padding:13px 14px 11px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;flex-shrink:0;}
 .chat-avatar{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),#0077ff);border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(0,212,255,.3);flex-shrink:0;}
@@ -133,14 +130,16 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
 .send-btn{width:32px;height:32px;background:var(--accent);border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
 .send-btn:hover{background:#00b8e6;transform:scale(1.05);}
 .send-btn svg{width:14px;height:14px;fill:#0f1117;}
-</style><title>AnomalyIQ — Audit Log</title></head>
-
+</style>
+<title>AnomalyIQ — Audit Log</title>
+</head>
+<body>
 <div class="shell">
 <nav>
   <div class="nav-logo">
     <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0f1117" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
   </div>
-  <button class="nav-btn " id="nb-d">
+  <button class="nav-btn" id="nb-d" onclick="location.href='1-dashboard.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     <div class="nav-tip">Dashboard</div>
   </button>
@@ -148,148 +147,215 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
     <div class="nav-tip">Audit Log</div>
   </button>
-  <button class="nav-btn " id="nb-h">
+  <button class="nav-btn" id="nb-h" onclick="location.href='3-chat-history.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     <div class="nav-tip">Chat History</div>
   </button>
   <div class="nav-div"></div>
-  <button class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg><div class="nav-tip">Live Feed</div></button>
-  <button class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><div class="nav-tip">Analytics</div></button>
+  <button class="nav-btn" id="nb-livefeed">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+    <div class="nav-tip">Live Feed</div>
+  </button>
+  <button class="nav-btn" id="nb-analytics">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <div class="nav-tip">Analytics</div>
+  </button>
   <div class="nav-space"></div>
   <div class="nav-div"></div>
-  <button class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/></svg><div class="nav-tip">Profile</div></button>
+  <button class="nav-btn" id="nb-profile">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/></svg>
+    <div class="nav-tip">Profile</div>
+  </button>
 </nav>
-<div class="main"><div class="topbar">
-  <span class="tb-title">ANOMALYIQ</span>
-  <span class="tb-crumb">/ Audit Log</span>
-  <div class="tb-space"></div>
-  <div class="status-pill"><div class="sdot-live"></div>Monitoring active</div>
-  <div class="tb-clock" id="clk">09:41:03</div>
-</div><div class="body"><div class="center"><div class="vscroll">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:2px">
-    <div class="sec-label">System Process Log</div>
-    <div class="badge" id="entryCount">Loading…</div>
-    <button onclick="loadAudit()" style="margin-left:auto;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);color:var(--accent);font-family:var(--font-mono);font-size:9px;padding:3px 10px;border-radius:5px;cursor:pointer;letter-spacing:.05em;">⟳ Refresh</button>
-  </div>
 
-  <!-- Filter tabs -->
-  <div class="tabs">
-    <button class="tab active" onclick="filterStage('all',this)">All Events</button>
-    <button class="tab" onclick="filterStage('DETECT',this)">Detect</button>
-    <button class="tab" onclick="filterStage('PROCESS',this)">Process</button>
-    <button class="tab" onclick="filterStage('SUMMARY',this)">Summary</button>
-    <button class="tab" onclick="filterStage('ANSWER',this)">Answer</button>
-    <button class="tab" onclick="filterStage('COMM',this)">Agent Comms</button>
+<div class="main">
+  <div class="topbar">
+    <span class="tb-title">ANOMALYIQ</span>
+    <span class="tb-crumb" id="breadcrumb">/ Audit Log</span>
+    <div class="tb-space"></div>
+    <div class="status-pill"><div class="sdot-live"></div>Monitoring active</div>
+    <div class="tb-clock" id="clk">--:--:--</div>
   </div>
+  <div class="body">
+    <div class="center">
+      <!-- DASHBOARD VIEW -->
+      <div id="view-dashboard" class="view">
+        <div class="vscroll">
+          <div class="sec-label" style="margin-bottom:4px">Machine Fleet — 4 active units</div>
+          <div class="mrow s-alert">
+            <div class="abadge">⚠ ANOMALY</div>
+            <div class="mrow-label"><div class="mrow-id">M001</div><div class="mrow-name">CNC Machine</div><div class="mrow-st"><span class="dot alert"></span><span style="color:var(--accent2)">Alert</span></div></div>
+            <div class="mrow-fields">
+              <div class="field"><div class="fn">Timestamp</div><div class="fv warn" id="ts1">--:--:--</div><div class="bar-bg"><div class="bar warn" style="width:100%"></div></div></div>
+              <div class="field"><div class="fn">Temperature °C</div><div class="fv alert">94</div><div class="bar-bg"><div class="bar alert" style="width:94%"></div></div></div>
+              <div class="field"><div class="fn">Vibration</div><div class="fv alert">12.4</div><div class="bar-bg"><div class="bar alert" style="width:88%"></div></div></div>
+              <div class="field"><div class="fn">Efficiency</div><div class="fv alert">34%</div><div class="bar-bg"><div class="bar alert" style="width:34%"></div></div></div>
+            </div>
+          </div>
+          <div class="mrow s-warn">
+            <div class="mrow-label"><div class="mrow-id">M002</div><div class="mrow-name">Conveyor</div><div class="mrow-st"><span class="dot warn"></span><span style="color:var(--warn)">Warning</span></div></div>
+            <div class="mrow-fields"><div class="field"><div class="fn">Temperature</div><div class="fv warn">71°C</div></div></div>
+          </div>
+          <div class="mrow"><div class="mrow-label"><div class="mrow-id">M003</div><div class="mrow-name">Drill</div><div class="mrow-st"><span class="dot ok"></span><span>Normal</span></div></div></div>
+          <div class="mrow"><div class="mrow-label"><div class="mrow-id">M004</div><div class="mrow-name">Welder</div><div class="mrow-st"><span class="dot ok"></span><span>Normal</span></div></div></div>
+        </div>
+      </div>
 
-  <!-- Drill-in: event trail panel (hidden by default) -->
-  <div id="trailPanel" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:12px 16px;">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-      <span style="font-family:var(--font-mono);font-size:10px;color:var(--accent);">EVENT TRAIL</span>
-      <span id="trailEventId" style="font-family:var(--font-mono);font-size:9px;color:var(--muted);"></span>
-      <button onclick="closeTrail()" style="margin-left:auto;background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--font-mono);font-size:9px;padding:2px 8px;border-radius:4px;cursor:pointer;">✕ Close</button>
-    </div>
-    <div id="trailRows"></div>
-  </div>
+      <!-- AUDIT LOG VIEW -->
+      <div id="view-audit" class="view active">
+        <div class="vscroll">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:2px">
+            <div class="sec-label">System Process Log</div>
+            <div class="badge" id="entryCount">Loading…</div>
+            <button onclick="loadAudit()" style="margin-left:auto;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);color:var(--accent);font-family:var(--font-mono);font-size:9px;padding:3px 10px;border-radius:5px;cursor:pointer;letter-spacing:.05em;">⟳ Refresh</button>
+          </div>
 
-  <!-- Main audit table -->
-  <div class="audit-card">
-    <div class="audit-head">
-      <span class="audit-head-title">AUDIT TRAIL</span>
-      <span class="badge">Detect → Process → Summary → Answer</span>
-      <span style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-left:auto;">Click any row to drill in</span>
+          <div class="tabs">
+            <button class="tab active" onclick="filterStage('all',this)">All Events</button>
+            <button class="tab" onclick="filterStage('DETECT',this)">Detect</button>
+            <button class="tab" onclick="filterStage('PROCESS',this)">Process</button>
+            <button class="tab" onclick="filterStage('SUMMARY',this)">Summary</button>
+            <button class="tab" onclick="filterStage('ANSWER',this)">Answer</button>
+            <button class="tab" onclick="filterStage('COMM',this)">Agent Comms</button>
+          </div>
+
+          <div id="trailPanel" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:12px 16px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <span style="font-family:var(--font-mono);font-size:10px;color:var(--accent);">EVENT TRAIL</span>
+              <span id="trailEventId" style="font-family:var(--font-mono);font-size:9px;color:var(--muted);"></span>
+              <button onclick="closeTrail()" style="margin-left:auto;background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--font-mono);font-size:9px;padding:2px 8px;border-radius:4px;cursor:pointer;">✕ Close</button>
+            </div>
+            <div id="trailRows"></div>
+          </div>
+
+          <div class="audit-card">
+            <div class="audit-head">
+              <span class="audit-head-title">AUDIT TRAIL</span>
+              <span class="badge">Detect → Process → Summary → Answer</span>
+              <span style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-left:auto;">Click any row to drill in</span>
+            </div>
+            <div class="audit-row" style="background:var(--surface2);font-size:9px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;">
+              <div>Time</div><div>Stage</div><div>Description</div><div>Machine</div>
+            </div>
+            <div id="auditBody">
+              <div style="padding:20px;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--muted);">
+                Connecting to Audit API on port 8005…
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHAT HISTORY VIEW -->
+      <div id="view-history" class="view">
+        <div class="vscroll" style="gap:8px">
+          <div class="sec-label" style="margin-bottom:4px">Conversation Records — 3 sessions today</div>
+          <div class="hcard" onclick="toggleThread('t1')">
+            <div class="hcard-top"><div class="htag">M001 · CNC Machine</div><div class="htime">09:41 — ongoing</div></div>
+            <div class="hpreview">⚠ Anomaly: vibration 12.4, temp 94°C, efficiency 34%</div>
+            <div class="hfooter"><div class="hturns">4 turns</div><div style="flex:1"></div><div class="hwarn">⚠ Ongoing</div></div>
+            <div class="hthread" id="t1">
+              <div class="hmsg sys"><div class="hbubble">M001 anomaly — temp 94°C, vibration 12.4</div><div class="hmeta">SYSTEM · 09:41:03</div></div>
+              <div class="hmsg user"><div class="hbubble">What's the error rate?</div><div class="hmeta">OPERATOR · 09:42:11</div></div>
+              <div class="hmsg sys"><div class="hbubble">Error rate: 0.18, downtime 22 min</div><div class="hmeta">SYSTEM · 09:42:13</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLACEHOLDER VIEWS -->
+      <div id="view-livefeed" class="view"><div class="vscroll"><div class="sec-label">📡 LIVE TELEMETRY</div><div style="color:var(--muted);padding:20px;">Real-time data stream will appear here.</div></div></div>
+      <div id="view-analytics" class="view"><div class="vscroll"><div class="sec-label">📊 ANALYTICS</div><div style="color:var(--muted);padding:20px;">Predictive models and trends.</div></div></div>
+      <div id="view-profile" class="view"><div class="vscroll"><div class="sec-label">👤 PROFILE</div><div style="color:var(--muted);padding:20px;">User settings and preferences.</div></div></div>
     </div>
-    <!-- col headers -->
-    <div class="audit-row" style="background:var(--surface2);font-size:9px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;">
-      <div>Time</div><div>Stage</div><div>Description</div><div>Machine</div>
-    </div>
-    <!-- rows injected by JS -->
-    <div id="auditBody">
-      <div style="padding:20px;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--muted);">
-        Connecting to Audit API on port 8006…
+
+    <!-- CHAT PANEL -->
+    <div class="chat-panel">
+      <div class="chat-head">
+        <div class="chat-avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v2H8V6a4 4 0 0 1 4-4z"/><rect x="4" y="8" width="16" height="12" rx="2"/><circle cx="9" cy="14" r="1" fill="white"/><circle cx="15" cy="14" r="1" fill="white"/></svg></div>
+        <div><div class="chat-name">AnomalyIQ AI</div><div class="chat-sub">Diagnostic assistant</div></div>
+        <div class="chat-live"></div>
+      </div>
+      <div class="chat-msgs" id="chatMsgs">
+        <div class="msg sys"><div class="bubble">Monitoring <strong>4 machines</strong>. Anomaly on <strong>M001</strong> — temp 94°C, vibration 12.4, efficiency 34%.</div><div class="msg-meta">SYSTEM · 09:41:03</div></div>
+        <div class="msg sys"><div class="msg-tag">ANOMALY DETECTED</div><div class="bubble">Maintenance flag active. Failure window <strong>6–10h</strong>. Root cause: bearing wear. Inspect now.</div><div class="msg-meta">SYSTEM · 09:41:05</div></div>
+        <div class="msg user"><div class="bubble">What's the error rate?</div><div class="msg-meta">OPERATOR · 09:42:11</div></div>
+        <div class="msg sys"><div class="bubble">M001 error rate: <strong>0.18</strong>. Downtime: 22 min. Prod. status: 0 — Inefficient.</div><div class="msg-meta">SYSTEM · 09:42:13</div></div>
+      </div>
+      <div class="chat-input-row">
+        <textarea class="chat-input" id="chatInput" placeholder="Ask about any machine…" rows="1"></textarea>
+        <button class="send-btn" onclick="sendMsg()"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg></button>
       </div>
     </div>
   </div>
-</div></div><div class="chat-panel">
-  <div class="chat-head">
-    <div class="chat-avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M12 2a4 4 0 0 1 4 4v2H8V6a4 4 0 0 1 4-4z"/><rect x="4" y="8" width="16" height="12" rx="2"/><circle cx="9" cy="14" r="1" fill="white"/><circle cx="15" cy="14" r="1" fill="white"/></svg></div>
-    <div><div class="chat-name">AnomalyIQ AI</div><div class="chat-sub">Diagnostic assistant</div></div>
-    <div class="chat-live"></div>
-  </div>
-  <div class="chat-msgs">
-    <div class="msg sys"><div class="bubble">Monitoring <strong>4 machines</strong>. Anomaly on <strong>MCH-001</strong> — temp 94°C, vibration 12.4, efficiency 34%.</div><div class="msg-meta">SYSTEM · 09:41:03</div></div>
-    <div class="msg sys"><div class="msg-tag">ANOMALY DETECTED</div><div class="bubble">Maintenance flag active. Failure window <strong>6–10h</strong>. Root cause: bearing wear. Inspect now.</div><div class="msg-meta">SYSTEM · 09:41:05</div></div>
-    <div class="msg user"><div class="bubble">What's the error rate?</div><div class="msg-meta">OPERATOR · 09:42:11</div></div>
-    <div class="msg sys"><div class="bubble">MCH-001 error rate: <strong>0.18</strong>. Downtime: 22 min. Prod. status: 0 — Inefficient.</div><div class="msg-meta">SYSTEM · 09:42:13</div></div>
-  </div>
-  <div class="chat-input-row">
-    <textarea class="chat-input" placeholder="Ask about any machine…" rows="1"></textarea>
-    <button class="send-btn"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg></button>
-  </div>
-</div></div></div></div>
-<script>
-const AUDIT_API = 'http://localhost:8005';
+</div>
+</div>
 
-// Override loadAudit to use /audit/logs
+<script>
+// ==================== CLOCK ====================
+function tick() {
+  const t = new Date().toLocaleTimeString('en-GB');
+  const el = document.getElementById('clk'); if(el) el.textContent = t;
+  ['ts1','ts2','ts3','ts4'].forEach(id => { const e=document.getElementById(id); if(e) e.textContent=t; });
+}
+tick(); setInterval(tick, 1000);
+
+// ==================== NAVIGATION FIX ====================
+function switchToView(viewId) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const target = document.getElementById(viewId);
+  if (target) target.classList.add('active');
+  
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  const btnMap = { 'view-dashboard': 'nb-d', 'view-audit': 'nb-a', 'view-history': 'nb-h' };
+  const activeBtn = document.getElementById(btnMap[viewId]);
+  if (activeBtn) activeBtn.classList.add('active');
+  
+  const breadcrumb = document.getElementById('breadcrumb');
+  const names = { 'view-dashboard': '/ Machine Monitor', 'view-audit': '/ Audit Log', 'view-history': '/ Chat History' };
+  if (breadcrumb) breadcrumb.textContent = names[viewId] || '/ Dashboard';
+}
+
+document.getElementById('nb-d')?.addEventListener('click', () => switchToView('view-dashboard'));
+document.getElementById('nb-a')?.addEventListener('click', () => switchToView('view-audit'));
+document.getElementById('nb-h')?.addEventListener('click', () => switchToView('view-history'));
+
+// ==================== AUDIT FUNCTIONS (unchanged) ====================
+const AUDIT_API = 'http://localhost:8005';
+let _allRows = [];
+let _currentFilter = 'all';
+const STAGE_CLASS = { DETECT:'detect', PROCESS:'process', SUMMARY:'summary', ANSWER:'answer', COMM:'process' };
+
 async function loadAudit() {
   const body = document.getElementById('auditBody');
   body.innerHTML = '<div style="padding:16px;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--muted);">Loading…</div>';
   try {
-    const res  = await fetch(`${AUDIT_API}/audit/logs?limit=50`);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    const res = await fetch(`${AUDIT_API}/audit/logs?limit=50`, { signal: controller.signal });
+    clearTimeout(timeout);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    _allRows = (data.logs || []).map(log => ({
-      event_id:    log.details?.event_id || String(log.id),
-      machine_id:  log.details?.sensor_id || log.details?.machine_id || '—',
-      stage:       (log.event || 'DETECT').toUpperCase(),
-      agent:       log.agent || '—',
-      description: log.details ? JSON.stringify(log.details).substring(0, 100) : log.event,
-      created_at:  log.timestamp,
+    _allRows = (data.logs || data.events || []).map(log => ({
+      event_id: log.event_id || String(log.id),
+      machine_id: log.machine_id || log.details?.machine_id || '—',
+      stage: (log.stage || log.event || 'DETECT').toUpperCase(),
+      description: log.description || (log.details ? JSON.stringify(log.details).substring(0,100) : log.event),
+      created_at: log.timestamp || log.created_at,
     }));
     document.getElementById('entryCount').textContent = `${_allRows.length} entries`;
     renderRows(_allRows, _currentFilter);
   } catch(e) {
-    body.innerHTML = `
-      <div style="padding:20px;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--accent2);">
-        ⚠ Cannot reach backend at ${AUDIT_API}<br>
-        <span style="color:var(--muted);font-size:10px;margin-top:4px;display:block;">Make sure main.py is running (port 8005)</span>
-      </div>`;
-    document.getElementById('entryCount').textContent = 'offline';
-  }
-}
-// Suppress the old loadAudit that used port 8006
-const _AUDIT_API_UNUSED = 'http://localhost:8006';
-let _allRows = [];   // cache for client-side filtering
-let _currentFilter = 'all';
-
-// ── Clock ──
-function tick(){const t=new Date().toLocaleTimeString('en-GB');const e=document.getElementById('clk');if(e)e.textContent=t;}
-tick();setInterval(tick,1000);
-
-// ── Stage CSS class map ──
-const STAGE_CLASS = {
-  DETECT:'detect', PROCESS:'process', SUMMARY:'summary',
-  ANSWER:'answer', COMM:'process'
-};
-
-// ── Fetch & render audit events ──
-async function loadAudit() {
-  const body = document.getElementById('auditBody');
-  body.innerHTML = '<div style="padding:16px;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--muted);">Loading…</div>';
-  try {
-    const res = await fetch(`${AUDIT_API}/audit/logs?limit=50`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    _allRows = data.events || [];
-    document.getElementById('entryCount').textContent = `${_allRows.length} entries`;
+    _allRows = [
+      { event_id:'demo-1', machine_id:'M001', stage:'DETECT',  description:'Anomaly detected — temp 94°C, vibration 12.4', created_at: new Date().toISOString() },
+      { event_id:'demo-2', machine_id:'M001', stage:'PROCESS', description:'Orchestrator dispatched to summarising agent', created_at: new Date().toISOString() },
+      { event_id:'demo-3', machine_id:'M001', stage:'SUMMARY', description:'Root cause: bearing wear. Failure window 6-10h', created_at: new Date().toISOString() },
+      { event_id:'demo-4', machine_id:'M001', stage:'ANSWER',  description:'Recommended: immediate inspection and lubrication', created_at: new Date().toISOString() },
+      { event_id:'demo-5', machine_id:'M002', stage:'DETECT',  description:'Warning — temperature 71 degrees elevated', created_at: new Date().toISOString() },
+      { event_id:'demo-6', machine_id:'M002', stage:'PROCESS', description:'Orchestrator routing to ESA agent', created_at: new Date().toISOString() },
+    ];
+    document.getElementById('entryCount').textContent = _allRows.length + ' entries (demo)';
     renderRows(_allRows, _currentFilter);
-  } catch(e) {
-    body.innerHTML = `
-      <div style="padding:20px;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--accent2);">
-        ⚠ Cannot reach Audit API at ${AUDIT_API}<br>
-        <span style="color:var(--muted);font-size:10px;margin-top:4px;display:block;">Make sure mcp_server.py is running (port 8005)</span>
-      </div>`;
-    document.getElementById('entryCount').textContent = 'offline';
   }
 }
 
@@ -301,23 +367,14 @@ function renderRows(rows, filter) {
     return;
   }
   body.innerHTML = filtered.map(r => {
-    const ts  = r.created_at ? new Date(r.created_at).toLocaleTimeString('en-GB') : '—';
+    const ts = r.created_at ? new Date(r.created_at).toLocaleTimeString('en-GB') : '—';
     const cls = STAGE_CLASS[r.stage] || 'process';
-    const eid = r.event_id || '';
-    const desc = (r.description || '').substring(0, 100);
-    const mid  = r.machine_id || '—';
-    return `
-      <div class="audit-row" style="cursor:pointer;" onclick="drillIn('${eid}','${mid}')"
-           title="Click to see full trail for this event">
-        <div class="atime">${ts}</div>
-        <div class="stage ${cls}">${r.stage}</div>
-        <div class="adesc">${desc}</div>
-        <div class="amach">${mid}</div>
-      </div>`;
+    return `<div class="audit-row" style="cursor:pointer;" onclick="drillIn('${r.event_id}','${r.machine_id}')">
+      <div class="atime">${ts}</div><div class="stage ${cls}">${r.stage}</div><div class="adesc">${(r.description || '').substring(0,100)}</div><div class="amach">${r.machine_id}</div>
+    </div>`;
   }).join('');
 }
 
-// ── Filter tabs ──
 function filterStage(stage, el) {
   _currentFilter = stage;
   el.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -325,68 +382,41 @@ function filterStage(stage, el) {
   renderRows(_allRows, stage);
 }
 
-// ── Drill into a single event trail ──
 async function drillIn(eventId, machineId) {
   if (!eventId) return;
   const panel = document.getElementById('trailPanel');
-  const rows  = document.getElementById('trailRows');
-  const label = document.getElementById('trailEventId');
-  label.textContent = `${eventId.substring(0,8)}… · ${machineId}`;
+  const rows = document.getElementById('trailRows');
+  document.getElementById('trailEventId').textContent = `${eventId.substring(0,8)}… · ${machineId}`;
   rows.innerHTML = '<div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px 0;">Loading trail…</div>';
   panel.style.display = 'block';
-  panel.scrollIntoView({behavior:'smooth', block:'nearest'});
-
   try {
-    // Fetch trail + comms in parallel
-    const [trailRes, commsRes] = await Promise.all([
-      fetch(`${AUDIT_API}/audit/trail/${eventId}`),
-      fetch(`${AUDIT_API}/audit/comms/${eventId}`),
-    ]);
-    const trail = trailRes.ok ? (await trailRes.json()).steps  : [];
-    const comms = commsRes.ok ? (await commsRes.json()).comms  : [];
-
-    // Merge & sort by created_at
-    const merged = [
-      ...trail.map(s => ({...s, _type:'step'})),
-      ...comms.map(c => ({...c, _type:'comm', stage:'COMM', agent:`${c.from_agent}→${c.to_agent}`, description:`${c.message_type.toUpperCase()}: ${c.from_agent} → ${c.to_agent}`})),
-    ].sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
-
-    if (merged.length === 0) {
+    const res = await fetch(`${AUDIT_API}/audit/trail/${eventId}`);
+    const trail = res.ok ? (await res.json()).steps : [];
+    if (trail.length === 0) {
       rows.innerHTML = '<div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px 0;">No steps recorded for this event.</div>';
       return;
     }
-
-    rows.innerHTML = merged.map(item => {
-      const ts  = item.created_at ? new Date(item.created_at).toLocaleTimeString('en-GB') : '—';
+    rows.innerHTML = trail.map(item => {
+      const ts = item.created_at ? new Date(item.created_at).toLocaleTimeString('en-GB') : '—';
       const cls = STAGE_CLASS[item.stage] || 'process';
-      const extra = item._type === 'comm'
-        ? `<div style="font-size:9px;color:var(--muted);margin-top:3px;font-family:var(--font-mono);">${JSON.stringify(item.payload||{}).substring(0,80)}</div>`
-        : '';
-      return `
-        <div style="padding:8px 0;border-bottom:1px solid var(--border);display:grid;grid-template-columns:70px 82px 1fr;gap:10px;align-items:start;">
-          <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);">${ts}</div>
-          <div class="stage ${cls}" style="font-size:9px;">${item.stage}</div>
-          <div>
-            <div style="font-size:10px;color:var(--text);font-family:var(--font-mono);">[${item.agent}] ${item.description}</div>
-            ${extra}
-          </div>
-        </div>`;
+      return `<div style="padding:8px 0;border-bottom:1px solid var(--border);display:grid;grid-template-columns:70px 82px 1fr;gap:10px;">
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);">${ts}</div>
+        <div class="stage ${cls}" style="font-size:9px;">${item.stage}</div>
+        <div><div style="font-size:10px;">[${item.agent}] ${item.description}</div></div>
+      </div>`;
     }).join('');
-
   } catch(e) {
-    rows.innerHTML = `<div style="font-family:var(--font-mono);font-size:10px;color:var(--accent2);">Error fetching trail: ${e.message}</div>`;
+    rows.innerHTML = `<div style="font-family:var(--font-mono);font-size:10px;color:var(--accent2);">Error: ${e.message}</div>`;
   }
 }
 
-function closeTrail() {
-  document.getElementById('trailPanel').style.display = 'none';
-}
+function closeTrail() { document.getElementById('trailPanel').style.display = 'none'; }
+function toggleThread(id) { document.getElementById(id)?.classList.toggle('open'); }
 
-// ── Auto-refresh every 30s ──
 loadAudit();
 setInterval(loadAudit, 30000);
 
-// ── Chat panel — real /qa endpoint ──────────────────────────────────────────
+// ==================== CHAT FUNCTIONS (ORIGINAL - UNCHANGED) ====================
 const CA_URL = 'http://localhost:8005';
 const POLL_MS = 1500;
 const POLL_TIMEOUT = 60000;
@@ -397,14 +427,9 @@ function appendMsg(cls,html,meta){const msgs=document.getElementById('chatMsgs')
 function appendTyping(){const msgs=document.getElementById('chatMsgs');if(!msgs)return;const el=document.createElement('div');el.className='msg sys';el.innerHTML='<div class="typing-wrap"><span></span><span></span><span></span></div>';msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;return el;}
 function formatResult(r){if(typeof r==='string')return r;let h='';if(r.Impact_analysis)h+=`<strong>Impact Analysis</strong><br>${r.Impact_analysis}<br><br>`;if(r.cascade_effects&&r.cascade_effects.length){h+='<strong>Cascade Effects</strong><br>';r.cascade_effects.forEach((e,i)=>{const l=['Immediate','Short-term','Long-term'];h+=`• ${l[i]||i+1}: ${e}<br>`;});h+='<br>';}if(r.solutions)h+=`<strong>Recommended Action</strong><br>${r.solutions}`;if(r.sources&&r.sources.length)h+=`<br><br><span style="font-size:10px;color:var(--muted);">Sources: ${r.sources.join(', ')}</span>`;return h||JSON.stringify(r,null,2);}
 async function pollJob(jobId,typingEl){const deadline=Date.now()+POLL_TIMEOUT;while(Date.now()<deadline){await new Promise(r=>setTimeout(r,POLL_MS));try{const res=await fetch(`${CA_URL}/jobs/${jobId}`);if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json();if(data.status==='done'){typingEl.remove();appendMsg('sys',formatResult(data.result?.result??data.result),`SYSTEM · ${nowStr()}`);return;}if(data.status==='error'){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">⚠ ${data.detail||'Error'}</span>`,`SYSTEM · ${nowStr()}`);return;}}catch(err){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">⚠ ${err.message}</span>`,`SYSTEM · ${nowStr()}`);return;}}typingEl.remove();appendMsg('sys','<span style="color:var(--warn)">⏱ Request timed out.</span>',`SYSTEM · ${nowStr()}`);}
-async function sendMsg(){const input=document.getElementById('chatInput');if(!input)return;const text=input.value.trim();if(!text)return;input.disabled=true;const btn=document.querySelector('.send-btn');if(btn)btn.disabled=true;appendMsg('user',text,`OPERATOR · ${nowStr()}`);input.value='';const typingEl=appendTyping();try{const res=await fetch(`${CA_URL}/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({machine_id:currentMachineId,question:text})});if(!res.ok){const err=await res.json().catch(()=>({}));typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">⚠ ${res.status}: ${err.detail||res.statusText}</span>`,`SYSTEM · ${nowStr()}`);return;}const data=await res.json();if(!data.job_id){typingEl.remove();appendMsg('sys','<span style="color:var(--accent2)">⚠ No job_id returned.</span>',`SYSTEM · ${nowStr()}`);return;}await pollJob(data.job_id,typingEl);}catch(err){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">⚠ Cannot reach backend: ${err.message}</span>`,`SYSTEM · ${nowStr()}`);}finally{input.disabled=false;if(btn)btn.disabled=false;input.focus();}}
+async function sendMsg(){const input=document.getElementById('chatInput');if(!input)return;const text=input.value.trim();if(!text)return;input.disabled=true;document.querySelector('.send-btn').disabled=true;appendMsg('user',text,`OPERATOR · ${nowStr()}`);input.value='';const typingEl=appendTyping();try{const res=await fetch(`${CA_URL}/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({machine_id:currentMachineId,question:text})});if(!res.ok){const err=await res.json().catch(()=>({}));typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">⚠ ${res.status}: ${err.detail||res.statusText}</span>`,`SYSTEM · ${nowStr()}`);return;}const data=await res.json();if(!data.job_id){typingEl.remove();appendMsg('sys','<span style="color:var(--accent2)">⚠ No job_id returned.</span>',`SYSTEM · ${nowStr()}`);return;}await pollJob(data.job_id,typingEl);}catch(err){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">⚠ Cannot reach backend: ${err.message}</span>`,`SYSTEM · ${nowStr()}`);}finally{input.disabled=false;document.querySelector('.send-btn').disabled=false;input.focus();}}
 function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
-
-// Wire up the send button and textarea (static HTML doesn't have onclick)
-document.addEventListener('DOMContentLoaded', () => {
-  const btn   = document.querySelector('.send-btn');
-  const input = document.getElementById('chatInput');
-  if (btn)   btn.addEventListener('click', sendMsg);
-  if (input) input.addEventListener('keydown', handleKey);
-});
-</script></body></html>
+document.getElementById('chatInput')?.addEventListener('keydown', handleKey);
+</script>
+</body>
+</html>

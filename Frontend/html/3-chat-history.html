@@ -140,11 +140,11 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
   <div class="nav-logo">
     <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0f1117" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
   </div>
-  <button class="nav-btn " id="nb-d">
+  <button class="nav-btn " id="nb-d" onclick="location.href='1-dashboard.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     <div class="nav-tip">Dashboard</div>
   </button>
-  <button class="nav-btn " id="nb-a">
+  <button class="nav-btn " id="nb-a" onclick="location.href='2-audit-log.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
     <div class="nav-tip">Audit Log</div>
   </button>
@@ -153,7 +153,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
     <div class="nav-tip">Chat History</div>
   </button>
   <div class="nav-div"></div>
-  <button class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg><div class="nav-tip">Live Feed</div></button>
+  <button class="nav-btn" onclick="location.href='4-system-status.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg><div class="nav-tip">Live Feed</div></button>
   <button class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><div class="nav-tip">Analytics</div></button>
   <div class="nav-space"></div>
   <div class="nav-div"></div>
@@ -168,22 +168,22 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
 </div><div class="body"><div class="center"><div class="vscroll" style="gap:8px">
   <div class="sec-label" style="margin-bottom:4px">Conversation Records — 3 sessions today</div>
   <div class="hcard" onclick="toggleThread('t1')">
-    <div class="hcard-top"><div class="htag">MCH-001 · Compressor A</div><div class="htime">09:41 — ongoing</div></div>
+    <div class="hcard-top"><div class="htag">M001 · CNC Machine</div><div class="htime">09:41 — ongoing</div></div>
     <div class="hpreview">⚠ Anomaly: vibration 12.4, temp 94°C, efficiency 34%, error rate 0.18, downtime 22 min, maintenance flag ON. Tap to view conversation…</div>
     <div class="hfooter"><div class="hturns">4 turns</div><div style="flex:1"></div><div class="hwarn">⚠ Ongoing</div></div>
     <div class="hthread" id="t1">
-      <div class="hmsg sys"><div class="hbubble"><strong>MCH-001</strong> anomaly — temp 94°C, vibration 12.4, efficiency 34%. Maintenance flag raised.</div><div class="hmeta">SYSTEM · 09:41:03</div></div>
+      <div class="hmsg sys"><div class="hbubble"><strong>M001</strong> anomaly — temp 94°C, vibration 12.4, efficiency 34%. Maintenance flag raised.</div><div class="hmeta">SYSTEM · 09:41:03</div></div>
       <div class="hmsg sys"><div class="hbubble">Root cause: bearing wear. Estimated failure in <strong>6–10 hours</strong> (83% confidence). Recommend immediate inspection.</div><div class="hmeta">SYSTEM · 09:41:05</div></div>
       <div class="hmsg user"><div class="hbubble">What's the current error rate?</div><div class="hmeta">OPERATOR · 09:42:11</div></div>
-      <div class="hmsg sys"><div class="hbubble">MCH-001 error rate: <strong>0.18</strong> (18% defects). Downtime 22 min. Production status: 0 — Inefficient.</div><div class="hmeta">SYSTEM · 09:42:13</div></div>
+      <div class="hmsg sys"><div class="hbubble">M001 error rate: <strong>0.18</strong> (18% defects). Downtime 22 min. Production status: 0 — Inefficient.</div><div class="hmeta">SYSTEM · 09:42:13</div></div>
     </div>
   </div>
   <div class="hcard" onclick="toggleThread('t2')">
-    <div class="hcard-top"><div class="htag">MCH-002 · Pump B</div><div class="htime">08:14 — 08:31</div></div>
+    <div class="hcard-top"><div class="htag">M002 · Conveyor</div><div class="htime">08:14 — 08:31</div></div>
     <div class="hpreview">Temp 71°C warning, cycle time 135s. Coolant flow 1.20 slightly reduced — monitoring every 30 min. Efficiency 61%.</div>
     <div class="hfooter"><div class="hturns">6 turns</div><div style="flex:1"></div><div class="hok">✓ Resolved</div></div>
     <div class="hthread" id="t2">
-      <div class="hmsg sys"><div class="hbubble">MCH-002 temperature warning: 71°C. Cycle time elevated 135s. Thermal analysis initiated.</div><div class="hmeta">SYSTEM · 08:14:22</div></div>
+      <div class="hmsg sys"><div class="hbubble">M002 temperature warning: 71°C. Cycle time elevated 135s. Thermal analysis initiated.</div><div class="hmeta">SYSTEM · 08:14:22</div></div>
       <div class="hmsg user"><div class="hbubble">Is the coolant system okay?</div><div class="hmeta">OPERATOR · 08:16:04</div></div>
       <div class="hmsg sys"><div class="hbubble">Coolant flow 1.20 (slightly reduced). Pressure 201000 Pa nominal. Not critical — monitor every 30 min.</div><div class="hmeta">SYSTEM · 08:16:07</div></div>
       <div class="hmsg user"><div class="hbubble">What's the efficiency score?</div><div class="hmeta">OPERATOR · 08:18:30</div></div>
@@ -192,11 +192,11 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
     </div>
   </div>
   <div class="hcard" onclick="toggleThread('t3')">
-    <div class="hcard-top"><div class="htag">MCH-003 · Motor C</div><div class="htime">06:02 — 06:09</div></div>
+    <div class="hcard-top"><div class="htag">M003 · Drill</div><div class="htime">06:02 — 06:09</div></div>
     <div class="hpreview">Power fluctuation ±0.4 kW. Confirmed load shift — not electrical. Efficiency 88%, error rate 0.02. No action required.</div>
     <div class="hfooter"><div class="hturns">3 turns</div><div style="flex:1"></div><div class="hok">✓ Resolved</div></div>
     <div class="hthread" id="t3">
-      <div class="hmsg sys"><div class="hbubble">MCH-003 power fluctuation ±0.4 kW. Investigating load shift vs. electrical fault.</div><div class="hmeta">SYSTEM · 06:02:11</div></div>
+      <div class="hmsg sys"><div class="hbubble">M003 power fluctuation ±0.4 kW. Investigating load shift vs. electrical fault.</div><div class="hmeta">SYSTEM · 06:02:11</div></div>
       <div class="hmsg user"><div class="hbubble">Is it an electrical issue?</div><div class="hmeta">OPERATOR · 06:04:55</div></div>
       <div class="hmsg sys"><div class="hbubble">Confirmed load shift — not electrical. Efficiency 88%, error rate 0.02, prod. status 1 (Efficient). No maintenance required.</div><div class="hmeta">SYSTEM · 06:04:58</div></div>
     </div>
@@ -208,10 +208,10 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
     <div class="chat-live"></div>
   </div>
   <div class="chat-msgs">
-    <div class="msg sys"><div class="bubble">Monitoring <strong>4 machines</strong>. Anomaly on <strong>MCH-001</strong> — temp 94°C, vibration 12.4, efficiency 34%.</div><div class="msg-meta">SYSTEM · 09:41:03</div></div>
+    <div class="msg sys"><div class="bubble">Monitoring <strong>4 machines</strong>. Anomaly on <strong>M001</strong> — temp 94°C, vibration 12.4, efficiency 34%.</div><div class="msg-meta">SYSTEM · 09:41:03</div></div>
     <div class="msg sys"><div class="msg-tag">ANOMALY DETECTED</div><div class="bubble">Maintenance flag active. Failure window <strong>6–10h</strong>. Root cause: bearing wear. Inspect now.</div><div class="msg-meta">SYSTEM · 09:41:05</div></div>
     <div class="msg user"><div class="bubble">What's the error rate?</div><div class="msg-meta">OPERATOR · 09:42:11</div></div>
-    <div class="msg sys"><div class="bubble">MCH-001 error rate: <strong>0.18</strong>. Downtime: 22 min. Prod. status: 0 — Inefficient.</div><div class="msg-meta">SYSTEM · 09:42:13</div></div>
+    <div class="msg sys"><div class="bubble">M001 error rate: <strong>0.18</strong>. Downtime: 22 min. Prod. status: 0 — Inefficient.</div><div class="msg-meta">SYSTEM · 09:42:13</div></div>
   </div>
   <div class="chat-input-row">
     <textarea class="chat-input" placeholder="Ask about any machine…" rows="1"></textarea>
