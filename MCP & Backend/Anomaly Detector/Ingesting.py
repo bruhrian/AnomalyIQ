@@ -1,5 +1,4 @@
-import json
-import pickle, requests
+import json, pickle, requests
 import time
 import numpy as np
 from pathlib import Path
@@ -145,21 +144,25 @@ def ingest_data(payload: dict, machine_id: str, machine_type: str, timestamp: st
         "buffer_size":  len(buf),
     }
 
-with requests.get(STREAM_URL, stream=True) as r:
-    for line in r.iter_lines():
-        if line and line.startswith(b"data:"):
-            msg     = line.decode("utf-8")[len("data: "):]
-            payload = json.loads(msg)
+def run_ingest_loop():
+    with requests.get(STREAM_URL, stream=True) as r:
+        for line in r.iter_lines():
+            if line and line.startswith(b"data:"):
+                msg     = line.decode("utf-8")[len("data: "):]
+                payload = json.loads(msg)
 
-            if not _is_valid_row(payload):
-                continue
+                if not _is_valid_row(payload):
+                    continue
 
-            machine_id   = payload.get("machine_id", "")
-            machine_type = payload.get("machine_type", "")
-            timestamp    = payload.get("timestamp", "")
+                machine_id   = payload.get("machine_id", "")
+                machine_type = payload.get("machine_type", "")
+                timestamp    = payload.get("timestamp", "")
 
-            result = ingest_data(payload, machine_id, machine_type, timestamp)
+                result = ingest_data(payload, machine_id, machine_type, timestamp)
 
-            if result["status"] == "buffering" and result["buffer_size"] == T_IN - 1 or result["status"] == "ready" and result["buffer_size"] == T_IN:
-                print(f"  [DEBUG] Buffer at {result['buffer_size']}/{T_IN}, pausing 20s before next row...")
-                time.sleep(15)
+                if result["status"] == "buffering" and result["buffer_size"] == T_IN - 1 or result["status"] == "ready" and result["buffer_size"] == T_IN:
+                    print(f"  [DEBUG] Buffer at {result['buffer_size']}/{T_IN}, pausing 20s before next row...")
+                    time.sleep(15)
+
+if __name__ == "__main__":
+    run_ingest_loop()
