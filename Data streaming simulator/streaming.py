@@ -21,7 +21,6 @@ def load_data(path: str) -> list[dict]:
     return df.to_dict(orient="records")
 
 def clean_row(row: dict) -> dict:
-    # Replace NaN/Infinity with None so json.dumps doesn't crash
     cleaned = {}
     for k, v in row.items():
         if isinstance(v, float) and (math.isnan(v) or math.isinf(v)):
@@ -64,5 +63,15 @@ def stream(interval: int = INTERVAL_SECONDS):
     rows = load_data(CSV_PATH)
     return StreamingResponse(event_generator(rows, interval), media_type="text/event-stream")
 
+@app.get("/health")
+def health():
+    try:
+        if not CSV_PATH or not os.path.exists(CSV_PATH):
+            return {"status": "error", "detail": "CSV not found"}
+        df = pd.read_csv(CSV_PATH, nrows=1)  # 只读1行
+        return {"status": "ok", "detail": "CSV reachable"}
+    except Exception as e:
+        return {"status": "error", "detail": str(e)[:60]}
+        
 if __name__ == "__main__":
     uvicorn.run("streaming:app", host="0.0.0.0", port=8000, reload=False)
