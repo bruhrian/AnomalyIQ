@@ -1,4 +1,5 @@
 import sys
+import sys
 from pathlib import Path #Added#
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))#Added#
 from fastmcp import FastMCP
@@ -17,20 +18,26 @@ agent_mcp = FastMCP(
 )
 
 @agent_mcp.tool(description="Explains summarised anomaly's cascade effects and provide solutions to the anomaly")
-async def run_explanation_solution_agent(query: str) -> str: 
+async def run_explanation_solution_agent(query: str = "") -> str: 
+    if not query:
+        return "No query was provided to the explanation/solution agent."
     response = await ESA_response(coordinator_input=query)
-    return json.dumps(response) if isinstance(response, dict) else str(response)
+    return json.dumps(response, default=str) if isinstance(response, dict) else str(response)
 
 @agent_mcp.tool(description="To track what the orchestrator is doing. Needs to called with every other step taken")
-async def run_audit_agent(query: str) -> str: 
+async def run_audit_agent(query: str = "") -> str: 
+    if not query:
+        return "No query was provided to the audit agent."
 
-    response = audit_query(query=query) #Changed#
-    return response
+    response = audit_query(question=query)
+    return json.dumps(response, default=str) if isinstance(response, dict) else str(response)
 
 @agent_mcp.tool(description="Summarises raw json anomaly data into text form, must always be called first when anomalies are received")
-async def run_summarising_agent(query:str) -> str:
+async def run_summarising_agent(query: str = "") -> str:
+    if not query:
+        return "No query was provided to the summarising agent."
     response = await summary_response(query=query)
-    return response
+    return json.dumps(response, default=str) if isinstance(response, dict) else str(response)
 
 if __name__ == "__main__":
     agent_mcp.run(transport="sse", port=8080)

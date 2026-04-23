@@ -1,131 +1,120 @@
-"""
-main.py  —  AnomalyIQ Unified Backend
-======================================
-Put this file inside:  MCP & Backend/main.py
-
-Folder structure expected:
-  MCP & Backend/
-  ├── main.py          ← this file
-  ├── backend.py       ← your original backend (kept for reference)
-  ├── mcp-server.py    ← your MCP server
-  └── Anomaly Detector/
-      └── ingesting.py ← original ingesting script
-
-  Agents/
-  ├── audit_agent.py
-  └── coordinator_agent.py
-
-Run:
-    cd "MCP & Backend"
-    python main.py
-"""
-
 import sys
 import os
 import asyncio
 import threading
-import uvicorn
-import httpx
 import json
-import sqlite3
-
+import asyncio
+import importlib.util
+import time
 from uuid import uuid4
 from typing import Optional
 from contextlib import asynccontextmanager
 from pathlib import Path
-
+import httpx
+import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from sqlalchemy import create_engine, text
 
-load_dotenv()
-
-# ── Add Agents/ to path so we can import audit_agent, coordinator_agent ───────
-REPO_ROOT  = Path(__file__).resolve().parent.parent   # AnomalyIQ/
+load_dotenv(dotenv_path=Path(__file__).resolve().parent / ".env", override=True)
+REPO_ROOT  = Path(__file__).resolve().parent.parent
 AGENTS_DIR = REPO_ROOT / "Agents"
 sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(AGENTS_DIR))
 
-# ── Config ────────────────────────────────────────────────────────────────────
-STREAMING_URL = os.getenv("STREAMING_URL", "http://localhost:8000")
-MCP_URL       = os.getenv("mcp_server_ip", "http://localhost:8080")
+from orchestrator import orchestrator_response
+from Agents.audit_agent import query_logs, _get_conn
+from langchain_community.chat_message_histories import SQLChatMessageHistory
 
-# ── Job queue (same pattern as original backend.py) ───────────────────────────
-_jobs: dict[str, dict] = {}
-_job_queue: asyncio.Queue = None
+STREAMING_URL = os.getenv("STREAMING_URL")
+MCP_URL       = os.getenv("mcp_server_ip")
+AGENTS_DB     = os.getenv("agents_memory")
+FRONTEND_DIR  = os.getenv("FRONTEND_DIR")
 
-# ── Ingesting thread state ────────────────────────────────────────────────────
-_ingest_running = False
-_latest_readings: dict[str, dict] = {}
+if not STREAMING_URL:
+    raise ValueError("❌ STREAMING_URL not set in .env")
+if not AGENTS_DB:
+    raise ValueError("❌ agents_memory not set in .env")
+if not FRONTEND_DIR:
+    raise ValueError("❌ FRONTEND_DIR not set in .env")
+
+print(f"✅ STREAMING_URL: {STREAMING_URL}")
+if MCP_URL:
+    print(f"✅ MCP_URL: {MCP_URL}")
+else:
+    print(f"ℹ️  MCP_URL not set (using stdio mode)")
+print(f"✅ AGENTS_DB loaded.")
+print(f"✅ FRONTEND_DIR: {FRONTEND_DIR}")
+
+_jobs:          dict[str, dict] = {}
+_job_queue:     asyncio.Queue   = None
+_chat_queue:    asyncio.Queue   = None
+_ingest_running                  = False
+_latest_machine_state: dict[str, dict] = {}
 
 
-# ── Ingesting background thread ───────────────────────────────────────────────
+def _machine_state_key(machine_id: str, machine_type: str) -> str:
+    return f"{machine_id}::{machine_type}"
+
+
 def _start_ingesting():
     global _ingest_running
     _ingest_running = True
 
-    # Try to import from Anomaly Detector folder
-    ingest_path = Path(__file__).parent / "Anomaly Detector" / "ingesting.py"
-    if not ingest_path.exists():
-        # Try alternate location
-        ingest_path = REPO_ROOT / "Data streaming simulator" / "ingesting.py"
-
+    ingest_path = Path(os.getenv('ingesting', ''))
     if ingest_path.exists():
-        import importlib.util
         spec = importlib.util.spec_from_file_location("ingesting", str(ingest_path))
         ing  = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(ing)
-        print(f"[MAIN] Ingesting started from {ingest_path}")
+        print(f"✅ Ingesting started from {ingest_path}")
         if hasattr(ing, "run_ingest_loop"):
             ing.run_ingest_loop()
         else:
-            print("[MAIN] ingesting.py has no run_ingest_loop() — skipping")
+            print("❌ ingesting.py has no run_ingest_loop()")
     else:
-        print(f"[MAIN] ingesting.py not found — skipping ingest thread")
+        print(f"❌ ingesting.py not found at {ingest_path}")
 
     _ingest_running = False
 
 
-# ── Workers ───────────────────────────────────────────────────────────────────
-async def _worker(worker_id: int):
-    print(f"[WORKER {worker_id}] Ready")
+async def _worker(worker_id: int, queue: asyncio.Queue, queue_name: str):
+    print(f"[WORKER {queue_name}-{worker_id}] Ready")
     while True:
-        job_id, coro_fn = await _job_queue.get()
-        _jobs[job_id] = {"status": "processing"}
+        job_id, coro_fn = await queue.get()
+        _jobs[job_id] = {"status": "processing", "queue": queue_name}
         try:
             result = await coro_fn()
-            _jobs[job_id] = {"status": "done", "result": result}
+            _jobs[job_id] = {"status": "done", "result": result, "queue": queue_name}
         except Exception as e:
-            _jobs[job_id] = {"status": "error", "detail": str(e)}
+            _jobs[job_id] = {"status": "error", "detail": str(e), "queue": queue_name}
         finally:
-            _job_queue.task_done()
+            queue.task_done()
 
 
-# ── Lifespan ──────────────────────────────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global _job_queue
+    global _job_queue, _chat_queue
 
-    # Start job queue + workers
     _job_queue = asyncio.Queue(maxsize=200)
+    _chat_queue = asyncio.Queue(maxsize=50)
     for i in range(2):
-        asyncio.create_task(_worker(i))
+        asyncio.create_task(_worker(i, _job_queue, "agent"))
+    asyncio.create_task(_worker(0, _chat_queue, "chat"))
 
-    # Start ingesting thread
-    t = threading.Thread(target=_start_ingesting, daemon=True)
-    t.start()
+    threading.Thread(target=_start_ingesting, daemon=True).start()
 
-    print("[MAIN] AnomalyIQ backend ready on http://localhost:8005")
-    print("[MAIN] Open your HTML files in the browser to use the UI")
+    print(f"✅ AnomalyIQ backend ready — http://localhost:8005")
+    print(f"✅ UI at http://localhost:8005/ui/1-dashboard.html")
 
     yield
 
-    print("[MAIN] Shutting down")
+    print("AnomalyIQ shutting down.")
 
 
-# ── App ───────────────────────────────────────────────────────────────────────
 app = FastAPI(title="AnomalyIQ Backend", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
@@ -135,18 +124,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from fastapi.staticfiles import StaticFiles
-app.mount("/ui", StaticFiles(directory=r"C:\Users\jiang\AnomalyIQ\Frontend", html=True), name="ui")
+app.mount("/ui", StaticFiles(directory=FRONTEND_DIR, html=True), name="ui")
 
-# ═════════════════════════════════════════════════════════════════════════════
-# ROUTES
-# ═════════════════════════════════════════════════════════════════════════════
-
-# ── Request models ────────────────────────────────────────────────────────────
-class ChatRequest(BaseModel):
-    machine_id: str
-    question:   str
-    session_id: Optional[str] = None
 
 class AnomalyAlert(BaseModel):
     machine_id:   str
@@ -159,77 +138,143 @@ class QARequest(BaseModel):
     machine_id: str
     question:   str
 
+class ChatRequest(BaseModel):
+    machine_id: str
+    question:   str
+    session_id: Optional[str] = None
 
-# ── GET /health ───────────────────────────────────────────────────────────────
+class MachineStateUpdate(BaseModel):
+    machine_id: str
+    machine_type: str
+    label: str
+    confidence: float
+    visual_url: list[str] = []
+
+
 @app.get("/health")
 async def health():
-    return {"status": "ok", "queue_size": _job_queue.qsize() if _job_queue else 0}
+    return {
+        "status": "ok",
+        "queue_size": _job_queue.qsize() if _job_queue else 0,
+        "chat_queue_size": _chat_queue.qsize() if _chat_queue else 0,
+    }
 
 
-# ── POST /chat  (from UI chat panel) ─────────────────────────────────────────
-@app.post("/chat")
-async def chat(req: ChatRequest):
-    if _job_queue.full():
-        raise HTTPException(status_code=429, detail="Queue full — try again later")
-
-    job_id = str(uuid4())
-    _jobs[job_id] = {"status": "queued"}
-
-    async def run():
-        from coordinator_agent import handle_qa_question
-        return await handle_qa_question(
-            machine_id = req.machine_id,
-            question   = req.question,
-        )
-
-    await _job_queue.put((job_id, run))
-    return {"job_id": job_id, "status": "queued"}
-
-
-# ── POST /qa  (kept for backward compat with original backend.py) ─────────────
-@app.post("/qa")
-async def qa(request: QARequest):
-    if _job_queue.full():
-        raise HTTPException(status_code=429, detail="Queue full — try again later")
-
-    job_id = str(uuid4())
-    _jobs[job_id] = {"status": "queued"}
-
-    async def run():
-        from coordinator_agent import handle_qa_question
-        return await handle_qa_question(
-            machine_id = request.machine_id,
-            question   = request.question,
-        )
-
-    await _job_queue.put((job_id, run))
-    return {"job_id": job_id, "status": "queued"}
-
-
-# ── POST /anomaly  (called by CNN when anomaly detected) ──────────────────────
 @app.post("/anomaly")
 async def anomaly(alert: AnomalyAlert):
     if _job_queue.full():
         raise HTTPException(status_code=429, detail="Queue full — try again later")
 
     job_id = str(uuid4())
-    _jobs[job_id] = {"status": "queued"}
+    _jobs[job_id] = {"status": "queued", "position": _job_queue.qsize() + 1}
+    print(f"[CA] Anomaly received — machine: {alert.machine_id} | job: {job_id}")
 
     async def run():
-        from coordinator_agent import handle_anomaly_alert
-        return await handle_anomaly_alert(
-            machine_id   = alert.machine_id,
-            machine_type = alert.machine_type,
-            label        = alert.label,
-            confidence   = alert.confidence,
-            visual_url   = alert.visual_url,
+        query = (
+            f"ANOMALY ALERT — Machine {alert.machine_id} ({alert.machine_type})\n"
+            f"Label: {alert.label} | Confidence: {alert.confidence:.1%}\n"
+            f"Visuals: {', '.join(alert.visual_url) if alert.visual_url else 'none'}\n\n"
+            f"Please analyse this anomaly, explain the root cause, cascade effects, and recommended actions."
+        )
+        return await orchestrator_response(query=query, session_id=f"anomaly-{alert.machine_id}")
+
+    await _job_queue.put((job_id, run))
+    return {"job_id": job_id, "status": "queued", "position": _job_queue.qsize()}
+
+
+@app.post("/qa")
+async def qa(request: QARequest):
+    if _job_queue.full():
+        raise HTTPException(status_code=429, detail="Queue full — try again later")
+
+    job_id = str(uuid4())
+    _jobs[job_id] = {"status": "queued", "position": _job_queue.qsize() + 1}
+    print(f"[CA] QA received — machine: {request.machine_id} | job: {job_id}")
+
+    async def run():
+        return await orchestrator_response(
+            query      = f"[Machine: {request.machine_id}] {request.question}",
+            session_id = f"machine-{request.machine_id}",
         )
 
     await _job_queue.put((job_id, run))
-    return {"job_id": job_id, "status": "queued"}
+    return {"job_id": job_id, "status": "queued", "position": _job_queue.qsize()}
 
 
-# ── GET /jobs/{job_id} ────────────────────────────────────────────────────────
+@app.post("/chat")
+async def chat(req: ChatRequest):
+    if _chat_queue.full():
+        raise HTTPException(status_code=429, detail="Chat queue full - try again later")
+
+    job_id = str(uuid4())
+    session_id = req.session_id or f"chat-{req.machine_id}-{uuid4().hex[:8]}"
+    _jobs[job_id] = {"status": "queued", "queue": "chat", "session_id": session_id}
+
+    async def run():
+        q_lower = req.question.lower()
+        if any(term in q_lower for term in ("backend", "connected", "connection", "health", "status")):
+            return {
+                "result": (
+                    "Backend is connected. This request reached the backend /chat endpoint, "
+                    f"agent queue size is {_job_queue.qsize() if _job_queue else 0}, "
+                    f"chat queue size is {_chat_queue.qsize() if _chat_queue else 0}."
+                ),
+                "session_id": session_id,
+                "elapsed_time": 0,
+            }
+
+        if any(term in q_lower for term in ("anomaly", "anomalies", "maintenance", "abnormal")):
+            try:
+                recent = query_logs(limit=10)
+                result = recent.get("result")
+                logs = getattr(result, "logs", []) if result else []
+                anomaly_logs = [
+                    log for log in logs
+                    if str(log.event).lower() in {"detect", "anomaly_detected"}
+                    or "needs_maintenance" in str(log.details).lower()
+                ]
+                if anomaly_logs:
+                    lines = []
+                    for log in anomaly_logs[:5]:
+                        details = log.details or {}
+                        machine = details.get("machine_id") or details.get("sensor_id") or "unknown machine"
+                        lines.append(f"{log.timestamp}: {log.event} for {machine}")
+                    answer = "Recent anomaly records found:\n" + "\n".join(lines)
+                else:
+                    answer = "No recent anomaly records are available in the audit log context."
+                return {"result": answer, "session_id": session_id, "elapsed_time": 0}
+            except Exception as e:
+                return {
+                    "result": f"Could not read anomaly records from audit log: {str(e)}",
+                    "session_id": session_id,
+                    "error": str(e),
+                }
+
+        context = "Backend API status: connected; this chat request reached /chat successfully."
+        try:
+            recent = query_logs(limit=5)
+            result = recent.get("result")
+            logs = getattr(result, "logs", []) if result else []
+            if logs:
+                context += "\nRecent audit records:\n" + "\n".join(
+                    f"- {log.timestamp} | {log.agent} | {log.event} | {log.details}"
+                    for log in logs[:5]
+                )
+            else:
+                context += "\nRecent audit records: none available."
+        except Exception as e:
+            context += f"\nRecent audit records unavailable: {str(e)}"
+
+        return await orchestrator_response(
+            query      = f"[Machine: {req.machine_id}] {req.question}\n\nBackend context:\n{context}",
+            session_id = session_id,
+            use_tools  = False,
+        )
+
+    await _chat_queue.put((job_id, run))
+    return {"job_id": job_id, "status": "queued", "session_id": session_id}
+
+
 @app.get("/jobs/{job_id}")
 async def get_job(job_id: str):
     job = _jobs.get(job_id)
@@ -238,13 +283,6 @@ async def get_job(job_id: str):
     return job
 
 
-# ── GET /machines/status ──────────────────────────────────────────────────────
-@app.get("/machines/status")
-async def machines_status():
-    return {"machines": list(_latest_readings.values())}
-
-
-# ── GET /machines/stream  (SSE proxy) ────────────────────────────────────────
 @app.get("/machines/stream")
 async def machines_stream():
     async def event_gen():
@@ -253,143 +291,178 @@ async def machines_stream():
                 async with client.stream("GET", f"{STREAMING_URL}/stream") as resp:
                     async for line in resp.aiter_lines():
                         if line.startswith("data:"):
-                            yield f"{line}\n\n"
+                            raw = line[len("data:"):].strip()
+                            payload = json.loads(raw)
+                            machine_id = payload.get("machine_id")
+                            machine_type = payload.get("machine_type")
+                            state = (
+                                _latest_machine_state.get(_machine_state_key(machine_id, machine_type))
+                                if machine_id and machine_type
+                                else None
+                            )
+                            if state:
+                                payload.update({
+                                    "label": state.get("label", payload.get("label", "normal")),
+                                    "confidence": state.get("confidence", payload.get("confidence")),
+                                    "visual_url": state.get("visual_url", payload.get("visual_url", [])),
+                                    "state_source": "cnn",
+                                })
+                            else:
+                                payload.setdefault("label", "normal")
+                                payload.setdefault("visual_url", [])
+                                payload.setdefault("state_source", "stream")
+                            yield f"data: {json.dumps(payload)}\n\n"
         except Exception as e:
             yield f"data: {json.dumps({'error': str(e)})}\n\n"
 
     return StreamingResponse(event_gen(), media_type="text/event-stream")
 
 
-# ── GET /audit/logs ───────────────────────────────────────────────────────────
+@app.post("/machine-state")
+async def machine_state(update: MachineStateUpdate):
+    state = update.model_dump()
+    state["updated_at"] = time.time()
+    _latest_machine_state[_machine_state_key(update.machine_id, update.machine_type)] = state
+    return {"status": "ok", "machine_id": update.machine_id, "machine_type": update.machine_type}
+
+
 @app.get("/audit/logs")
-async def audit_logs(
-    agent:     str = "",
-    event:     str = "",
-    sensor_id: str = "",
-    limit:     int = 50,
-):
+async def audit_logs(agent: str = "", event: str = "", sensor_id: str = "", limit: int = 50):
     try:
-        from audit_agent import query_logs
         res    = query_logs(agent=agent, event=event, sensor_id=sensor_id, limit=limit)
         result = res["result"]
-        return {
-            "count": result.count,
-            "logs":  [log.model_dump() for log in result.logs],
-        }
+        return {"count": result.count, "logs": [log.model_dump() for log in result.logs]}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# ── GET /chat/sessions ────────────────────────────────────────────────────────
 @app.get("/chat/sessions")
 async def chat_sessions():
-    db_path = os.getenv("ca_memory_db", "./data/conversations.db")
     try:
-        conn = sqlite3.connect(db_path)
-        cur  = conn.cursor()
-        cur.execute(
-            "SELECT DISTINCT session_id FROM message_store ORDER BY rowid DESC LIMIT 50"
-        )
-        sessions = [row[0] for row in cur.fetchall()]
-        conn.close()
+        engine = create_engine(AGENTS_DB)
+        with engine.connect() as conn:
+            result = conn.execute(text(
+                """
+                SELECT session_id
+                FROM message_store
+                GROUP BY session_id
+                ORDER BY MAX(id) DESC
+                LIMIT 50
+                """
+            ))
+            sessions = [row[0] for row in result.fetchall()]
         return {"sessions": sessions}
     except Exception as e:
         return {"sessions": [], "error": str(e)}
 
 
-# ── GET /chat/history/{session_id} ───────────────────────────────────────────
 @app.get("/chat/history/{session_id}")
 async def chat_history(session_id: str):
     try:
-        from langchain_community.chat_message_histories import SQLChatMessageHistory
-        db_path = os.getenv("ca_memory_db", "./data/conversations.db")
-        history = SQLChatMessageHistory(
-            session_id        = session_id,
-            connection_string = f"sqlite:///{db_path}",
-        )
-        messages = [
-            {"role": msg.type, "content": msg.content}
-            for msg in history.messages
-        ]
+        history  = SQLChatMessageHistory(session_id=session_id, connection_string=AGENTS_DB)
+        messages = [{"role": msg.type, "content": msg.content} for msg in history.messages]
         return {"session_id": session_id, "messages": messages}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# ── GET /system/health ────────────────────────────────────────────────────────
 @app.get("/system/health")
 async def system_health():
     results = {}
 
+    # ── Regular HTTP ping ──
     async def ping(name: str, url: str, timeout: float = 3.0):
+        start = time.perf_counter()
         try:
             async with httpx.AsyncClient(timeout=timeout) as client:
                 r = await client.get(url)
                 results[name] = {
                     "status": "ok" if r.status_code < 400 else "degraded",
                     "detail": f"HTTP {r.status_code}",
+                    "latency_ms": round((time.perf_counter() - start) * 1000),
                 }
         except httpx.ConnectError:
-            results[name] = {"status": "error", "detail": "Connection refused"}
+            results[name] = {"status": "error", "detail": "Connection refused", "latency_ms": round((time.perf_counter() - start) * 1000)}
         except httpx.TimeoutException:
-            results[name] = {"status": "degraded", "detail": "Timeout"}
+            results[name] = {"status": "error", "detail": "Timeout", "latency_ms": round((time.perf_counter() - start) * 1000)}
         except Exception as e:
-            results[name] = {"status": "error", "detail": str(e)}
+            results[name] = {"status": "error", "detail": str(e)[:60], "latency_ms": round((time.perf_counter() - start) * 1000)}
 
-    results["UI"]      = {"status": "ok",     "detail": "Frontend served"}
-    results["Backend"] = {"status": "ok",     "detail": "Running"}
+    # ── SSE ping: only reads response headers, doesn't consume the stream ──
+    async def ping_sse(name: str, url: str, timeout: float = 3.0):
+        start = time.perf_counter()
+        try:
+            async with httpx.AsyncClient(timeout=timeout) as client:
+                async with client.stream("GET", url) as r:
+                    results[name] = {
+                        "status": "ok" if r.status_code < 400 else "error",
+                        "detail": f"HTTP {r.status_code}",
+                        "latency_ms": round((time.perf_counter() - start) * 1000),
+                    }
+        except httpx.ConnectError:
+            results[name] = {"status": "error", "detail": "Connection refused", "latency_ms": round((time.perf_counter() - start) * 1000)}
+        except httpx.TimeoutException:
+            results[name] = {"status": "error", "detail": "Timeout", "latency_ms": round((time.perf_counter() - start) * 1000)}
+        except Exception as e:
+            results[name] = {"status": "error", "detail": str(e)[:60], "latency_ms": round((time.perf_counter() - start) * 1000)}
 
-    await asyncio.gather(
-        ping("Streaming", f"{STREAMING_URL}/data"),
-        ping("MCP",       MCP_URL),
-    )
+    # ── Static results ──
+    results["UI"]      = {"status": "ok", "detail": "Frontend served", "latency_ms": 0}
+    results["Backend"] = {"status": "ok", "detail": "Running", "latency_ms": 0}
 
-    # PostgreSQL
+    # ── Concurrent HTTP pings ──
+    tasks = [ping("Streaming", f"{STREAMING_URL}/health")]
+    if MCP_URL:
+        tasks.append(ping_sse("MCP", MCP_URL))
+    else:
+        results["MCP"] = {"status": "error", "detail": "MCP_URL not configured"}
+    await asyncio.gather(*tasks)
+
+    # ── PostgreSQL ──
     try:
-        from audit_agent import _get_conn
+        start = time.perf_counter()
         _get_conn()
-        results["PostgreSQL"] = {"status": "ok", "detail": "Connected"}
+        results["PostgreSQL"] = {"status": "ok", "detail": "Connected", "latency_ms": round((time.perf_counter() - start) * 1000)}
     except Exception as e:
-        results["PostgreSQL"] = {"status": "error", "detail": str(e)}
+        results["PostgreSQL"] = {"status": "error", "detail": str(e)[:60], "latency_ms": round((time.perf_counter() - start) * 1000)}
 
-    # Qdrant
+    # ── Neo4j ──
     try:
-        async with httpx.AsyncClient(timeout=3.0) as client:
-            r = await client.get("http://localhost:6333/healthz")
-            results["Qdrant"] = {
-                "status": "ok" if r.status_code == 200 else "degraded",
-                "detail": f"HTTP {r.status_code}",
-            }
+        start = time.perf_counter()
+        from neo4j import AsyncGraphDatabase
+        neo4j_uri  = os.getenv("NEO4J_URI", "bolt://localhost:7687").strip()
+        print(f"DEBUG NEO4J_URI = [{neo4j_uri}]") 
+        neo4j_user = os.getenv("NEO4J_USERNAME", "neo4j").strip()
+        neo4j_pass = os.getenv("NEO4J_PASSWORD", "").strip()
+        async with AsyncGraphDatabase.driver(neo4j_uri, auth=(neo4j_user, neo4j_pass)) as driver:
+            await driver.verify_connectivity()
+        results["Neo4j"] = {"status": "ok", "detail": "Connected", "latency_ms": round((time.perf_counter() - start) * 1000)}
     except Exception as e:
-        results["Qdrant"] = {"status": "error", "detail": str(e)}
+        results["Neo4j"] = {"status": "error", "detail": str(e)[:60], "latency_ms": round((time.perf_counter() - start) * 1000)}
 
-    # Data Simulator thread
+    # ── Data Simulator ──
     results["DataSimulator"] = {
         "status": "ok" if _ingest_running else "degraded",
         "detail": "Thread alive" if _ingest_running else "Not started",
+        "latency_ms": 0,
     }
 
+    # ── Overall ──
     statuses = [v["status"] for v in results.values()]
     overall  = "error" if "error" in statuses else "degraded" if "degraded" in statuses else "ok"
 
     return {"overall": overall, "components": results}
 
 
-# ── GET /anomalies ────────────────────────────────────────────────────────────
 @app.get("/anomalies")
 async def anomalies(limit: int = 20):
     try:
-        from audit_agent import query_logs
         res    = query_logs(event="anomaly_detected", limit=limit)
         result = res["result"]
-        return {
-            "count":     result.count,
-            "anomalies": [log.model_dump() for log in result.logs],
-        }
+        return {"count": result.count, "anomalies": [log.model_dump() for log in result.logs]}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# ── Run ───────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8005, reload=False)
