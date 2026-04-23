@@ -1,18 +1,19 @@
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import HumanMessage, BaseMessage
 from langchain_community.chat_message_histories import SQLChatMessageHistory
-from mcp.client.streamable_http import streamable_http_client
-from mcp import ClientSession
 from dotenv import load_dotenv
+import asyncio
 import os, time, psycopg2
 from langchain_ollama import ChatOllama
 
 load_dotenv()
 
 SUMMARISING_PROMPT_PATH = os.getenv('sum_prompt')
-MODEL = "gemma4:e4b"
+MODEL = os.getenv("SUMMARISING_MODEL") or os.getenv("MODEL") or "gemma3:2b"
 MCP_SERVER_IP = os.getenv('mcp_server_ip')
 DEFAULT_SESSION_ID = "summary-default-session"
+REQUEST_TIMEOUT_SECONDS = float(os.getenv("SUMMARISER_TIMEOUT_SECONDS", "60"))
+MAX_HISTORY_MESSAGES = int(os.getenv("SUMMARISER_MAX_HISTORY_MESSAGES", "8"))
 
 DB_CONN = os.getenv('agents_memory')
 if not DB_CONN:
@@ -50,6 +51,15 @@ def log_session_history(session_id: str, conn_string: str = DB_CONN) -> None:
             preview += "..."
         print(f"   [{i}] {type(msg).__name__}: {preview}")
 
+def get_trimmed_messages(history: SQLChatMessageHistory) -> list[BaseMessage]:
+    if MAX_HISTORY_MESSAGES <= 0:
+        return []
+    if len(history.messages) <= MAX_HISTORY_MESSAGES:
+        return history.messages
+    trimmed = history.messages[-MAX_HISTORY_MESSAGES:]
+    print(f"History trimmed from {len(history.messages)} to {len(trimmed)} messages.")
+    return trimmed
+
 async def summary_response(
     query: str,
     session_id: str | None = None,
@@ -74,7 +84,7 @@ async def summary_response(
     with open(SUMMARISING_PROMPT_PATH, 'r', encoding='utf-8') as f:
         system_prompt = f.read()
 
-    llm = ChatOllama(model=MODEL)
+    llm = ChatOllama(model=MODEL, request_timeout=REQUEST_TIMEOUT_SECONDS)
 
     agent = create_react_agent(
         model=llm,
@@ -83,24 +93,31 @@ async def summary_response(
     )
 
     history = get_session_history(session_id, conn_string)
-    messages_in = history.messages + [HumanMessage(content=query)]
+    trimmed_history = get_trimmed_messages(history)
+    messages_in = trimmed_history + [HumanMessage(content=query)]
 
-    print(f"📨 Sending {len(messages_in)} message(s) to agent "f"({len(history.messages)} from history + 1 new)")
+    print(
+        f"Sending {len(messages_in)} message(s) to agent "
+        f"({len(trimmed_history)} from history + 1 new)"
+    )
 
     try:
         start_time = time.time()
 
-        raw_res = await agent.ainvoke({"messages": messages_in})
+        raw_res = await asyncio.wait_for(
+            agent.ainvoke({"messages": messages_in}),
+            timeout=REQUEST_TIMEOUT_SECONDS,
+        )
         output = raw_res["messages"][-1].content
         elapsed = time.time() - start_time
 
         history.add_user_message(query)
         history.add_ai_message(output)
-        print(f"💾 Turn saved to DB (session: {session_id})")
+        print(f"Turn saved to DB (session: {session_id})")
 
-        print(f"\n💬 Response : {output}")
-        print(f"⏱️  Elapsed  : {elapsed:.2f}s")
-        print(f"🗂️  Session  : {session_id}")
+        print(f"\nResponse : {output}")
+        print(f"Elapsed  : {elapsed:.2f}s")
+        print(f"Session  : {session_id}")
 
         return {
             "result": output,
@@ -108,8 +125,15 @@ async def summary_response(
             "elapsed_time": elapsed
         }
 
+    except asyncio.TimeoutError:
+        print(f"Summarising agent timed out after {REQUEST_TIMEOUT_SECONDS:.0f}s")
+        return {
+            "result": f"Summariser timed out after {REQUEST_TIMEOUT_SECONDS:.0f}s.",
+            "error": "summariser timeout",
+            "session_id": session_id
+        }
     except Exception as e:
-        print(f"❌ Agent execution error: {e}")
+        print(f"Agent execution error: {e}")
         return {
             "result": f"Error processing request: {str(e)}",
             "error": str(e),

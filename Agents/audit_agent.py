@@ -22,25 +22,25 @@ import psycopg2.extras
 from typing import Optional
 from pydantic import BaseModel
 from dotenv import load_dotenv
-from langchain_ollama import ChatOllama
 
 from llama_index.core import SQLDatabase, Settings
 from llama_index.core.query_engine import NLSQLTableQueryEngine
 from llama_index.llms.ollama import Ollama
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 
 load_dotenv()
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 DB_CONFIG = {
     "host":     os.getenv("POSTGRES_HOST"),
-    "port":     int(os.getenv("POSTGRES_PORT")),
+    "port":     int(os.getenv("POSTGRES_PORT", "5432")),
     "dbname":   os.getenv("PG_AUDIT"),
     "user":     os.getenv("POSTGRES_USER"),
     "password": os.getenv("POSTGRES_PASSWORD"),
 }
 
-MODEL = "gemma4:e4b"   # same model as ESA
+MODEL = os.getenv("AUDIT_MODEL") or os.getenv("MODEL") or "gemma3:2b"
+AUDIT_QUERY_TIMEOUT_SECONDS = float(os.getenv("AUDIT_QUERY_TIMEOUT_SECONDS", "60"))
 
 # SQLAlchemy connection string for LlamaIndex
 DB_URL = (
@@ -84,7 +84,7 @@ _nl_engine = None
 def _get_nl_engine():
     global _nl_engine
     if _nl_engine is None:
-        Settings.llm = Ollama(model=MODEL, request_timeout=120.0)
+        Settings.llm = Ollama(model=MODEL, request_timeout=AUDIT_QUERY_TIMEOUT_SECONDS)
         engine      = create_engine(DB_URL)
         sql_db      = SQLDatabase(engine, include_tables=["audit_logs"])
         _nl_engine  = NLSQLTableQueryEngine(
@@ -292,7 +292,7 @@ def query_logs(
 
 # ── 3. audit_query — NLP-to-SQL ───────────────────────────────────────────────
 
-def audit_query(question: str) -> dict:
+def audit_query(question: str = "", query: str = "") -> dict:
     """
     Natural language query against the audit_logs table.
     Uses LlamaIndex NLSQLTableQueryEngine (text-to-SQL) under the hood.
@@ -306,6 +306,7 @@ def audit_query(question: str) -> dict:
     Args:
         question : plain English question about the audit log
     """
+    question = query or question
     start = time.time()
     try:
         engine   = _get_nl_engine()

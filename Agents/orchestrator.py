@@ -1,18 +1,22 @@
 from langgraph.prebuilt import create_react_agent
-from langchain_core.messages import HumanMessage, BaseMessage
+from langchain_core.messages import HumanMessage, SystemMessage, BaseMessage
 from langchain_mcp_adapters.tools import load_mcp_tools
+from pathlib import Path
 from langchain_community.chat_message_histories import SQLChatMessageHistory
-from mcp.client.streamable_http import streamable_http_client
+from mcp.client.sse import sse_client
 from mcp import ClientSession
 from dotenv import load_dotenv
-import os, time, psycopg2
+from langchain_ollama import ChatOllama
+import asyncio
+import os, sys, time, psycopg2
 
-load_dotenv()
-
+load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env", override=True)
 ORCHESTRATOR_PROMPT_PATH = os.getenv('orc_prompt')
-MODEL = "gemma4:e4b"
+MODEL = os.getenv("MODEL")     
 MCP_SERVER_IP = os.getenv('mcp_server_ip')
 DEFAULT_SESSION_ID = "orchestrator-default-session"
+REQUEST_TIMEOUT_SECONDS = float(os.getenv("ORCHESTRATOR_TIMEOUT_SECONDS", "180"))
+MAX_HISTORY_MESSAGES = int(os.getenv("ORCHESTRATOR_MAX_HISTORY_MESSAGES", "12"))
 
 DB_CONN = os.getenv('agents_memory')
 if not DB_CONN:
@@ -50,10 +54,23 @@ def log_session_history(session_id: str, conn_string: str = DB_CONN) -> None:
             preview += "..."
         print(f"   [{i}] {type(msg).__name__}: {preview}")
 
+def get_trimmed_messages(history: SQLChatMessageHistory) -> list[BaseMessage]:
+    if MAX_HISTORY_MESSAGES <= 0:
+        return []
+    if len(history.messages) <= MAX_HISTORY_MESSAGES:
+        return history.messages
+    trimmed = history.messages[-MAX_HISTORY_MESSAGES:]
+    print(
+        f"History trimmed from {len(history.messages)} to {len(trimmed)} messages "
+        f"for faster orchestration."
+    )
+    return trimmed
+
 async def orchestrator_response(
     query: str,
     session_id: str | None = None,
-    conn_string: str = DB_CONN
+    conn_string: str = DB_CONN,
+    use_tools: bool = True,
 ) -> dict:
 
     if not init_postgres_db(conn_string):
@@ -74,49 +91,142 @@ async def orchestrator_response(
     with open(ORCHESTRATOR_PROMPT_PATH, 'r', encoding='utf-8') as f:
         system_prompt = f.read()
 
-    llm = ChatOllama(model=MODEL)
+    llm = ChatOllama(model=MODEL, request_timeout=REQUEST_TIMEOUT_SECONDS)
 
-    async with streamable_http_client(MCP_SERVER_IP) as (read, write, _):
-        async with ClientSession(read, write) as mcp_session:
-            await mcp_session.initialize()
-            tools = await load_mcp_tools(mcp_session)
+    history = get_session_history(session_id, conn_string)
+    trimmed_history = get_trimmed_messages(history)
+    messages_in = trimmed_history + [HumanMessage(content=query)]
 
-            agent = create_react_agent(
-                model=llm,
-                tools=tools,
-                prompt=system_prompt,
+    if not use_tools:
+        print("MCP tools disabled for this response; using direct model call with supplied backend context.")
+        direct_chat_prompt = (
+            "You are AnomalyIQ AI, a diagnostic assistant inside the operator UI.\n"
+            "Answer the operator directly and concisely.\n"
+            "Do not create plans, do not delegate tasks, and do not claim you will call tools.\n"
+            "You do not have tool access in this mode. Use only the user question, chat history, "
+            "and any backend context included in the message.\n"
+            "If the operator asks whether the backend is connected, explain that this chat request "
+            "reached the backend if you are responding.\n"
+            "If anomaly context is missing, say no anomaly records are available in the provided context."
+        )
+        try:
+            start_time = time.time()
+            raw_msg = await asyncio.wait_for(
+                llm.ainvoke([SystemMessage(content=direct_chat_prompt), *messages_in]),
+                timeout=REQUEST_TIMEOUT_SECONDS,
             )
+            output = raw_msg.content
+            elapsed = time.time() - start_time
 
-            history = get_session_history(session_id, conn_string)
-            messages_in = history.messages + [HumanMessage(content=query)]
+            history.add_user_message(query)
+            history.add_ai_message(output)
+            print(f"Turn saved to DB (session: {session_id})")
 
-            print(f"📨 Sending {len(messages_in)} message(s) to agent "f"({len(history.messages)} from history + 1 new)")
+            return {
+                "result": output,
+                "session_id": session_id,
+                "elapsed_time": elapsed
+            }
+        except asyncio.TimeoutError:
+            print(f"Direct chat timed out after {REQUEST_TIMEOUT_SECONDS:.0f}s")
+            timeout_msg = f"Request timed out after {REQUEST_TIMEOUT_SECONDS:.0f}s while waiting for the model."
+            history.add_user_message(query)
+            history.add_ai_message(timeout_msg)
+            return {
+                "result": timeout_msg,
+                "error": "model timeout",
+                "session_id": session_id
+            }
+        except Exception as e:
+            print(f"Direct chat error: {e}")
+            error_msg = f"Error processing request: {str(e)}"
+            history.add_user_message(query)
+            history.add_ai_message(error_msg)
+            return {
+                "result": error_msg,
+                "error": str(e),
+                "session_id": session_id
+            }
 
-            try:
-                start_time = time.time()
+    tools = []
+    mcp_context = None
+    if use_tools:
+        mcp_started = time.time()
+        print(f"Connecting to MCP server: {MCP_SERVER_IP}")
+        mcp_context = sse_client(MCP_SERVER_IP)
+        read, write = await mcp_context.__aenter__()
+        mcp_session_context = ClientSession(read, write)
+        mcp_session = await mcp_session_context.__aenter__()
+        try:
+            await mcp_session.initialize()
+            print(f"MCP session initialized in {time.time() - mcp_started:.2f}s")
+            tools = await load_mcp_tools(mcp_session)
+            print(f"Loaded {len(tools)} MCP tools")
+        except Exception:
+            await mcp_session_context.__aexit__(*sys.exc_info())
+            await mcp_context.__aexit__(*sys.exc_info())
+            raise
+    try:
+        agent = create_react_agent(
+            model=llm,
+            tools=tools,
+            prompt=system_prompt,
+        )
 
-                raw_res = await agent.ainvoke({"messages": messages_in})
-                output = raw_res["messages"][-1].content
-                elapsed = time.time() - start_time
+        print(
+            f"Sending {len(messages_in)} message(s) to agent "
+            f"({len(trimmed_history)} from history + 1 new)"
+        )
 
-                history.add_user_message(query)
-                history.add_ai_message(output)
-                print(f"💾 Turn saved to DB (session: {session_id})")
+        try:
+            start_time = time.time()
 
-                print(f"\n💬 Response : {output}")
-                print(f"⏱️  Elapsed  : {elapsed:.2f}s")
-                print(f"🗂️  Session  : {session_id}")
+            print(f"Starting agent invocation with {REQUEST_TIMEOUT_SECONDS:.0f}s timeout")
+            raw_res = await asyncio.wait_for(
+                agent.ainvoke({"messages": messages_in}),
+                timeout=REQUEST_TIMEOUT_SECONDS,
+            )
+            output = raw_res["messages"][-1].content
+            elapsed = time.time() - start_time
 
-                return {
-                    "result": output,
-                    "session_id": session_id, 
-                    "elapsed_time": elapsed
-                }
+            history.add_user_message(query)
+            history.add_ai_message(output)
+            print(f"Turn saved to DB (session: {session_id})")
 
-            except Exception as e:
-                print(f"❌ Agent execution error: {e}")
-                return {
-                    "result": f"Error processing request: {str(e)}",
-                    "error": str(e),
-                    "session_id": session_id
-                }
+            print(f"\nResponse : {output}")
+            print(f"Elapsed  : {elapsed:.2f}s")
+            print(f"Session  : {session_id}")
+
+            return {
+                "result": output,
+                "session_id": session_id,
+                "elapsed_time": elapsed
+            }
+
+        except asyncio.TimeoutError:
+            print(f"Agent execution timed out after {REQUEST_TIMEOUT_SECONDS:.0f}s")
+            timeout_msg = (
+                f"Request timed out after {REQUEST_TIMEOUT_SECONDS:.0f}s while waiting for the "
+                "orchestrator or one of its tools."
+            )
+            history.add_user_message(query)
+            history.add_ai_message(timeout_msg)
+            return {
+                "result": timeout_msg,
+                "error": "orchestrator timeout",
+                "session_id": session_id
+            }
+        except Exception as e:
+            print(f"Agent execution error: {e}")
+            error_msg = f"Error processing request: {str(e)}"
+            history.add_user_message(query)
+            history.add_ai_message(error_msg)
+            return {
+                "result": error_msg,
+                "error": str(e),
+                "session_id": session_id
+            }
+    finally:
+        if use_tools and mcp_session_context is not None and mcp_context is not None:
+            await mcp_session_context.__aexit__(None, None, None)
+            await mcp_context.__aexit__(None, None, None)

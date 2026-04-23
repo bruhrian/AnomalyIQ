@@ -5,12 +5,13 @@ import os, time
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_classic.agents import AgentExecutor, create_tool_calling_agent
+from langchain_ollama import ChatOllama
 from typing import Optional 
 import asyncio
 
 load_dotenv()
 ESA_prompt = os.getenv('ESA_prompt_template')
-model="gemma4:e4b"
+model = os.getenv("ESA_MODEL") or os.getenv("MODEL") or "qwen2.5:3b"
 
 class ESA_Response(BaseModel):
     Impact_analysis: str
