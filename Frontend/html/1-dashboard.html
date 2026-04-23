@@ -355,8 +355,8 @@ nav {
           <!-- M001 CNC -->
           <div class="mrow" id="row-M001" data-machine-id="M001">
             <div class="mrow-label">
-              <div class="mrow-id">M001</div>
-              <div class="mrow-name">CNC Machine</div>
+              <div class="mrow-id" id="name-M001">—</div>
+              <div class="mrow-name">M001</div>
               <div class="mrow-st"><span class="dot ok" id="dot-M001"></span><span id="status-M001" style="color:var(--ok)">Normal</span></div>
             </div>
             <div class="mrow-fields">
@@ -373,8 +373,8 @@ nav {
           <!-- M002 Conveyor -->
           <div class="mrow" id="row-M002" data-machine-id="M002">
             <div class="mrow-label">
-              <div class="mrow-id">M002</div>
-              <div class="mrow-name">Conveyor</div>
+              <div class="mrow-id" id="name-M002">—</div>
+              <div class="mrow-name">M002</div>
               <div class="mrow-st"><span class="dot ok" id="dot-M002"></span><span id="status-M002" style="color:var(--ok)">Normal</span></div>
             </div>
             <div class="mrow-fields">
@@ -391,8 +391,8 @@ nav {
           <!-- M003 Drill -->
           <div class="mrow" id="row-M003" data-machine-id="M003">
             <div class="mrow-label">
-              <div class="mrow-id">M003</div>
-              <div class="mrow-name">Drill</div>
+              <div class="mrow-id" id="name-M003">—</div>
+              <div class="mrow-name">M003</div>
               <div class="mrow-st"><span class="dot ok" id="dot-M003"></span><span id="status-M003" style="color:var(--ok)">Normal</span></div>
             </div>
             <div class="mrow-fields">
@@ -409,8 +409,8 @@ nav {
           <!-- M004 Welder -->
           <div class="mrow" id="row-M004" data-machine-id="M004">
             <div class="mrow-label">
-              <div class="mrow-id">M004</div>
-              <div class="mrow-name">Welder</div>
+              <div class="mrow-id" id="name-M004">—</div>
+              <div class="mrow-name">M004</div>
               <div class="mrow-st"><span class="dot ok" id="dot-M004"></span><span id="status-M004" style="color:var(--ok)">Normal</span></div>
             </div>
             <div class="mrow-fields">
@@ -457,10 +457,6 @@ nav {
             <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 14px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:10px;">
               <span style="color:var(--muted)">Machine:</span>
               <select id="chartMachine" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:10px;padding:3px 8px;border-radius:5px;outline:none;">
-                <option value="M001">M001 — CNC Machine</option>
-                <option value="M002">M002 — Conveyor</option>
-                <option value="M003">M003 — Drill</option>
-                <option value="M004">M004 — Welder</option>
               </select>
             </div>
             <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 14px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:10px;">
@@ -520,7 +516,31 @@ nav {
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:16px;">
             <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Anomalies by Machine</div>
-            <canvas id="barChart" height="180"></canvas>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <canvas id="barChart" height="160" style="width:100%;max-height:160px;"></canvas>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--font-mono);">
+                  <div style="width:10px;height:10px;border-radius:2px;background:#00d4ff;"></div>
+                  <span style="font-size:9px;color:var(--muted);">M001</span>
+                  <span id="leg-M001" style="font-size:14px;font-weight:600;color:var(--text);">0</span>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--font-mono);">
+                  <div style="width:10px;height:10px;border-radius:2px;background:#ff6b35;"></div>
+                  <span style="font-size:9px;color:var(--muted);">M002</span>
+                  <span id="leg-M002" style="font-size:14px;font-weight:600;color:var(--text);">0</span>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--font-mono);">
+                  <div style="width:10px;height:10px;border-radius:2px;background:#00e87a;"></div>
+                  <span style="font-size:9px;color:var(--muted);">M003</span>
+                  <span id="leg-M003" style="font-size:14px;font-weight:600;color:var(--text);">0</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;">
+                  <div style="width:10px;height:10px;border-radius:2px;background:#ffb800;flex-shrink:0;"></div>
+                  <span style="color:var(--muted);flex:1;">M004</span>
+                  <span id="leg-M004" style="color:var(--text);font-weight:600;">0</span>
+                </div>
+              </div>
+            </div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:16px;">
             <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Recent Anomaly Events</div>
@@ -540,7 +560,7 @@ nav {
               <div id="sys-detail" style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px;">Fetching system health from backend</div>
             </div>
             <div style="margin-left:auto;">
-              <a href="4-system-status.html" style="font-family:var(--font-mono);font-size:10px;color:var(--accent);text-decoration:none;border:1px solid rgba(0,212,255,.3);padding:4px 12px;border-radius:6px;">View Details →</a>
+              <a href="4-system-status.html" target="_blank" onclick="event.stopPropagation()" style="font-family:var(--font-mono);font-size:10px;color:var(--accent);text-decoration:none;border:1px solid rgba(0,212,255,.3);padding:4px 12px;border-radius:6px;">View Details →</a>
             </div>
           </div>
           <div id="sys-components" style="display:flex;flex-direction:column;gap:6px;"></div>
@@ -597,8 +617,6 @@ nav {
         <div class="chat-live"></div>
       </div>
       <div class="chat-msgs" id="chatMsgs">
-        <div class="msg sys"><div class="bubble">Monitoring <strong>4 machines</strong>. Anomaly on <strong>MCH-001</strong> — temp 94°C, vibration 12.4, efficiency 34%.</div><div class="msg-meta">SYSTEM · 09:41:03</div></div>
-        <div class="msg sys"><div class="msg-tag">ANOMALY DETECTED</div><div class="bubble">Maintenance flag active. Failure window <strong>6–10h</strong>. Root cause: bearing wear.</div><div class="msg-meta">SYSTEM · 09:41:05</div></div>
       </div>
       <div class="chat-input-row">
         <textarea class="chat-input" id="chatInput" placeholder="Ask about any machine…" rows="1"></textarea>
@@ -669,7 +687,7 @@ Object.keys(viewMap).forEach(btnId => {
 const CA_URL = 'http://localhost:8005';
 const POLL_MS = 1500;
 const POLL_TIMEOUT = 60000;
-let currentMachineId = 'MCH-001';
+let currentMachineId = 'M001';
 
 function nowStr() {
   return new Date().toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
@@ -804,21 +822,21 @@ console.log('✅ Navigation fixed, AI chatbot original logic restored!');
 const STREAM_URL = 'http://localhost:8005/machines/stream';
 
 const FIELD_RANGES = {
-  temperature:        { min: 20,  max: 120 },
-  vibration_level:    { min: 0,   max: 20  },
-  power_consumption:  { min: 0,   max: 15  },
-  pressure:           { min: 80000, max: 400000 },
-  material_flow_rate: { min: 0,   max: 3   },
-  cycle_time:         { min: 50,  max: 250 },
+  temperature:        { min: 60,  max: 100 },
+  vibration_level:    { min: 0,   max: 10  },
+  power_consumption:  { min: 10,  max: 30  },  // real data: 14~28 kW
+  pressure:           { min: 3.5, max: 6.5 },  // real data: 4~6 Pa
+  material_flow_rate: { min: 15,  max: 25  },  // real data: 17~22
+  cycle_time:         { min: 100, max: 140 },  // real data: 109~132s
 };
 
 const THRESHOLDS = {
-  temperature:        { warn: 70,     alert: 90     },
-  vibration_level:    { warn: 5,      alert: 10     },
-  power_consumption:  { warn: 8,      alert: 12     },
-  pressure:           { warn: 300000, alert: 350000 },
-  material_flow_rate: { warn: 0.5,    alert: 0.3    },
-  cycle_time:         { warn: 150,    alert: 180    },
+  temperature:        { warn: 82,   alert: 88   },  // real data: 66~92°C
+  vibration_level:    { warn: 4.0,  alert: 6.0  },  // real data: 1.2~7.2
+  power_consumption:  { warn: 22,   alert: 26   },  // real data: 14~28 kW
+  pressure:           { warn: 5.3,  alert: 5.6  },  // real data: 4.1~5.8 Pa
+  material_flow_rate: { warn: 18.0, alert: 17.0 },  // lower = worse, real: 17~22
+  cycle_time:         { warn: 125,  alert: 130  },  // real data: 109~132s
 };
 
 function getLevel(field, val) {
@@ -845,18 +863,31 @@ function updateMachine(d) {
   const row = document.getElementById(`row-${id}`);
   if (!row) return;
 
-  const fields = ['temperature','vibration_level','power_consumption','pressure','material_flow_rate','cycle_time'];
-  let worstLevel = 'ok';
+  // 更新机器类型显示
+  if (d.machine_type) {
+    const nameEl = document.getElementById(`name-${id}`);
+    if (nameEl) nameEl.textContent = d.machine_type;
+  }
 
+  const fields = ['temperature','vibration_level','power_consumption','pressure','material_flow_rate','cycle_time'];
+
+  // 计算当前所有字段中最严重的等级（如果没有 CNN label，则根据阈值计算）
+  const worstLevel = d.label === 'needs_maintenance' ? 'alert' : 'ok';
   fields.forEach(f => {
     const val = d[f];
-    if (val == null) return;
-    const el  = document.getElementById(`${id}-${f}`);
+    // 更新数值显示和进度条
+    const el = document.getElementById(`${id}-${f}`);
     const bar = document.getElementById(`${id}-${f}-bar`);
-    const lvl = getLevel(f, val);
-    if (lvl === 'alert' || (lvl === 'warn' && worstLevel === 'ok')) worstLevel = lvl;
-    if (el)  { el.textContent = typeof val === 'number' ? val.toFixed(f==='pressure'?0:2) : val; el.className = `fv ${lvl}`; }
-    if (bar) { bar.style.width = getPct(f, val) + '%'; bar.className = `bar ${lvl}`; }
+    if (el) {
+      el.textContent = typeof val === 'number' ? val.toFixed(f==='pressure'?0:2) : val;
+      el.className = `fv ok`;  // 数值颜色固定为 ok
+    }
+    if (bar) {
+      const pct = getPct(f, val);
+      bar.style.width = pct + '%';
+      // 进度条颜色跟随最严重等级
+      bar.className = `bar ${worstLevel}`;
+    }
   });
 
   const tsEl = document.getElementById(`${id}-timestamp`);
@@ -894,12 +925,29 @@ startStream();
 // ==================== LIVE CHART ====================
 const MAX_POINTS = 60;
 const chartBuffers = {};
-['M001','M002','M003','M004'].forEach(id => {
-  chartBuffers[id] = {};
-  ['temperature','vibration_level','power_consumption','pressure','material_flow_rate','cycle_time'].forEach(f => {
-    chartBuffers[id][f] = [];
-  });
-});
+const CHART_FIELDS = ['temperature','vibration_level','power_consumption','pressure','material_flow_rate','cycle_time'];
+
+function getMachineKey(d) {
+  return `${d.machine_id || 'unknown'}::${d.machine_type || 'unknown'}`;
+}
+
+function ensureChartMachine(d) {
+  const key = getMachineKey(d);
+  if (!chartBuffers[key]) {
+    chartBuffers[key] = {};
+    CHART_FIELDS.forEach(f => { chartBuffers[key][f] = []; });
+  }
+
+  const select = document.getElementById('chartMachine');
+  if (select && !Array.from(select.options).some(opt => opt.value === key)) {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = `${d.machine_id || 'unknown'} - ${d.machine_type || 'unknown'}`;
+    select.appendChild(opt);
+    if (!select.value) select.value = key;
+  }
+  return key;
+}
 
 let liveChart = null;
 
@@ -940,7 +988,7 @@ function initChart() {
 
 function updateChart() {
   if (!liveChart) return;
-  const machine = document.getElementById('chartMachine')?.value || 'M001';
+  const machine = document.getElementById('chartMachine')?.value || Object.keys(chartBuffers)[0];
   const field   = document.getElementById('chartField')?.value   || 'temperature';
   const buf = chartBuffers[machine]?.[field] || [];
 
@@ -966,16 +1014,15 @@ function updateChart() {
 const _origUpdate = updateMachine;
 window.updateMachine = function(d) {
   _origUpdate(d);
-  const id = d.machine_id;
-  if (!chartBuffers[id]) return;
-  ['temperature','vibration_level','power_consumption','pressure','material_flow_rate','cycle_time'].forEach(f => {
+  const key = ensureChartMachine(d);
+  CHART_FIELDS.forEach(f => {
     if (d[f] == null) return;
-    chartBuffers[id][f].push({ v: d[f], t: d.timestamp });
-    if (chartBuffers[id][f].length > MAX_POINTS) chartBuffers[id][f].shift();
+    chartBuffers[key][f].push({ v: d[f], t: d.timestamp });
+    if (chartBuffers[key][f].length > MAX_POINTS) chartBuffers[key][f].shift();
   });
   const selM = document.getElementById('chartMachine')?.value;
   const selF = document.getElementById('chartField')?.value;
-  if (id === selM) updateChart();
+  if (key === selM) updateChart();
 };
 
 document.getElementById('chartMachine')?.addEventListener('change', updateChart);
@@ -993,20 +1040,37 @@ function initBarChart() {
   barChart = new Chart(canvas.getContext('2d'), {
     type: 'bar',
     data: {
-      labels: ['M001 CNC','M002 Conveyor','M003 Drill','M004 Welder'],
+      labels: ['M001', 'M002', 'M003', 'M004'],
       datasets: [{
-        data: [0,0,0,0],
-        backgroundColor: ['rgba(0,212,255,.5)','rgba(255,107,53,.5)','rgba(0,232,122,.5)','rgba(255,184,0,.5)'],
-        borderColor:      ['#00d4ff','#ff6b35','#00e87a','#ffb800'],
-        borderWidth: 1.5, borderRadius: 5,
+        label: 'Anomalies',
+        data: [0, 0, 0, 0],
+        backgroundColor: ['rgba(0,212,255,.25)','rgba(255,107,53,.25)','rgba(0,232,122,.25)','rgba(255,184,0,.25)'],
+        borderColor: ['#00d4ff','#ff6b35','#00e87a','#ffb800'],
+        borderWidth: 2,
+        borderRadius: 6,
+        borderSkipped: false,
       }]
     },
     options: {
-      responsive:true, maintainAspectRatio:false, animation:false,
-      plugins:{ legend:{display:false} },
-      scales:{
-        x:{ ticks:{color:'#6b7394',font:{family:'IBM Plex Mono',size:10}}, grid:{display:false} },
-        y:{ ticks:{color:'#6b7394',font:{family:'IBM Plex Mono',size:10},stepSize:1}, grid:{color:'rgba(42,48,72,.8)'} }
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 300 },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: {
+          label: ctx => ` ${ctx.parsed.y} anomalies`
+        }}
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(42,48,72,.8)' },
+          ticks: { color: '#6b7394', font: { family: 'IBM Plex Mono', size: 10 } }
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(42,48,72,.8)' },
+          ticks: { color: '#6b7394', font: { family: 'IBM Plex Mono', size: 10 }, stepSize: 1 }
+        }
       }
     }
   });
@@ -1032,8 +1096,15 @@ function recordAnomaly(machineId, level) {
   document.getElementById('an-ok').textContent    = okCount;
 
   if (barChart) {
-    barChart.data.datasets[0].data = ids.map(id => anomalyStats[id] || 0);
+    const vals = ids.map(id => anomalyStats[id] || 0);
+    barChart.data.datasets[0].data = vals;
     barChart.update('none');
+    // Update legend counts
+    ids.forEach(id => {
+      const el = document.getElementById('leg-' + id);
+      if (el) el.textContent = anomalyStats[id] || 0;
+    });
+
   }
 
   const colors = { alert:'var(--accent2)', warn:'var(--warn)', ok:'var(--ok)' };
@@ -1058,20 +1129,24 @@ window.updateMachine = function(d) {
 };
 
 // ==================== SYSTEM STATUS (mini) ====================
+let miniOnline = false;
+
 async function loadMiniStatus() {
   try {
     const controller = new AbortController();
-    setTimeout(() => controller.abort(), 3000);
+    setTimeout(() => controller.abort(), 4000);
     const res = await fetch('http://localhost:8005/system/health', { signal: controller.signal });
     const data = await res.json();
     const overall = data.overall || 'unknown';
+    miniOnline = true;
+
     const dot = document.getElementById('sys-dot');
     const ov  = document.getElementById('sys-overall');
     const det = document.getElementById('sys-detail');
     const comp = document.getElementById('sys-components');
     const colors = { ok:'var(--ok)', degraded:'var(--warn)', error:'var(--accent2)' };
     const labels = { ok:'All systems operational', degraded:'Some services degraded', error:'Connection errors detected' };
-    if (dot) { dot.style.background = colors[overall]; dot.style.boxShadow = `0 0 8px ${colors[overall]}`; }
+    if (dot) { dot.style.background = colors[overall] || 'var(--muted)'; dot.style.boxShadow = `0 0 8px ${colors[overall] || 'var(--muted)'}`; }
     if (ov)  ov.textContent = labels[overall] || 'Unknown';
     if (det) {
       const comps = Object.entries(data.components || {});
@@ -1088,16 +1163,18 @@ async function loadMiniStatus() {
       }).join('');
     }
   } catch(e) {
+    miniOnline = false;
     const ov  = document.getElementById('sys-overall');
     const det = document.getElementById('sys-detail');
     const dot = document.getElementById('sys-dot');
     if (dot) { dot.style.background = 'var(--muted)'; dot.style.boxShadow = 'none'; }
     if (ov)  ov.textContent = 'Backend offline';
-    if (det) det.textContent = 'Cannot reach main.py — make sure it is running on port 8005';
+    if (det) det.textContent = 'Cannot reach main.py — retrying…';
+  } finally {
+    setTimeout(loadMiniStatus, 3000); // poll every 3s
   }
 }
 loadMiniStatus();
-setInterval(loadMiniStatus, 30000);
 
 // ==================== PROFILE ====================
 function saveProfile() {

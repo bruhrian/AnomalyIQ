@@ -255,21 +255,34 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
             </div>
           </div>
 
-          <!-- UI → MCP -->
-          <div class="conn-line ok">
-            <div class="conn-tag ok">12 ms</div>
+          <!-- UI → Streaming -->
+          <div class="conn-line ok" id="line-ui-streaming">
+            <div class="conn-line-inner"></div>
+          </div>
+
+          <!-- Streaming node -->
+          <div class="conn-node">
+            <div class="node-box ok" id="node-streaming">
+              <div class="node-status-dot ok"></div>
+              <div class="node-icon">📡</div>
+              <div class="node-name">STREAMING</div>
+            </div>
+          </div>
+
+          <!-- Streaming → MCP -->
+          <div class="conn-line ok" id="line-streaming-mcp">
+            <div class="conn-tag ok" id="tag-mcp-latency">— ms</div>
             <div class="conn-line-inner"></div>
           </div>
 
           <!-- MCP node -->
           <div class="conn-node">
-            <div class="node-box ok">
+            <div class="node-box ok" id="node-mcp">
               <div class="node-status-dot ok"></div>
               <div class="node-icon">⚙️</div>
               <div class="node-name">MCP</div>
             </div>
           </div>
-
           <!-- MCP → DB fork -->
           <div class="conn-line ok" style="max-width:50px;">
             <div class="conn-line-inner"></div>
@@ -326,8 +339,8 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
         <div class="status-table">
           <div class="st-header">
             <span class="st-header-title">CONNECTION STATUS</span>
-            <span class="st-badge" style="background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);color:var(--accent2);">1 error</span>
-            <span class="st-badge" style="background:rgba(0,232,122,.1);border:1px solid rgba(0,232,122,.3);color:var(--ok);margin-left:4px;">3 healthy</span>
+            <span class="st-badge" id="statusErrorCount" style="background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);color:var(--accent2);">checking</span>
+            <span class="st-badge" id="statusHealthyCount" style="background:rgba(0,232,122,.1);border:1px solid rgba(0,232,122,.3);color:var(--ok);margin-left:4px;">checking</span>
           </div>
 
           <!-- col headers -->
@@ -344,9 +357,9 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
             <div><div class="st-type">Frontend</div></div>
             <div>
               <div class="conn-badge ok" id="badge-ui"><div class="conn-badge-dot"></div>Connected</div>
-              <div class="st-detail" style="margin-top:4px;">Running normally. All components loaded.</div>
+              <div class="st-detail" id="detail-ui" style="margin-top:4px;">Waiting for backend health...</div>
             </div>
-            <div><div class="st-latency ok">— ms</div></div>
+            <div><div class="st-latency ok" id="lat-ui">-- ms</div></div>
             <div><div class="st-last" id="check-ui">09:41:03</div></div>
           </div>
 
@@ -359,9 +372,9 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
             <div><div class="st-type">Middleware</div></div>
             <div>
               <div class="conn-badge ok" id="badge-mcp"><div class="conn-badge-dot"></div>Connected</div>
-              <div class="st-detail" style="margin-top:4px;">Receiving sensor streams. 4 machines active.</div>
+              <div class="st-detail" id="detail-mcp" style="margin-top:4px;">Waiting for backend health...</div>
             </div>
-            <div><div class="st-latency ok">12 ms</div></div>
+            <div><div class="st-latency ok" id="lat-mcp">-- ms</div></div>
             <div><div class="st-last" id="check-mcp">09:41:03</div></div>
           </div>
 
@@ -374,9 +387,9 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
             <div><div class="st-type">Database</div></div>
             <div>
               <div class="conn-badge ok" id="badge-pg"><div class="conn-badge-dot"></div>Connected</div>
-              <div class="st-detail" style="margin-top:4px;">Read/write healthy. 14.2k rows synced.</div>
+              <div class="st-detail" id="detail-pg" style="margin-top:4px;">Waiting for backend health...</div>
             </div>
-            <div><div class="st-latency ok">8 ms</div></div>
+            <div><div class="st-latency ok" id="lat-pg">-- ms</div></div>
             <div><div class="st-last" id="check-pg">09:41:03</div></div>
           </div>
 
@@ -389,9 +402,9 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
             <div><div class="st-type">Database</div></div>
             <div>
               <div class="conn-badge err" id="badge-neo4j"><div class="conn-badge-dot"></div>Disconnected</div>
-              <div class="st-detail err" style="margin-top:4px;">Check if Neo4j is running on port 7687.</div>
+              <div class="st-detail err" id="detail-neo4j" style="margin-top:4px;">Waiting for backend health...</div>
             </div>
-            <div><div class="st-latency err">timeout</div></div>
+            <div><div class="st-latency err" id="lat-neo4j">-- ms</div></div>
             <div><div class="st-last" id="check-neo4j">09:38:47</div></div>
           </div>
 
@@ -404,9 +417,9 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
             <div><div class="st-type">Service</div></div>
             <div>
               <div class="conn-badge ok" id="badge-ds"><div class="conn-badge-dot"></div>Connected</div>
-              <div class="st-detail" style="margin-top:4px;">Emitting at 1-min intervals. 4 machine feeds.</div>
+              <div class="st-detail" id="detail-ds" style="margin-top:4px;">Waiting for backend health...</div>
             </div>
-            <div><div class="st-latency ok">3 ms</div></div>
+            <div><div class="st-latency ok" id="lat-ds">-- ms</div></div>
             <div><div class="st-last" id="check-ds">09:41:03</div></div>
           </div>
 
@@ -440,23 +453,6 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
       </div>
 
       <div class="chat-msgs" id="chatMsgs">
-        <div class="msg sys">
-          <div class="msg-tag">SYSTEM ALERT</div>
-          <div class="bubble"><strong>Neo4j</strong> connection status unknown. Check if service is running on port 7687.</div>
-          <div class="msg-meta">SYSTEM · 09:38:50</div>
-        </div>
-        <div class="msg sys">
-          <div class="bubble">All other services nominal — UI, MCP, PostgreSQL, Data Simulator all connected.</div>
-          <div class="msg-meta">SYSTEM · 09:38:52</div>
-        </div>
-        <div class="msg user">
-          <div class="bubble">What's affected by Neo4j being down?</div>
-          <div class="msg-meta">OPERATOR · 09:40:05</div>
-        </div>
-        <div class="msg sys">
-          <div class="bubble">Anomaly similarity search and historical pattern matching are unavailable. Root cause analysis still works via PostgreSQL. Sensor monitoring unaffected.</div>
-          <div class="msg-meta">SYSTEM · 09:40:07</div>
-        </div>
       </div>
 
       <div class="chat-input-row">
@@ -491,15 +487,16 @@ const STATUS_LABELS = { ok:'Connected', degraded:'Degraded', error:'Disconnected
 
 // Map backend component names to HTML element IDs
 const COMPONENT_MAP = {
-  UI:            { badge:'badge-ui',  check:'check-ui',  node:'node-ui' },
-  MCP:           { badge:'badge-mcp', check:'check-mcp', node:'node-mcp' },
-  PostgreSQL:    { badge:'badge-pg',  check:'check-pg',  node:'node-pg' },
-  Neo4j:         { badge:'badge-neo4j', check:'check-neo4j', node:'node-neo4j' },
-  DataSimulator: { badge:'badge-ds',  check:'check-ds',  node:'node-ds' },
-  Backend:       { badge:'badge-be',  check:'check-be',  node:'node-be' },
+  UI:            { badge:'badge-ui',         check:'check-ui',         node:'node-ui',         latency:'lat-ui',        detail:'detail-ui'    },
+  Streaming:     { badge:'badge-streaming',  check:'check-streaming',  node:'node-streaming',  latency:'lat-streaming'},
+  MCP:           { badge:'badge-mcp',        check:'check-mcp',        node:'node-mcp',        latency:'lat-mcp',       detail:'detail-mcp'   },
+  PostgreSQL:    { badge:'badge-pg',         check:'check-pg',         node:'node-pg',         latency:'lat-pg',        detail:'detail-pg'    },
+  Neo4j:         { badge:'badge-neo4j',      check:'check-neo4j',      node:'node-neo4j',      latency:'lat-neo4j',     detail:'detail-neo4j' },
+  DataSimulator: { badge:'badge-ds',         check:'check-ds',         node:'node-ds',         latency:'lat-ds',        detail:'detail-ds'    },
+  Backend:       { badge:'badge-be',         check:'check-be',         node:null,              latency:null           },
 };
 
-function applyStatus(name, status, detail) {
+function applyStatus(name, status, detail, latencyMs) {
   const ids   = COMPONENT_MAP[name];
   const theme = STATUS_COLORS[status] || STATUS_COLORS.error;
   const now   = new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
@@ -516,6 +513,19 @@ function applyStatus(name, status, detail) {
   // Update last-check timestamp
   const check = document.getElementById(ids?.check);
   if (check) check.textContent = now;
+
+  const detailEl = document.getElementById(ids?.detail);
+  if (detailEl) {
+    detailEl.textContent = detail || (status === 'ok' ? 'Connected' : status === 'degraded' ? 'Degraded' : 'Unavailable');
+    detailEl.className = `st-detail ${status === 'error' ? 'err' : ''}`;
+  }
+
+  const latencyEl = document.getElementById(ids?.latency);
+  if (latencyEl) {
+    const ms = Number.isFinite(latencyMs) ? `${latencyMs} ms` : (detail && /timeout/i.test(detail) ? 'timeout' : '-- ms');
+    latencyEl.textContent = ms;
+    latencyEl.className = `st-latency ${status === 'ok' ? 'ok' : status === 'degraded' ? 'warn' : 'err'}`;
+  }
 
   // Update connection map node
   const node = document.getElementById(ids?.node);
@@ -535,8 +545,17 @@ async function loadHealth() {
     const components = data.components || {};
 
     Object.entries(components).forEach(([name, info]) => {
-      applyStatus(name, info.status, info.detail || '');
+      applyStatus(name, info.status, info.detail || '', info.latency_ms);
     });
+
+    const statuses = Object.values(components).map(c => c.status);
+    const errCount = statuses.filter(s => s === 'error').length;
+    const okCount = statuses.filter(s => s === 'ok').length;
+    const warnCount = statuses.filter(s => s === 'degraded').length;
+    const errBadge = document.getElementById('statusErrorCount');
+    const okBadge = document.getElementById('statusHealthyCount');
+    if (errBadge) errBadge.textContent = warnCount ? `${errCount} error, ${warnCount} degraded` : `${errCount} error${errCount !== 1 ? 's' : ''}`;
+    if (okBadge) okBadge.textContent = `${okCount} healthy`;
 
     // Update top pill
     const pill = document.getElementById('topPill');
@@ -545,7 +564,6 @@ async function loadHealth() {
       const overall = data.overall || 'error';
       const theme   = STATUS_COLORS[overall];
       pill.className = `status-pill ${overall === 'ok' ? 'all-ok' : overall === 'degraded' ? 'has-warn' : 'has-err'}`;
-      const errCount = Object.values(components).filter(c => c.status === 'error').length;
       pillText.textContent = overall === 'ok'
         ? 'All systems nominal'
         : `${errCount} connection error${errCount !== 1 ? 's' : ''}`;

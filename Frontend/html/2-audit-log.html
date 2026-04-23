@@ -62,7 +62,10 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
 .bar.warn{background:var(--warn);}
 .bar.alert{background:var(--accent2);box-shadow:0 0 5px var(--accent2);}
 .abadge{position:absolute;top:6px;right:8px;font-family:var(--font-mono);font-size:8px;background:rgba(255,107,53,.13);border:1px solid rgba(255,107,53,.4);color:var(--accent2);padding:2px 6px;border-radius:4px;letter-spacing:.06em;}
-.audit-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;overflow:hidden;}
+.audit-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;overflow:hidden;min-height:0;}
+#auditBody{max-height:calc(100vh - 330px);overflow-y:auto;}
+#auditBody::-webkit-scrollbar{width:5px;}
+#auditBody::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 .audit-head{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--surface2);}
 .audit-head-title{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--text);letter-spacing:.05em;}
 .badge{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);color:var(--accent);font-family:var(--font-mono);font-size:9px;padding:1px 7px;border-radius:10px;}
@@ -139,7 +142,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
   <div class="nav-logo">
     <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0f1117" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
   </div>
-  <button class="nav-btn" id="nb-d" onclick="location.href='1-dashboard.html'">
+  <button class="nav-btn" id="nb-d">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     <div class="nav-tip">Dashboard</div>
   </button>
@@ -147,7 +150,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
     <div class="nav-tip">Audit Log</div>
   </button>
-  <button class="nav-btn" id="nb-h" onclick="location.href='3-chat-history.html'">
+  <button class="nav-btn" id="nb-h">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     <div class="nav-tip">Chat History</div>
   </button>
@@ -184,7 +187,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
           <div class="sec-label" style="margin-bottom:4px">Machine Fleet — 4 active units</div>
           <div class="mrow s-alert">
             <div class="abadge">⚠ ANOMALY</div>
-            <div class="mrow-label"><div class="mrow-id">M001</div><div class="mrow-name">CNC Machine</div><div class="mrow-st"><span class="dot alert"></span><span style="color:var(--accent2)">Alert</span></div></div>
+            <div class="mrow-label"><div class="mrow-id">MCH-001</div><div class="mrow-name">Compressor A</div><div class="mrow-st"><span class="dot alert"></span><span style="color:var(--accent2)">Alert</span></div></div>
             <div class="mrow-fields">
               <div class="field"><div class="fn">Timestamp</div><div class="fv warn" id="ts1">--:--:--</div><div class="bar-bg"><div class="bar warn" style="width:100%"></div></div></div>
               <div class="field"><div class="fn">Temperature °C</div><div class="fv alert">94</div><div class="bar-bg"><div class="bar alert" style="width:94%"></div></div></div>
@@ -193,11 +196,11 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
             </div>
           </div>
           <div class="mrow s-warn">
-            <div class="mrow-label"><div class="mrow-id">M002</div><div class="mrow-name">Conveyor</div><div class="mrow-st"><span class="dot warn"></span><span style="color:var(--warn)">Warning</span></div></div>
+            <div class="mrow-label"><div class="mrow-id">MCH-002</div><div class="mrow-name">Pump B</div><div class="mrow-st"><span class="dot warn"></span><span style="color:var(--warn)">Warning</span></div></div>
             <div class="mrow-fields"><div class="field"><div class="fn">Temperature</div><div class="fv warn">71°C</div></div></div>
           </div>
-          <div class="mrow"><div class="mrow-label"><div class="mrow-id">M003</div><div class="mrow-name">Drill</div><div class="mrow-st"><span class="dot ok"></span><span>Normal</span></div></div></div>
-          <div class="mrow"><div class="mrow-label"><div class="mrow-id">M004</div><div class="mrow-name">Welder</div><div class="mrow-st"><span class="dot ok"></span><span>Normal</span></div></div></div>
+          <div class="mrow"><div class="mrow-label"><div class="mrow-id">MCH-003</div><div class="mrow-name">Motor C</div><div class="mrow-st"><span class="dot ok"></span><span>Normal</span></div></div></div>
+          <div class="mrow"><div class="mrow-label"><div class="mrow-id">MCH-004</div><div class="mrow-name">Conveyor D</div><div class="mrow-st"><span class="dot ok"></span><span>Normal</span></div></div></div>
         </div>
       </div>
 
@@ -249,17 +252,8 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
       <!-- CHAT HISTORY VIEW -->
       <div id="view-history" class="view">
         <div class="vscroll" style="gap:8px">
-          <div class="sec-label" style="margin-bottom:4px">Conversation Records — 3 sessions today</div>
-          <div class="hcard" onclick="toggleThread('t1')">
-            <div class="hcard-top"><div class="htag">M001 · CNC Machine</div><div class="htime">09:41 — ongoing</div></div>
-            <div class="hpreview">⚠ Anomaly: vibration 12.4, temp 94°C, efficiency 34%</div>
-            <div class="hfooter"><div class="hturns">4 turns</div><div style="flex:1"></div><div class="hwarn">⚠ Ongoing</div></div>
-            <div class="hthread" id="t1">
-              <div class="hmsg sys"><div class="hbubble">M001 anomaly — temp 94°C, vibration 12.4</div><div class="hmeta">SYSTEM · 09:41:03</div></div>
-              <div class="hmsg user"><div class="hbubble">What's the error rate?</div><div class="hmeta">OPERATOR · 09:42:11</div></div>
-              <div class="hmsg sys"><div class="hbubble">Error rate: 0.18, downtime 22 min</div><div class="hmeta">SYSTEM · 09:42:13</div></div>
-            </div>
-          </div>
+          <div class="sec-label" style="margin-bottom:4px">Conversation Records</div>
+          <div style="color:var(--muted);font-family:var(--font-mono);font-size:10px;padding:12px 0;">Open Chat History to view saved conversations.</div>
         </div>
       </div>
 
@@ -276,12 +270,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
         <div><div class="chat-name">AnomalyIQ AI</div><div class="chat-sub">Diagnostic assistant</div></div>
         <div class="chat-live"></div>
       </div>
-      <div class="chat-msgs" id="chatMsgs">
-        <div class="msg sys"><div class="bubble">Monitoring <strong>4 machines</strong>. Anomaly on <strong>M001</strong> — temp 94°C, vibration 12.4, efficiency 34%.</div><div class="msg-meta">SYSTEM · 09:41:03</div></div>
-        <div class="msg sys"><div class="msg-tag">ANOMALY DETECTED</div><div class="bubble">Maintenance flag active. Failure window <strong>6–10h</strong>. Root cause: bearing wear. Inspect now.</div><div class="msg-meta">SYSTEM · 09:41:05</div></div>
-        <div class="msg user"><div class="bubble">What's the error rate?</div><div class="msg-meta">OPERATOR · 09:42:11</div></div>
-        <div class="msg sys"><div class="bubble">M001 error rate: <strong>0.18</strong>. Downtime: 22 min. Prod. status: 0 — Inefficient.</div><div class="msg-meta">SYSTEM · 09:42:13</div></div>
-      </div>
+      <div class="chat-msgs" id="chatMsgs"></div>
       <div class="chat-input-row">
         <textarea class="chat-input" id="chatInput" placeholder="Ask about any machine…" rows="1"></textarea>
         <button class="send-btn" onclick="sendMsg()"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg></button>
@@ -293,6 +282,16 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
 
 <script>
 // ==================== CLOCK ====================
+document.getElementById('chatMsgs')?.replaceChildren();
+const auditDashboardPane = document.querySelector('#view-dashboard .vscroll');
+if (auditDashboardPane) {
+  auditDashboardPane.innerHTML = '<div class="sec-label" style="margin-bottom:4px">Audit Log</div><div style="color:var(--muted);font-family:var(--font-mono);font-size:10px;padding:12px 0;">Use the Audit Log tab to view real Detect -> Process -> Summary -> Answer records from PostgreSQL.</div>';
+}
+const historyPane = document.querySelector('#view-history .vscroll');
+if (historyPane) {
+  historyPane.innerHTML = '<div class="sec-label" style="margin-bottom:4px">Conversation Records</div><div style="color:var(--muted);font-family:var(--font-mono);font-size:10px;padding:12px 0;">Open Chat History to view saved conversations.</div>';
+}
+
 function tick() {
   const t = new Date().toLocaleTimeString('en-GB');
   const el = document.getElementById('clk'); if(el) el.textContent = t;
@@ -326,14 +325,36 @@ let _allRows = [];
 let _currentFilter = 'all';
 const STAGE_CLASS = { DETECT:'detect', PROCESS:'process', SUMMARY:'summary', ANSWER:'answer', COMM:'process' };
 
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function normalizeStage(log) {
+  const event = String(log.event || log.stage || 'DETECT').toUpperCase();
+  if (['DETECT','PROCESS','SUMMARY','ANSWER','COMM'].includes(event)) return event;
+  if (event.includes('SUMMARY')) return 'SUMMARY';
+  if (event.includes('ANSWER') || event.includes('RESPONSE')) return 'ANSWER';
+  if (event.includes('COMM')) return 'COMM';
+  if (event.includes('PROCESS') || event.includes('ORCHESTRATOR')) return 'PROCESS';
+  return 'DETECT';
+}
+
+function describeAuditRow(log, stage, details) {
+  if (details.description) return details.description;
+  if (stage === 'DETECT') {
+    return `CNN detection result: ${details.label || log.event || 'detected'}${details.confidence != null ? `, confidence ${Number(details.confidence).toFixed(3)}` : ''}`;
+  }
+  if (stage === 'PROCESS') return 'Backend accepted alert and queued orchestration';
+  if (stage === 'SUMMARY') return details.summary || details.result || 'Analysis summary generated';
+  if (stage === 'ANSWER') return details.response || details.answer || 'Orchestrator answer generated';
+  return details.message || details.query || log.event || 'Agent communication';
+}
+
 async function loadAudit() {
   const body = document.getElementById('auditBody');
   body.innerHTML = '<div style="padding:16px;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--muted);">Loading…</div>';
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3000);
-    const res = await fetch(`${AUDIT_API}/audit/logs?limit=50`, { signal: controller.signal });
-    clearTimeout(timeout);
+    const res = await fetch(`${AUDIT_API}/audit/logs?limit=200`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     _allRows = (data.logs || data.events || []).map(log => ({
@@ -343,19 +364,26 @@ async function loadAudit() {
       description: log.description || (log.details ? JSON.stringify(log.details).substring(0,100) : log.event),
       created_at: log.timestamp || log.created_at,
     }));
+    _allRows = (data.logs || data.events || []).map(log => {
+      const details = log.details || {};
+      const stage = normalizeStage(log);
+      return {
+        event_id: String(log.id ?? log.event_id ?? details.job_id ?? ''),
+        job_id: details.job_id || String(log.id ?? ''),
+        agent: log.agent || details.agent || 'SYSTEM',
+        machine_id: log.machine_id || details.machine_id || details.sensor_id || '-',
+        machine_type: details.machine_type || log.machine_type || '-',
+        stage,
+        description: describeAuditRow(log, stage, details),
+        created_at: log.timestamp || log.created_at,
+        details,
+      };
+    });
     document.getElementById('entryCount').textContent = `${_allRows.length} entries`;
     renderRows(_allRows, _currentFilter);
   } catch(e) {
-    _allRows = [
-      { event_id:'demo-1', machine_id:'M001', stage:'DETECT',  description:'Anomaly detected — temp 94°C, vibration 12.4', created_at: new Date().toISOString() },
-      { event_id:'demo-2', machine_id:'M001', stage:'PROCESS', description:'Orchestrator dispatched to summarising agent', created_at: new Date().toISOString() },
-      { event_id:'demo-3', machine_id:'M001', stage:'SUMMARY', description:'Root cause: bearing wear. Failure window 6-10h', created_at: new Date().toISOString() },
-      { event_id:'demo-4', machine_id:'M001', stage:'ANSWER',  description:'Recommended: immediate inspection and lubrication', created_at: new Date().toISOString() },
-      { event_id:'demo-5', machine_id:'M002', stage:'DETECT',  description:'Warning — temperature 71 degrees elevated', created_at: new Date().toISOString() },
-      { event_id:'demo-6', machine_id:'M002', stage:'PROCESS', description:'Orchestrator routing to ESA agent', created_at: new Date().toISOString() },
-    ];
-    document.getElementById('entryCount').textContent = _allRows.length + ' entries (demo)';
-    renderRows(_allRows, _currentFilter);
+    body.innerHTML = `<div style="padding:20px;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--accent2);">⚠ Cannot reach backend at ${AUDIT_API}<br><span style="color:var(--muted);font-size:10px;">Make sure main.py is running (port 8005)</span></div>`;
+    document.getElementById('entryCount').textContent = 'offline';
   }
 }
 
@@ -369,8 +397,8 @@ function renderRows(rows, filter) {
   body.innerHTML = filtered.map(r => {
     const ts = r.created_at ? new Date(r.created_at).toLocaleTimeString('en-GB') : '—';
     const cls = STAGE_CLASS[r.stage] || 'process';
-    return `<div class="audit-row" style="cursor:pointer;" onclick="drillIn('${r.event_id}','${r.machine_id}')">
-      <div class="atime">${ts}</div><div class="stage ${cls}">${r.stage}</div><div class="adesc">${(r.description || '').substring(0,100)}</div><div class="amach">${r.machine_id}</div>
+    return `<div class="audit-row" style="cursor:pointer;" onclick="drillIn('${escapeHtml(r.event_id)}','${escapeHtml(r.job_id)}')">
+      <div class="atime">${ts}</div><div class="stage ${cls}">${r.stage}</div><div class="adesc">${escapeHtml(r.description).substring(0,140)}</div><div class="amach"><div>${escapeHtml(r.machine_id)}</div><span>${escapeHtml(r.machine_type)}</span></div>
     </div>`;
   }).join('');
 }
@@ -411,6 +439,38 @@ async function drillIn(eventId, machineId) {
 }
 
 function closeTrail() { document.getElementById('trailPanel').style.display = 'none'; }
+
+function drillIn(eventId, jobId) {
+  if (!eventId) return;
+  const panel = document.getElementById('trailPanel');
+  const rows = document.getElementById('trailRows');
+  document.getElementById('trailEventId').textContent = `${String(jobId || eventId).substring(0,8)}...`;
+  panel.style.display = 'block';
+
+  const trail = _allRows
+    .filter(item => item.job_id === jobId || item.event_id === eventId)
+    .sort((a,b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
+
+  if (trail.length === 0) {
+    rows.innerHTML = '<div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px 0;">No related audit rows found.</div>';
+    return;
+  }
+
+  rows.innerHTML = trail.map(item => {
+    const ts = item.created_at ? new Date(item.created_at).toLocaleTimeString('en-GB') : '--';
+    const cls = STAGE_CLASS[item.stage] || 'process';
+    const detailJson = escapeHtml(JSON.stringify(item.details || {}, null, 2));
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--border);display:grid;grid-template-columns:70px 82px 1fr;gap:10px;">
+      <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);">${ts}</div>
+      <div class="stage ${cls}" style="font-size:9px;">${item.stage}</div>
+      <div>
+        <div style="font-size:10px;"><strong>[${escapeHtml(item.agent)}]</strong> ${escapeHtml(item.description)}</div>
+        <pre style="white-space:pre-wrap;margin-top:6px;color:var(--muted);font-size:9px;line-height:1.35;">${detailJson}</pre>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function toggleThread(id) { document.getElementById(id)?.classList.toggle('open'); }
 
 loadAudit();
