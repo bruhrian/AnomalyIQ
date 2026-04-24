@@ -23,6 +23,7 @@ from sqlalchemy import create_engine, text
 load_dotenv(dotenv_path=Path(__file__).resolve().parent / ".env", override=True)
 REPO_ROOT  = Path(__file__).resolve().parent.parent
 AGENTS_DIR = REPO_ROOT / "Agents"
+GRAPH_DIR  = REPO_ROOT / "Data" / "Graphs"
 sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(AGENTS_DIR))
 
@@ -125,6 +126,17 @@ app.add_middleware(
 )
 
 app.mount("/ui", StaticFiles(directory=FRONTEND_DIR, html=True), name="ui")
+app.mount("/graphs", StaticFiles(directory=GRAPH_DIR), name="graphs")
+
+
+def _graph_public_url(path_value: str) -> str:
+    if not path_value:
+        return ""
+    path = Path(path_value)
+    try:
+        return f"/graphs/{path.resolve().relative_to(GRAPH_DIR.resolve()).as_posix()}"
+    except ValueError:
+        return path_value
 
 
 class AnomalyAlert(BaseModel):
@@ -133,6 +145,8 @@ class AnomalyAlert(BaseModel):
     label:        str
     confidence:   float
     visual_url:   list[str]
+    visuals:      dict[str, str] = {}
+    cnn_targets:  dict[str, float] = {}
 
 class QARequest(BaseModel):
     machine_id: str
@@ -170,13 +184,41 @@ async def anomaly(alert: AnomalyAlert):
     print(f"[CA] Anomaly received — machine: {alert.machine_id} | job: {job_id}")
 
     async def run():
-        query = (
+        line_plot = alert.visuals.get("line_plot") or (alert.visual_url[0] if len(alert.visual_url) > 0 else "")
+        heatmap = alert.visuals.get("heatmap") or (alert.visual_url[1] if len(alert.visual_url) > 1 else "")
+        line_plot_url = _graph_public_url(line_plot)
+        heatmap_url = _graph_public_url(heatmap)
+        anomaly_context = {
+            "job_id": job_id,
+            "machine_id": alert.machine_id,
+            "machine_type": alert.machine_type,
+            "label": alert.label,
+            "confidence": alert.confidence,
+            "cnn_targets": alert.cnn_targets,
+            "visuals": {
+                "line_plot": line_plot_url,
+                "heatmap": heatmap_url,
+            },
+        }
+        _legacy_query = (
             f"ANOMALY ALERT — Machine {alert.machine_id} ({alert.machine_type})\n"
             f"Label: {alert.label} | Confidence: {alert.confidence:.1%}\n"
             f"Visuals: {', '.join(alert.visual_url) if alert.visual_url else 'none'}\n\n"
             f"Please analyse this anomaly, explain the root cause, cascade effects, and recommended actions."
         )
-        return await orchestrator_response(query=query, session_id=f"anomaly-{alert.machine_id}")
+        query = (
+            "ANOMALY ALERT - CNN has already detected an abnormal machine state.\n"
+            "Do not ask the operator for more raw data. Use the complete JSON context below.\n"
+            "Your final answer must include root cause, cascade effects, recommended actions, "
+            "and a Visual Evidence section that explicitly references visuals.line_plot and visuals.heatmap.\n\n"
+            f"ANOMALY_CONTEXT_JSON:\n{json.dumps(anomaly_context, indent=2)}"
+        )
+        result = await orchestrator_response(query=query, session_id=f"anomaly-{alert.machine_id}")
+        if isinstance(result, dict):
+            result["visual_url"] = [v for v in [line_plot_url, heatmap_url] if v]
+            result["visuals"] = anomaly_context["visuals"]
+            result["anomaly_context"] = anomaly_context
+        return result
 
     await _job_queue.put((job_id, run))
     return {"job_id": job_id, "status": "queued", "position": _job_queue.qsize()}
@@ -230,8 +272,14 @@ async def chat(req: ChatRequest):
                 logs = getattr(result, "logs", []) if result else []
                 anomaly_logs = [
                     log for log in logs
-                    if str(log.event).lower() in {"detect", "anomaly_detected"}
-                    or "needs_maintenance" in str(log.details).lower()
+                    if (
+                        (str((log.details or {}).get("machine_id", "")).lower() == req.machine_id.lower()
+                         or str((log.details or {}).get("sensor_id", "")).lower() == req.machine_id.lower())
+                        and (
+                            str(log.event).lower() in {"detect", "anomaly_detected"}
+                            or "needs_maintenance" in str(log.details).lower()
+                        )
+                    )
                 ]
                 if anomaly_logs:
                     lines = []
@@ -242,7 +290,17 @@ async def chat(req: ChatRequest):
                     answer = "Recent anomaly records found:\n" + "\n".join(lines)
                 else:
                     answer = "No recent anomaly records are available in the audit log context."
-                return {"result": answer, "session_id": session_id, "elapsed_time": 0}
+                matching_states = [
+                    state for key, state in _latest_machine_state.items()
+                    if key.lower().startswith(f"{req.machine_id.lower()}::")
+                ]
+                latest_state = max(matching_states, key=lambda s: s.get("updated_at", 0), default={})
+                return {
+                    "result": answer,
+                    "session_id": session_id,
+                    "elapsed_time": 0,
+                    "visual_url": latest_state.get("visual_url", []),
+                }
             except Exception as e:
                 return {
                     "result": f"Could not read anomaly records from audit log: {str(e)}",
@@ -256,9 +314,15 @@ async def chat(req: ChatRequest):
             result = recent.get("result")
             logs = getattr(result, "logs", []) if result else []
             if logs:
+                machine_logs = [
+                    log for log in logs
+                    if str((log.details or {}).get("machine_id", "")).lower() == req.machine_id.lower()
+                    or str((log.details or {}).get("sensor_id", "")).lower() == req.machine_id.lower()
+                ]
+                context_logs = machine_logs or logs[:2]
                 context += "\nRecent audit records:\n" + "\n".join(
                     f"- {log.timestamp} | {log.agent} | {log.event} | {log.details}"
-                    for log in logs[:5]
+                    for log in context_logs[:5]
                 )
             else:
                 context += "\nRecent audit records: none available."
@@ -269,6 +333,7 @@ async def chat(req: ChatRequest):
             query      = f"[Machine: {req.machine_id}] {req.question}\n\nBackend context:\n{context}",
             session_id = session_id,
             use_tools  = False,
+            request_timeout_seconds = 45,
         )
 
     await _chat_queue.put((job_id, run))
@@ -321,6 +386,7 @@ async def machines_stream():
 @app.post("/machine-state")
 async def machine_state(update: MachineStateUpdate):
     state = update.model_dump()
+    state["visual_url"] = [_graph_public_url(url) for url in state.get("visual_url", [])]
     state["updated_at"] = time.time()
     _latest_machine_state[_machine_state_key(update.machine_id, update.machine_type)] = state
     return {"status": "ok", "machine_id": update.machine_id, "machine_type": update.machine_type}
