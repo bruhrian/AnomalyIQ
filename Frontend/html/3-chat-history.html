@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -133,14 +133,14 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
 .send-btn{width:32px;height:32px;background:var(--accent);border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
 .send-btn:hover{background:#00b8e6;transform:scale(1.05);}
 .send-btn svg{width:14px;height:14px;fill:#0f1117;}
-</style><title>AnomalyIQ — Chat History</title></head>
+</style><title>AnomalyIQ - Chat History</title></head>
 
 <div class="shell">
 <nav>
   <div class="nav-logo">
     <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0f1117" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
   </div>
-  <button class="nav-btn " id="nb-d" onclick="location.href='1-dashboard.html'">
+  <button class="nav-btn " id="nb-d" onclick="location.href='1-dashboard.html#dashboard'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     <div class="nav-tip">Dashboard</div>
   </button>
@@ -153,20 +153,20 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
     <div class="nav-tip">Chat History</div>
   </button>
   <div class="nav-div"></div>
-  <button class="nav-btn" onclick="location.href='4-system-status.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg><div class="nav-tip">Live Feed</div></button>
-  <button class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><div class="nav-tip">Analytics</div></button>
+  <button class="nav-btn" onclick="location.href='1-dashboard.html#livefeed'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg><div class="nav-tip">Live Feed</div></button>
+  <button class="nav-btn" onclick="location.href='1-dashboard.html#analytics'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><div class="nav-tip">Analytics</div></button>
   <div class="nav-space"></div>
   <div class="nav-div"></div>
-  <button class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/></svg><div class="nav-tip">Profile</div></button>
+  <button class="nav-btn" onclick="location.href='1-dashboard.html#profile'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/></svg><div class="nav-tip">Profile</div></button>
 </nav>
 <div class="main"><div class="topbar">
   <span class="tb-title">ANOMALYIQ</span>
   <span class="tb-crumb">/ Chat History</span>
   <div class="tb-space"></div>
   <div class="status-pill"><div class="sdot-live"></div>Monitoring active</div>
-  <div class="tb-clock" id="clk">09:41:03</div>
+  <div class="tb-clock" id="clk">--:--:--</div>
 </div><div class="body"><div class="center"><div class="vscroll" style="gap:8px">
-  <div class="sec-label" style="margin-bottom:4px" id="sessionsLabel">Conversation Records — loading…</div>
+  <div class="sec-label" style="margin-bottom:4px" id="sessionsLabel">Conversation Records - loading...</div>
 </div></div><div class="chat-panel">
   <div class="chat-head">
     <div class="chat-avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M12 2a4 4 0 0 1 4 4v2H8V6a4 4 0 0 1 4-4z"/><rect x="4" y="8" width="16" height="12" rx="2"/><circle cx="9" cy="14" r="1" fill="white"/><circle cx="15" cy="14" r="1" fill="white"/></svg></div>
@@ -175,7 +175,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
   </div>
   <div class="chat-msgs" id="chatMsgs"></div>
   <div class="chat-input-row">
-    <textarea class="chat-input" id="chatInput" placeholder="Ask about any machine…" rows="1"></textarea>
+    <textarea class="chat-input" id="chatInput" placeholder="Ask about any machine..." rows="1"></textarea>
     <button class="send-btn"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg></button>
   </div>
 </div></div></div></div>
@@ -186,10 +186,29 @@ document.getElementById('chatMsgs')?.replaceChildren();
 function tick(){const t=new Date().toLocaleTimeString('en-GB');const e=document.getElementById('clk');if(e)e.textContent=t;}
 tick();setInterval(tick,1000);
 loadSessions();
+setInterval(loadSessions, 10000);
 function setTab(el){el.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');}
 function toggleThread(id){document.getElementById(id).classList.toggle('open');}
 
-// ── Load real chat sessions from backend ──────────────────────────────────────
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function displayHistoryContent(message) {
+  let content = String(message?.content ?? '');
+  if (message?.role === 'human') {
+    content = content.split('\n\nBackend context:')[0];
+    content = content.replace(/^\[Machine:\s*([^\]]+)\]\s*/i, '');
+  }
+  return content;
+}
+
+// â”€â”€ Load real chat sessions from backend â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function loadSessions() {
   try {
     const res  = await fetch(`${BACKEND_URL}/chat/sessions`);
@@ -204,7 +223,7 @@ async function loadSessions() {
     // Remove old cards
     container.querySelectorAll('.hcard').forEach(c => c.remove());
 
-    if (label) label.textContent = `Conversation Records — ${sessions.length} session${sessions.length !== 1 ? 's' : ''}`;
+    if (label) label.textContent = `Conversation Records - ${sessions.length} session${sessions.length !== 1 ? 's' : ''}`;
 
     if (sessions.length === 0) {
       const empty = document.createElement('div');
@@ -223,15 +242,15 @@ async function loadSessions() {
           <div class="htag">${sessionId}</div>
           <div class="htime">tap to load</div>
         </div>
-        <div class="hpreview" id="prev-${threadId}">Tap to load messages…</div>
-        <div class="hfooter"><div class="hturns" id="turns-${threadId}">— turns</div><div style="flex:1"></div></div>
+        <div class="hpreview" id="prev-${threadId}">Tap to load messages...</div>
+        <div class="hfooter"><div class="hturns" id="turns-${threadId}">-- turns</div><div style="flex:1"></div></div>
         <div class="hthread" id="${threadId}"></div>`;
       card.onclick = () => loadThread(sessionId, card);
       container.appendChild(card);
     }
   } catch(e) {
     const label = document.getElementById('sessionsLabel');
-    if (label) label.textContent = 'Conversation Records — backend offline';
+    if (label) label.textContent = 'Conversation Records - backend offline';
     console.log('Chat history load failed:', e.message);
   }
 }
@@ -246,7 +265,7 @@ async function loadThread(sessionId, card) {
     return;
   }
 
-  thread.innerHTML = '<div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px 0;">Loading…</div>';
+  thread.innerHTML = '<div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px 0;">Loading...</div>';
   thread.classList.add('open');
 
   try {
@@ -256,13 +275,16 @@ async function loadThread(sessionId, card) {
 
     const preview = document.getElementById(`prev-${threadId}`);
     const turns   = document.getElementById(`turns-${threadId}`);
-    if (preview) preview.textContent = msgs.length ? msgs[0].content.substring(0,100) + '…' : 'No messages.';
+    if (preview) {
+      const firstDisplay = msgs.length ? displayHistoryContent(msgs[0]) : '';
+      preview.textContent = firstDisplay ? firstDisplay.substring(0,100) + '...' : 'No messages.';
+    }
     if (turns)   turns.textContent   = `${msgs.length} turns`;
 
     thread.innerHTML = msgs.length
       ? msgs.map(m => {
           const cls = m.role === 'human' ? 'user' : 'sys';
-          return `<div class="hmsg ${cls}"><div class="hbubble">${m.content}</div><div class="hmeta">${m.role.toUpperCase()}</div></div>`;
+          return `<div class="hmsg ${cls}"><div class="hbubble">${escapeHtml(displayHistoryContent(m))}</div><div class="hmeta">${escapeHtml(m.role.toUpperCase())}</div></div>`;
         }).join('')
       : '<div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px 0;">No messages in this session.</div>';
 
@@ -274,27 +296,25 @@ async function loadThread(sessionId, card) {
   }
 }
 
-// Try to load real sessions, fall back to mock if backend is offline
-loadSessions();
-
-// ── Chat panel — real /qa endpoint ──────────────────────────────────────────
+// â”€â”€ Chat panel â€” real /qa endpoint â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const CA_URL = 'http://localhost:8005';
 const POLL_MS = 1500;
-const POLL_TIMEOUT = 60000;
+const POLL_TIMEOUT = 70000;
 let currentMachineId = 'M001';
+let currentSessionId = null;
 
 function nowStr(){return new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
 function appendMsg(cls,html,meta){const msgs=document.getElementById('chatMsgs');if(!msgs)return;const el=document.createElement('div');el.className=`msg ${cls}`;el.innerHTML=`<div class="bubble">${html}</div><div class="msg-meta">${meta}</div>`;msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;return el;}
 function appendTyping(){const msgs=document.getElementById('chatMsgs');if(!msgs)return;const el=document.createElement('div');el.className='msg sys';el.innerHTML='<div class="typing-wrap"><span></span><span></span><span></span></div>';msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;return el;}
-function formatResult(r){if(typeof r==='string')return r;let h='';if(r.Impact_analysis)h+=`<strong>Impact Analysis</strong><br>${r.Impact_analysis}<br><br>`;if(r.cascade_effects&&r.cascade_effects.length){h+='<strong>Cascade Effects</strong><br>';r.cascade_effects.forEach((e,i)=>{const l=['Immediate','Short-term','Long-term'];h+=`• ${l[i]||i+1}: ${e}<br>`;});h+='<br>';}if(r.solutions)h+=`<strong>Recommended Action</strong><br>${r.solutions}`;if(r.sources&&r.sources.length)h+=`<br><br><span style="font-size:10px;color:var(--muted);">Sources: ${r.sources.join(', ')}</span>`;return h||JSON.stringify(r,null,2);}
-async function pollJob(jobId,typingEl){const deadline=Date.now()+POLL_TIMEOUT;while(Date.now()<deadline){await new Promise(r=>setTimeout(r,POLL_MS));try{const res=await fetch(`${CA_URL}/jobs/${jobId}`);if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json();if(data.status==='done'){typingEl.remove();appendMsg('sys',formatResult(data.result?.result??data.result),`SYSTEM · ${nowStr()}`);return;}if(data.status==='error'){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">⚠ ${data.detail||'Error'}</span>`,`SYSTEM · ${nowStr()}`);return;}}catch(err){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">⚠ ${err.message}</span>`,`SYSTEM · ${nowStr()}`);return;}}typingEl.remove();appendMsg('sys','<span style="color:var(--warn)">⏱ Request timed out.</span>',`SYSTEM · ${nowStr()}`);}
+function formatResult(r){if(typeof r==='string')return r;let h='';if(r.Impact_analysis)h+=`<strong>Impact Analysis</strong><br>${r.Impact_analysis}<br><br>`;if(r.cascade_effects&&r.cascade_effects.length){h+='<strong>Cascade Effects</strong><br>';r.cascade_effects.forEach((e,i)=>{const l=['Immediate','Short-term','Long-term'];h+=`- ${l[i]||i+1}: ${e}<br>`;});h+='<br>';}if(r.solutions)h+=`<strong>Recommended Action</strong><br>${r.solutions}`;if(r.sources&&r.sources.length)h+=`<br><br><span style="font-size:10px;color:var(--muted);">Sources: ${r.sources.join(', ')}</span>`;return h||JSON.stringify(r,null,2);}
+async function pollJob(jobId,typingEl){const deadline=Date.now()+POLL_TIMEOUT;while(Date.now()<deadline){await new Promise(r=>setTimeout(r,POLL_MS));try{const res=await fetch(`${CA_URL}/jobs/${jobId}`);if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json();if(data.status==='done'){typingEl.remove();appendMsg('sys',formatResult(data.result?.result??data.result),`SYSTEM · ${nowStr()}`);return;}if(data.status==='error'){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">${data.detail||'Error'}</span>`,`SYSTEM · ${nowStr()}`);return;}}catch(err){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">${err.message}</span>`,`SYSTEM · ${nowStr()}`);return;}}typingEl.remove();appendMsg('sys','<span style="color:var(--warn)">Request timed out.</span>',`SYSTEM · ${nowStr()}`);}
 async function sendMsg(){
   const input = document.getElementById('chatInput');
   if(!input) return;
   let text = input.value.trim();
   if(!text) return;
   
-  // 确保 text 是字符串，不是对象
+  // ç¡®ä¿ text æ˜¯å­—ç¬¦ä¸²ï¼Œä¸æ˜¯å¯¹è±¡
   text = String(text);
   
   input.disabled=true;
@@ -305,12 +325,13 @@ async function sendMsg(){
   const typingEl=appendTyping();
   
   try{
-    // 明确构造要发送的对象，确保没有额外属性
+    // æ˜Žç¡®æž„é€ è¦å‘é€çš„å¯¹è±¡ï¼Œç¡®ä¿æ²¡æœ‰é¢å¤–å±žæ€§
     const payload = {
       machine_id: String(currentMachineId),
-      question: text
+      question: text,
+      session_id: currentSessionId
     };
-    // 如果后端支持 session_id，可以加上（可选）
+    // å¦‚æžœåŽç«¯æ”¯æŒ session_idï¼Œå¯ä»¥åŠ ä¸Šï¼ˆå¯é€‰ï¼‰
     // payload.session_id = "chat-history-" + Date.now();
     
     const res=await fetch(`${CA_URL}/chat`,{
@@ -322,19 +343,21 @@ async function sendMsg(){
     if(!res.ok){
       const err=await res.json().catch(()=>({}));
       typingEl.remove();
-      appendMsg('sys',`<span style="color:var(--accent2)">⚠ ${res.status}: ${err.detail||res.statusText}</span>`,`SYSTEM · ${nowStr()}`);
+      appendMsg('sys',`<span style="color:var(--accent2)">${res.status}: ${err.detail||res.statusText}</span>`,`SYSTEM · ${nowStr()}`);
       return;
     }
     const data=await res.json();
+    if(data.session_id) currentSessionId = data.session_id;
     if(!data.job_id){
       typingEl.remove();
-      appendMsg('sys','<span style="color:var(--accent2)">⚠ No job_id returned.</span>',`SYSTEM · ${nowStr()}`);
+      appendMsg('sys','<span style="color:var(--accent2)">No job_id returned.</span>',`SYSTEM · ${nowStr()}`);
       return;
     }
     await pollJob(data.job_id, typingEl);
+    await loadSessions();
   } catch(err){
     typingEl.remove();
-    appendMsg('sys',`<span style="color:var(--accent2)">⚠ Cannot reach backend: ${err.message}</span>`,`SYSTEM · ${nowStr()}`);
+    appendMsg('sys',`<span style="color:var(--accent2)">Cannot reach backend: ${err.message}</span>`,`SYSTEM · ${nowStr()}`);
   } finally{
     input.disabled=false;
     if(btn) btn.disabled=false;
@@ -351,3 +374,4 @@ document.addEventListener('DOMContentLoaded', () => {
   if (input) input.addEventListener('keydown', handleKey);
 });
 </script></body></html>
+

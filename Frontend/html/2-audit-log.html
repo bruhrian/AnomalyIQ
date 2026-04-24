@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -134,7 +134,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
 .send-btn:hover{background:#00b8e6;transform:scale(1.05);}
 .send-btn svg{width:14px;height:14px;fill:#0f1117;}
 </style>
-<title>AnomalyIQ — Audit Log</title>
+<title>AnomalyIQ - Audit Log</title>
 </head>
 <body>
 <div class="shell">
@@ -142,7 +142,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
   <div class="nav-logo">
     <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0f1117" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
   </div>
-  <button class="nav-btn" id="nb-d">
+  <button class="nav-btn" id="nb-d" onclick="location.href='1-dashboard.html#dashboard'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     <div class="nav-tip">Dashboard</div>
   </button>
@@ -150,22 +150,22 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
     <div class="nav-tip">Audit Log</div>
   </button>
-  <button class="nav-btn" id="nb-h">
+  <button class="nav-btn" id="nb-h" onclick="location.href='3-chat-history.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     <div class="nav-tip">Chat History</div>
   </button>
   <div class="nav-div"></div>
-  <button class="nav-btn" id="nb-livefeed">
+  <button class="nav-btn" id="nb-livefeed" onclick="location.href='1-dashboard.html#livefeed'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
     <div class="nav-tip">Live Feed</div>
   </button>
-  <button class="nav-btn" id="nb-analytics">
+  <button class="nav-btn" id="nb-analytics" onclick="location.href='1-dashboard.html#analytics'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
     <div class="nav-tip">Analytics</div>
   </button>
   <div class="nav-space"></div>
   <div class="nav-div"></div>
-  <button class="nav-btn" id="nb-profile">
+  <button class="nav-btn" id="nb-profile" onclick="location.href='1-dashboard.html#profile'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/></svg>
     <div class="nav-tip">Profile</div>
   </button>
@@ -182,35 +182,14 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
   <div class="body">
     <div class="center">
       <!-- DASHBOARD VIEW -->
-      <div id="view-dashboard" class="view">
-        <div class="vscroll">
-          <div class="sec-label" style="margin-bottom:4px">Machine Fleet — 4 active units</div>
-          <div class="mrow s-alert">
-            <div class="abadge">⚠ ANOMALY</div>
-            <div class="mrow-label"><div class="mrow-id">MCH-001</div><div class="mrow-name">Compressor A</div><div class="mrow-st"><span class="dot alert"></span><span style="color:var(--accent2)">Alert</span></div></div>
-            <div class="mrow-fields">
-              <div class="field"><div class="fn">Timestamp</div><div class="fv warn" id="ts1">--:--:--</div><div class="bar-bg"><div class="bar warn" style="width:100%"></div></div></div>
-              <div class="field"><div class="fn">Temperature °C</div><div class="fv alert">94</div><div class="bar-bg"><div class="bar alert" style="width:94%"></div></div></div>
-              <div class="field"><div class="fn">Vibration</div><div class="fv alert">12.4</div><div class="bar-bg"><div class="bar alert" style="width:88%"></div></div></div>
-              <div class="field"><div class="fn">Efficiency</div><div class="fv alert">34%</div><div class="bar-bg"><div class="bar alert" style="width:34%"></div></div></div>
-            </div>
-          </div>
-          <div class="mrow s-warn">
-            <div class="mrow-label"><div class="mrow-id">MCH-002</div><div class="mrow-name">Pump B</div><div class="mrow-st"><span class="dot warn"></span><span style="color:var(--warn)">Warning</span></div></div>
-            <div class="mrow-fields"><div class="field"><div class="fn">Temperature</div><div class="fv warn">71°C</div></div></div>
-          </div>
-          <div class="mrow"><div class="mrow-label"><div class="mrow-id">MCH-003</div><div class="mrow-name">Motor C</div><div class="mrow-st"><span class="dot ok"></span><span>Normal</span></div></div></div>
-          <div class="mrow"><div class="mrow-label"><div class="mrow-id">MCH-004</div><div class="mrow-name">Conveyor D</div><div class="mrow-st"><span class="dot ok"></span><span>Normal</span></div></div></div>
-        </div>
-      </div>
 
       <!-- AUDIT LOG VIEW -->
       <div id="view-audit" class="view active">
         <div class="vscroll">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:2px">
             <div class="sec-label">System Process Log</div>
-            <div class="badge" id="entryCount">Loading…</div>
-            <button onclick="loadAudit()" style="margin-left:auto;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);color:var(--accent);font-family:var(--font-mono);font-size:9px;padding:3px 10px;border-radius:5px;cursor:pointer;letter-spacing:.05em;">⟳ Refresh</button>
+            <div class="badge" id="entryCount">Loading...</div>
+            <button onclick="loadAudit()" style="margin-left:auto;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);color:var(--accent);font-family:var(--font-mono);font-size:9px;padding:3px 10px;border-radius:5px;cursor:pointer;letter-spacing:.05em;">Refresh</button>
           </div>
 
           <div class="tabs">
@@ -226,7 +205,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
               <span style="font-family:var(--font-mono);font-size:10px;color:var(--accent);">EVENT TRAIL</span>
               <span id="trailEventId" style="font-family:var(--font-mono);font-size:9px;color:var(--muted);"></span>
-              <button onclick="closeTrail()" style="margin-left:auto;background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--font-mono);font-size:9px;padding:2px 8px;border-radius:4px;cursor:pointer;">✕ Close</button>
+              <button onclick="closeTrail()" style="margin-left:auto;background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--font-mono);font-size:9px;padding:2px 8px;border-radius:4px;cursor:pointer;">Close</button>
             </div>
             <div id="trailRows"></div>
           </div>
@@ -234,7 +213,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
           <div class="audit-card">
             <div class="audit-head">
               <span class="audit-head-title">AUDIT TRAIL</span>
-              <span class="badge">Detect → Process → Summary → Answer</span>
+              <span class="badge">Detect -> Process -> Summary -> Answer</span>
               <span style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-left:auto;">Click any row to drill in</span>
             </div>
             <div class="audit-row" style="background:var(--surface2);font-size:9px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;">
@@ -242,7 +221,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
             </div>
             <div id="auditBody">
               <div style="padding:20px;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--muted);">
-                Connecting to Audit API on port 8005…
+                Connecting to Audit API on port 8005...
               </div>
             </div>
           </div>
@@ -250,17 +229,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
       </div>
 
       <!-- CHAT HISTORY VIEW -->
-      <div id="view-history" class="view">
-        <div class="vscroll" style="gap:8px">
-          <div class="sec-label" style="margin-bottom:4px">Conversation Records</div>
-          <div style="color:var(--muted);font-family:var(--font-mono);font-size:10px;padding:12px 0;">Open Chat History to view saved conversations.</div>
-        </div>
-      </div>
 
-      <!-- PLACEHOLDER VIEWS -->
-      <div id="view-livefeed" class="view"><div class="vscroll"><div class="sec-label">📡 LIVE TELEMETRY</div><div style="color:var(--muted);padding:20px;">Real-time data stream will appear here.</div></div></div>
-      <div id="view-analytics" class="view"><div class="vscroll"><div class="sec-label">📊 ANALYTICS</div><div style="color:var(--muted);padding:20px;">Predictive models and trends.</div></div></div>
-      <div id="view-profile" class="view"><div class="vscroll"><div class="sec-label">👤 PROFILE</div><div style="color:var(--muted);padding:20px;">User settings and preferences.</div></div></div>
     </div>
 
     <!-- CHAT PANEL -->
@@ -272,7 +241,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
       </div>
       <div class="chat-msgs" id="chatMsgs"></div>
       <div class="chat-input-row">
-        <textarea class="chat-input" id="chatInput" placeholder="Ask about any machine…" rows="1"></textarea>
+        <textarea class="chat-input" id="chatInput" placeholder="Ask about any machine..." rows="1"></textarea>
         <button class="send-btn" onclick="sendMsg()"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg></button>
       </div>
     </div>
@@ -283,19 +252,9 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
 <script>
 // ==================== CLOCK ====================
 document.getElementById('chatMsgs')?.replaceChildren();
-const auditDashboardPane = document.querySelector('#view-dashboard .vscroll');
-if (auditDashboardPane) {
-  auditDashboardPane.innerHTML = '<div class="sec-label" style="margin-bottom:4px">Audit Log</div><div style="color:var(--muted);font-family:var(--font-mono);font-size:10px;padding:12px 0;">Use the Audit Log tab to view real Detect -> Process -> Summary -> Answer records from PostgreSQL.</div>';
-}
-const historyPane = document.querySelector('#view-history .vscroll');
-if (historyPane) {
-  historyPane.innerHTML = '<div class="sec-label" style="margin-bottom:4px">Conversation Records</div><div style="color:var(--muted);font-family:var(--font-mono);font-size:10px;padding:12px 0;">Open Chat History to view saved conversations.</div>';
-}
-
 function tick() {
   const t = new Date().toLocaleTimeString('en-GB');
   const el = document.getElementById('clk'); if(el) el.textContent = t;
-  ['ts1','ts2','ts3','ts4'].forEach(id => { const e=document.getElementById(id); if(e) e.textContent=t; });
 }
 tick(); setInterval(tick, 1000);
 
@@ -306,18 +265,16 @@ function switchToView(viewId) {
   if (target) target.classList.add('active');
   
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-  const btnMap = { 'view-dashboard': 'nb-d', 'view-audit': 'nb-a', 'view-history': 'nb-h' };
+  const btnMap = { 'view-audit': 'nb-a' };
   const activeBtn = document.getElementById(btnMap[viewId]);
   if (activeBtn) activeBtn.classList.add('active');
   
   const breadcrumb = document.getElementById('breadcrumb');
-  const names = { 'view-dashboard': '/ Machine Monitor', 'view-audit': '/ Audit Log', 'view-history': '/ Chat History' };
-  if (breadcrumb) breadcrumb.textContent = names[viewId] || '/ Dashboard';
+  const names = { 'view-audit': '/ Audit Log' };
+  if (breadcrumb) breadcrumb.textContent = names[viewId] || '/ Audit Log';
 }
 
-document.getElementById('nb-d')?.addEventListener('click', () => switchToView('view-dashboard'));
 document.getElementById('nb-a')?.addEventListener('click', () => switchToView('view-audit'));
-document.getElementById('nb-h')?.addEventListener('click', () => switchToView('view-history'));
 
 // ==================== AUDIT FUNCTIONS (unchanged) ====================
 const AUDIT_API = 'http://localhost:8005';
@@ -352,14 +309,14 @@ function describeAuditRow(log, stage, details) {
 
 async function loadAudit() {
   const body = document.getElementById('auditBody');
-  body.innerHTML = '<div style="padding:16px;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--muted);">Loading…</div>';
+  body.innerHTML = '<div style="padding:16px;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--muted);">Loading...</div>';
   try {
     const res = await fetch(`${AUDIT_API}/audit/logs?limit=200`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     _allRows = (data.logs || data.events || []).map(log => ({
       event_id: log.event_id || String(log.id),
-      machine_id: log.machine_id || log.details?.machine_id || '—',
+      machine_id: log.machine_id || log.details?.machine_id || '-',
       stage: (log.stage || log.event || 'DETECT').toUpperCase(),
       description: log.description || (log.details ? JSON.stringify(log.details).substring(0,100) : log.event),
       created_at: log.timestamp || log.created_at,
@@ -382,7 +339,7 @@ async function loadAudit() {
     document.getElementById('entryCount').textContent = `${_allRows.length} entries`;
     renderRows(_allRows, _currentFilter);
   } catch(e) {
-    body.innerHTML = `<div style="padding:20px;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--accent2);">⚠ Cannot reach backend at ${AUDIT_API}<br><span style="color:var(--muted);font-size:10px;">Make sure main.py is running (port 8005)</span></div>`;
+    body.innerHTML = `<div style="padding:20px;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--accent2);">Cannot reach backend at ${AUDIT_API}<br><span style="color:var(--muted);font-size:10px;">Make sure main.py is running (port 8005)</span></div>`;
     document.getElementById('entryCount').textContent = 'offline';
   }
 }
@@ -395,7 +352,7 @@ function renderRows(rows, filter) {
     return;
   }
   body.innerHTML = filtered.map(r => {
-    const ts = r.created_at ? new Date(r.created_at).toLocaleTimeString('en-GB') : '—';
+    const ts = r.created_at ? new Date(r.created_at).toLocaleTimeString('en-GB') : '-';
     const cls = STAGE_CLASS[r.stage] || 'process';
     return `<div class="audit-row" style="cursor:pointer;" onclick="drillIn('${escapeHtml(r.event_id)}','${escapeHtml(r.job_id)}')">
       <div class="atime">${ts}</div><div class="stage ${cls}">${r.stage}</div><div class="adesc">${escapeHtml(r.description).substring(0,140)}</div><div class="amach"><div>${escapeHtml(r.machine_id)}</div><span>${escapeHtml(r.machine_type)}</span></div>
@@ -414,8 +371,8 @@ async function drillIn(eventId, machineId) {
   if (!eventId) return;
   const panel = document.getElementById('trailPanel');
   const rows = document.getElementById('trailRows');
-  document.getElementById('trailEventId').textContent = `${eventId.substring(0,8)}… · ${machineId}`;
-  rows.innerHTML = '<div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px 0;">Loading trail…</div>';
+  document.getElementById('trailEventId').textContent = `${eventId.substring(0,8)}... · ${machineId}`;
+  rows.innerHTML = '<div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px 0;">Loading trail...</div>';
   panel.style.display = 'block';
   try {
     const res = await fetch(`${AUDIT_API}/audit/trail/${eventId}`);
@@ -425,7 +382,7 @@ async function drillIn(eventId, machineId) {
       return;
     }
     rows.innerHTML = trail.map(item => {
-      const ts = item.created_at ? new Date(item.created_at).toLocaleTimeString('en-GB') : '—';
+      const ts = item.created_at ? new Date(item.created_at).toLocaleTimeString('en-GB') : '-';
       const cls = STAGE_CLASS[item.stage] || 'process';
       return `<div style="padding:8px 0;border-bottom:1px solid var(--border);display:grid;grid-template-columns:70px 82px 1fr;gap:10px;">
         <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);">${ts}</div>
@@ -485,9 +442,9 @@ let currentMachineId = 'M001';
 function nowStr(){return new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
 function appendMsg(cls,html,meta){const msgs=document.getElementById('chatMsgs');if(!msgs)return;const el=document.createElement('div');el.className=`msg ${cls}`;el.innerHTML=`<div class="bubble">${html}</div><div class="msg-meta">${meta}</div>`;msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;return el;}
 function appendTyping(){const msgs=document.getElementById('chatMsgs');if(!msgs)return;const el=document.createElement('div');el.className='msg sys';el.innerHTML='<div class="typing-wrap"><span></span><span></span><span></span></div>';msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;return el;}
-function formatResult(r){if(typeof r==='string')return r;let h='';if(r.Impact_analysis)h+=`<strong>Impact Analysis</strong><br>${r.Impact_analysis}<br><br>`;if(r.cascade_effects&&r.cascade_effects.length){h+='<strong>Cascade Effects</strong><br>';r.cascade_effects.forEach((e,i)=>{const l=['Immediate','Short-term','Long-term'];h+=`• ${l[i]||i+1}: ${e}<br>`;});h+='<br>';}if(r.solutions)h+=`<strong>Recommended Action</strong><br>${r.solutions}`;if(r.sources&&r.sources.length)h+=`<br><br><span style="font-size:10px;color:var(--muted);">Sources: ${r.sources.join(', ')}</span>`;return h||JSON.stringify(r,null,2);}
-async function pollJob(jobId,typingEl){const deadline=Date.now()+POLL_TIMEOUT;while(Date.now()<deadline){await new Promise(r=>setTimeout(r,POLL_MS));try{const res=await fetch(`${CA_URL}/jobs/${jobId}`);if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json();if(data.status==='done'){typingEl.remove();appendMsg('sys',formatResult(data.result?.result??data.result),`SYSTEM · ${nowStr()}`);return;}if(data.status==='error'){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">⚠ ${data.detail||'Error'}</span>`,`SYSTEM · ${nowStr()}`);return;}}catch(err){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">⚠ ${err.message}</span>`,`SYSTEM · ${nowStr()}`);return;}}typingEl.remove();appendMsg('sys','<span style="color:var(--warn)">⏱ Request timed out.</span>',`SYSTEM · ${nowStr()}`);}
-async function sendMsg(){const input=document.getElementById('chatInput');if(!input)return;const text=input.value.trim();if(!text)return;input.disabled=true;document.querySelector('.send-btn').disabled=true;appendMsg('user',text,`OPERATOR · ${nowStr()}`);input.value='';const typingEl=appendTyping();try{const res=await fetch(`${CA_URL}/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({machine_id:currentMachineId,question:text})});if(!res.ok){const err=await res.json().catch(()=>({}));typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">⚠ ${res.status}: ${err.detail||res.statusText}</span>`,`SYSTEM · ${nowStr()}`);return;}const data=await res.json();if(!data.job_id){typingEl.remove();appendMsg('sys','<span style="color:var(--accent2)">⚠ No job_id returned.</span>',`SYSTEM · ${nowStr()}`);return;}await pollJob(data.job_id,typingEl);}catch(err){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">⚠ Cannot reach backend: ${err.message}</span>`,`SYSTEM · ${nowStr()}`);}finally{input.disabled=false;document.querySelector('.send-btn').disabled=false;input.focus();}}
+function formatResult(r){if(typeof r==='string')return r;let h='';if(r.Impact_analysis)h+=`<strong>Impact Analysis</strong><br>${r.Impact_analysis}<br><br>`;if(r.cascade_effects&&r.cascade_effects.length){h+='<strong>Cascade Effects</strong><br>';r.cascade_effects.forEach((e,i)=>{const l=['Immediate','Short-term','Long-term'];h+=`- ${l[i]||i+1}: ${e}<br>`;});h+='<br>';}if(r.solutions)h+=`<strong>Recommended Action</strong><br>${r.solutions}`;if(r.sources&&r.sources.length)h+=`<br><br><span style="font-size:10px;color:var(--muted);">Sources: ${r.sources.join(', ')}</span>`;return h||JSON.stringify(r,null,2);}
+async function pollJob(jobId,typingEl){const deadline=Date.now()+POLL_TIMEOUT;while(Date.now()<deadline){await new Promise(r=>setTimeout(r,POLL_MS));try{const res=await fetch(`${CA_URL}/jobs/${jobId}`);if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json();if(data.status==='done'){typingEl.remove();appendMsg('sys',formatResult(data.result?.result??data.result),`SYSTEM · ${nowStr()}`);return;}if(data.status==='error'){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">${data.detail||'Error'}</span>`,`SYSTEM · ${nowStr()}`);return;}}catch(err){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">${err.message}</span>`,`SYSTEM · ${nowStr()}`);return;}}typingEl.remove();appendMsg('sys','<span style="color:var(--warn)">Request timed out.</span>',`SYSTEM · ${nowStr()}`);}
+async function sendMsg(){const input=document.getElementById('chatInput');if(!input)return;const text=input.value.trim();if(!text)return;input.disabled=true;document.querySelector('.send-btn').disabled=true;appendMsg('user',text,`OPERATOR · ${nowStr()}`);input.value='';const typingEl=appendTyping();try{const res=await fetch(`${CA_URL}/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({machine_id:currentMachineId,question:text})});if(!res.ok){const err=await res.json().catch(()=>({}));typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">${res.status}: ${err.detail||res.statusText}</span>`,`SYSTEM · ${nowStr()}`);return;}const data=await res.json();if(!data.job_id){typingEl.remove();appendMsg('sys','<span style="color:var(--accent2)">No job_id returned.</span>',`SYSTEM · ${nowStr()}`);return;}await pollJob(data.job_id,typingEl);}catch(err){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">Cannot reach backend: ${err.message}</span>`,`SYSTEM · ${nowStr()}`);}finally{input.disabled=false;document.querySelector('.send-btn').disabled=false;input.focus();}}
 function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
 document.getElementById('chatInput')?.addEventListener('keydown', handleKey);
 </script>

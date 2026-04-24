@@ -184,7 +184,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
     <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0f1117" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
   </div>
 
-  <button class="nav-btn" onclick="location.href='1-dashboard.html'">
+  <button class="nav-btn" onclick="location.href='1-dashboard.html#dashboard'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     <div class="nav-tip">Dashboard</div>
   </button>
@@ -199,6 +199,13 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
     <div class="nav-tip">Chat History</div>
   </button>
 
+  <div class="nav-div"></div>
+
+  <button class="nav-btn" onclick="location.href='1-dashboard.html#livefeed'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+    <div class="nav-tip">Live Feed</div>
+  </button>
+
   <!-- STATUS — active -->
   <button class="nav-btn active" id="nb-status">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
@@ -209,7 +216,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
 
   <div class="nav-div"></div>
 
-  <button class="nav-btn">
+  <button class="nav-btn" onclick="location.href='1-dashboard.html#analytics'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
     <div class="nav-tip">Analytics</div>
   </button>
@@ -217,7 +224,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
   <div class="nav-space"></div>
   <div class="nav-div"></div>
 
-  <button class="nav-btn">
+  <button class="nav-btn" onclick="location.href='1-dashboard.html#profile'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/></svg>
     <div class="nav-tip">Profile</div>
   </button>
@@ -248,7 +255,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
 
           <!-- UI node -->
           <div class="conn-node">
-            <div class="node-box ok">
+            <div class="node-box ok" id="node-ui">
               <div class="node-status-dot ok"></div>
               <div class="node-icon">🖥️</div>
               <div class="node-name">UI</div>
@@ -294,7 +301,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
             <!-- PostgreSQL -->
             <div class="db-row">
               <div class="conn-node">
-                <div class="node-box ok">
+                <div class="node-box ok" id="node-pg">
                   <div class="node-status-dot ok"></div>
                   <div class="node-icon">🗄️</div>
                   <div class="node-name">PostgreSQL</div>
@@ -307,7 +314,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
             <!-- Neo4j -->
             <div class="db-row">
               <div class="conn-node">
-                <div class="node-box err">
+                <div class="node-box err" id="node-neo4j">
                   <div class="node-status-dot err"></div>
                   <div class="node-icon">🔍</div>
                   <div class="node-name">Neo4j</div>
@@ -320,7 +327,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
             <!-- Data Simulator -->
             <div class="db-row">
               <div class="conn-node">
-                <div class="node-box ok">
+                <div class="node-box ok" id="node-ds">
                   <div class="node-status-dot ok"></div>
                   <div class="node-icon">📡</div>
                   <div class="node-name">Data Sim</div>
@@ -360,7 +367,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
               <div class="st-detail" id="detail-ui" style="margin-top:4px;">Waiting for backend health...</div>
             </div>
             <div><div class="st-latency ok" id="lat-ui">-- ms</div></div>
-            <div><div class="st-last" id="check-ui">09:41:03</div></div>
+            <div><div class="st-last" id="check-ui">--:--:--</div></div>
           </div>
 
           <!-- MCP -->
@@ -375,7 +382,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
               <div class="st-detail" id="detail-mcp" style="margin-top:4px;">Waiting for backend health...</div>
             </div>
             <div><div class="st-latency ok" id="lat-mcp">-- ms</div></div>
-            <div><div class="st-last" id="check-mcp">09:41:03</div></div>
+            <div><div class="st-last" id="check-mcp">--:--:--</div></div>
           </div>
 
           <!-- PostgreSQL -->
@@ -390,7 +397,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
               <div class="st-detail" id="detail-pg" style="margin-top:4px;">Waiting for backend health...</div>
             </div>
             <div><div class="st-latency ok" id="lat-pg">-- ms</div></div>
-            <div><div class="st-last" id="check-pg">09:41:03</div></div>
+            <div><div class="st-last" id="check-pg">--:--:--</div></div>
           </div>
 
           <!-- Neo4j -->
@@ -420,7 +427,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
               <div class="st-detail" id="detail-ds" style="margin-top:4px;">Waiting for backend health...</div>
             </div>
             <div><div class="st-latency ok" id="lat-ds">-- ms</div></div>
-            <div><div class="st-last" id="check-ds">09:41:03</div></div>
+            <div><div class="st-last" id="check-ds">--:--:--</div></div>
           </div>
 
         </div>

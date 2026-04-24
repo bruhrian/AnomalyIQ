@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AnomalyIQ — Dashboard</title>
+<title>AnomalyIQ - Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 
@@ -24,10 +24,10 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body { height:100%; font-family:var(--font-sans); background:var(--bg); color:var(--text); overflow:hidden; }
 
-/* ═══ SHELL: nav | main ═══ */
+/* â•â•â• SHELL: nav | main â•â•â• */
 .shell { display:flex; height:100vh; overflow:hidden; }
 
-/* ── LEFT NAV ── */
+/* â”€â”€ LEFT NAV â”€â”€ */
 nav {
   width:60px; flex-shrink:0;
   background:var(--surface); border-right:1px solid var(--border);
@@ -59,7 +59,7 @@ nav {
 .nav-div   { width:30px; height:1px; background:var(--border); margin:5px 0; flex-shrink:0; }
 .nav-space { flex:1; }
 
-/* ── MAIN: topbar | body ── */
+/* â”€â”€ MAIN: topbar | body â”€â”€ */
 .main { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
 
 .topbar {
@@ -80,10 +80,10 @@ nav {
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .tb-clock { font-family:var(--font-mono); font-size:11px; color:var(--muted); }
 
-/* ── BODY: center-panel | chat-panel ── */
+/* â”€â”€ BODY: center-panel | chat-panel â”€â”€ */
 .body { flex:1; display:flex; overflow:hidden; min-height:0; }
 
-/* CENTER PANEL — swaps content */
+/* CENTER PANEL â€” swaps content */
 .center {
   flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0;
 }
@@ -102,9 +102,9 @@ nav {
 
 .sec-label { font-family:var(--font-mono); font-size:9px; letter-spacing:.12em; color:var(--muted); text-transform:uppercase; }
 
-/* ════════════════════════════════
-   VIEW 1 — MACHINE DASHBOARD
-   ════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   VIEW 1 â€” MACHINE DASHBOARD
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .mrow {
   background:var(--surface); border:1px solid var(--border);
   border-radius:9px; display:flex; overflow:hidden; position:relative;
@@ -155,9 +155,9 @@ nav {
   color:var(--accent2); padding:2px 6px; border-radius:4px; letter-spacing:.06em;
 }
 
-/* ════════════════════════════════
-   VIEW 2 — AUDIT LOG
-   ════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   VIEW 2 â€” AUDIT LOG
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .audit-card { background:var(--surface); border:1px solid var(--border); border-radius:9px; overflow:hidden; }
 .audit-head {
   padding:10px 16px; border-bottom:1px solid var(--border);
@@ -189,9 +189,9 @@ nav {
 .tab { padding:5px 13px; border-radius:5px; font-size:10px; font-family:var(--font-mono); cursor:pointer; border:none; background:transparent; color:var(--muted); transition:all .18s; }
 .tab.active { background:var(--surface); color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,.35); }
 
-/* ════════════════════════════════
-   VIEW 3 — CHAT HISTORY
-   ════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   VIEW 3 â€” CHAT HISTORY
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .hcard {
   background:var(--surface); border:1px solid var(--border);
   border-radius:9px; padding:14px 16px; cursor:pointer; transition:border-color .2s;
@@ -220,9 +220,9 @@ nav {
 .hmeta { font-family:var(--font-mono); font-size:9px; color:var(--muted); padding:0 3px; }
 .hmsg.user .hmeta { text-align:right; }
 
-/* ══════════════════════════════
-   RIGHT — CHATBOT PANEL (always visible)
-   ══════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   RIGHT â€” CHATBOT PANEL (always visible)
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .chat-panel {
   width:290px; flex-shrink:0;
   background:var(--surface); border-left:1px solid var(--border);
@@ -331,7 +331,7 @@ nav {
   <div class="nav-div"></div>
   <button class="nav-btn" id="nb-profile">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-      <circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
+      <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/>
     </svg>
     <div class="nav-tip">Profile</div>
   </button>
@@ -350,18 +350,18 @@ nav {
       <!-- VIEW: DASHBOARD -->
       <div id="view-dashboard" class="view active">
         <div class="vscroll">
-          <div class="sec-label" style="margin-bottom:4px">Machine Fleet — 4 active units</div>
+          <div class="sec-label" style="margin-bottom:4px">Machine Fleet - 4 active units</div>
 
           <!-- M001 CNC -->
           <div class="mrow" id="row-M001" data-machine-id="M001">
             <div class="mrow-label">
-              <div class="mrow-id" id="name-M001">—</div>
+              <div class="mrow-id" id="name-M001">-</div>
               <div class="mrow-name">M001</div>
               <div class="mrow-st"><span class="dot ok" id="dot-M001"></span><span id="status-M001" style="color:var(--ok)">Normal</span></div>
             </div>
             <div class="mrow-fields">
               <div class="field"><div class="fn">Timestamp</div><div class="fv ok" id="M001-timestamp">--:--:--</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
-              <div class="field"><div class="fn">Temperature °C</div><div class="fv ok" id="M001-temperature">--</div><div class="bar-bg"><div class="bar ok" id="M001-temperature-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Temperature C</div><div class="fv ok" id="M001-temperature">--</div><div class="bar-bg"><div class="bar ok" id="M001-temperature-bar" style="width:0%"></div></div></div>
               <div class="field"><div class="fn">Vibration</div><div class="fv ok" id="M001-vibration_level">--</div><div class="bar-bg"><div class="bar ok" id="M001-vibration_level-bar" style="width:0%"></div></div></div>
               <div class="field"><div class="fn">Power kW</div><div class="fv ok" id="M001-power_consumption">--</div><div class="bar-bg"><div class="bar ok" id="M001-power_consumption-bar" style="width:0%"></div></div></div>
               <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok" id="M001-pressure">--</div><div class="bar-bg"><div class="bar ok" id="M001-pressure-bar" style="width:0%"></div></div></div>
@@ -373,13 +373,13 @@ nav {
           <!-- M002 Conveyor -->
           <div class="mrow" id="row-M002" data-machine-id="M002">
             <div class="mrow-label">
-              <div class="mrow-id" id="name-M002">—</div>
+              <div class="mrow-id" id="name-M002">-</div>
               <div class="mrow-name">M002</div>
               <div class="mrow-st"><span class="dot ok" id="dot-M002"></span><span id="status-M002" style="color:var(--ok)">Normal</span></div>
             </div>
             <div class="mrow-fields">
               <div class="field"><div class="fn">Timestamp</div><div class="fv ok" id="M002-timestamp">--:--:--</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
-              <div class="field"><div class="fn">Temperature °C</div><div class="fv ok" id="M002-temperature">--</div><div class="bar-bg"><div class="bar ok" id="M002-temperature-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Temperature C</div><div class="fv ok" id="M002-temperature">--</div><div class="bar-bg"><div class="bar ok" id="M002-temperature-bar" style="width:0%"></div></div></div>
               <div class="field"><div class="fn">Vibration</div><div class="fv ok" id="M002-vibration_level">--</div><div class="bar-bg"><div class="bar ok" id="M002-vibration_level-bar" style="width:0%"></div></div></div>
               <div class="field"><div class="fn">Power kW</div><div class="fv ok" id="M002-power_consumption">--</div><div class="bar-bg"><div class="bar ok" id="M002-power_consumption-bar" style="width:0%"></div></div></div>
               <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok" id="M002-pressure">--</div><div class="bar-bg"><div class="bar ok" id="M002-pressure-bar" style="width:0%"></div></div></div>
@@ -391,13 +391,13 @@ nav {
           <!-- M003 Drill -->
           <div class="mrow" id="row-M003" data-machine-id="M003">
             <div class="mrow-label">
-              <div class="mrow-id" id="name-M003">—</div>
+              <div class="mrow-id" id="name-M003">-</div>
               <div class="mrow-name">M003</div>
               <div class="mrow-st"><span class="dot ok" id="dot-M003"></span><span id="status-M003" style="color:var(--ok)">Normal</span></div>
             </div>
             <div class="mrow-fields">
               <div class="field"><div class="fn">Timestamp</div><div class="fv ok" id="M003-timestamp">--:--:--</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
-              <div class="field"><div class="fn">Temperature °C</div><div class="fv ok" id="M003-temperature">--</div><div class="bar-bg"><div class="bar ok" id="M003-temperature-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Temperature C</div><div class="fv ok" id="M003-temperature">--</div><div class="bar-bg"><div class="bar ok" id="M003-temperature-bar" style="width:0%"></div></div></div>
               <div class="field"><div class="fn">Vibration</div><div class="fv ok" id="M003-vibration_level">--</div><div class="bar-bg"><div class="bar ok" id="M003-vibration_level-bar" style="width:0%"></div></div></div>
               <div class="field"><div class="fn">Power kW</div><div class="fv ok" id="M003-power_consumption">--</div><div class="bar-bg"><div class="bar ok" id="M003-power_consumption-bar" style="width:0%"></div></div></div>
               <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok" id="M003-pressure">--</div><div class="bar-bg"><div class="bar ok" id="M003-pressure-bar" style="width:0%"></div></div></div>
@@ -409,13 +409,13 @@ nav {
           <!-- M004 Welder -->
           <div class="mrow" id="row-M004" data-machine-id="M004">
             <div class="mrow-label">
-              <div class="mrow-id" id="name-M004">—</div>
+              <div class="mrow-id" id="name-M004">-</div>
               <div class="mrow-name">M004</div>
               <div class="mrow-st"><span class="dot ok" id="dot-M004"></span><span id="status-M004" style="color:var(--ok)">Normal</span></div>
             </div>
             <div class="mrow-fields">
               <div class="field"><div class="fn">Timestamp</div><div class="fv ok" id="M004-timestamp">--:--:--</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
-              <div class="field"><div class="fn">Temperature °C</div><div class="fv ok" id="M004-temperature">--</div><div class="bar-bg"><div class="bar ok" id="M004-temperature-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Temperature C</div><div class="fv ok" id="M004-temperature">--</div><div class="bar-bg"><div class="bar ok" id="M004-temperature-bar" style="width:0%"></div></div></div>
               <div class="field"><div class="fn">Vibration</div><div class="fv ok" id="M004-vibration_level">--</div><div class="bar-bg"><div class="bar ok" id="M004-vibration_level-bar" style="width:0%"></div></div></div>
               <div class="field"><div class="fn">Power kW</div><div class="fv ok" id="M004-power_consumption">--</div><div class="bar-bg"><div class="bar ok" id="M004-power_consumption-bar" style="width:0%"></div></div></div>
               <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok" id="M004-pressure">--</div><div class="bar-bg"><div class="bar ok" id="M004-pressure-bar" style="width:0%"></div></div></div>
@@ -431,9 +431,19 @@ nav {
       <div id="view-audit" class="view">
         <div class="vscroll">
           <div class="audit-card">
-            <div class="audit-head"><div class="audit-head-title">🔍 RECENT AI DECISIONS</div><div class="badge">LLM Context</div></div>
-            <div id="auditList"><div class="audit-row"><div class="atime">09:41:05</div><div class="stage detect">DETECT</div><div class="adesc">Anomaly on MCH-001: temp 94°C, vibration 12.4</div><div class="amach">MCH-001</div></div>
-            <div class="audit-row"><div class="atime">09:42:13</div><div class="stage answer">ANSWER</div><div class="adesc">Error rate reported: 0.18, inefficiency status</div><div class="amach">MCH-001</div></div></div>
+            <div class="audit-head">
+              <div class="audit-head-title">RECENT AUDIT TRAIL</div>
+              <div class="badge" id="miniAuditCount">Loading...</div>
+            </div>
+            <div class="audit-row" style="background:var(--surface2);font-size:9px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;">
+              <div>Time</div>
+              <div>Stage</div>
+              <div>Description</div>
+              <div>Machine</div>
+            </div>
+            <div id="auditList">
+              <div style="color:var(--muted);padding:12px 0;">Loading audit data...</div>
+            </div>
           </div>
         </div>
       </div>
@@ -441,10 +451,9 @@ nav {
       <!-- VIEW: CHAT HISTORY -->
       <div id="view-history" class="view">
         <div class="vscroll">
-          <div class="hcard" onclick="toggleThread('thread1')">
-            <div class="hcard-top"><span class="htag">⚙️ MCH-001</span><span class="htime">09:41:03</span></div>
-            <div class="hpreview">What's the error rate? → Error rate: 0.18, downtime 22 min</div>
-            <div id="thread1" class="hthread"><div class="hmsg user"><div class="hbubble">What's the error rate on MCH-001?</div><div class="hmeta">OPERATOR · 09:42:11</div></div><div class="hmsg sys"><div class="hbubble">MCH-001 error rate: 0.18. Downtime: 22 min.</div><div class="hmeta">SYSTEM · 09:42:13</div></div></div>
+          <div class="sec-label" style="margin-bottom:4px" id="embeddedHistoryLabel">Conversation Records - loading...</div>
+          <div id="embeddedHistoryList" style="display:flex;flex-direction:column;gap:8px;">
+            <div style="color:var(--muted);padding:12px 0;">Loading chat sessions...</div>
           </div>
         </div>
       </div>
@@ -452,7 +461,7 @@ nav {
       <!-- Additional views (livefeed, analytics, status, profile) - add as needed -->
       <div id="view-livefeed" class="view">
         <div class="vscroll" style="gap:14px;">
-          <div class="sec-label" style="margin-bottom:4px">📡 Live Telemetry — Real-time sensor data</div>
+          <div class="sec-label" style="margin-bottom:4px">Live Telemetry - Real-time sensor data</div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
             <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 14px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:10px;">
               <span style="color:var(--muted)">Machine:</span>
@@ -462,7 +471,7 @@ nav {
             <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 14px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:10px;">
               <span style="color:var(--muted)">Field:</span>
               <select id="chartField" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:10px;padding:3px 8px;border-radius:5px;outline:none;">
-                <option value="temperature">Temperature °C</option>
+                <option value="temperature">Temperature C</option>
                 <option value="vibration_level">Vibration</option>
                 <option value="power_consumption">Power kW</option>
                 <option value="pressure">Pressure Pa</option>
@@ -495,7 +504,7 @@ nav {
       </div>
       <div id="view-analytics" class="view">
         <div class="vscroll" style="gap:14px;">
-          <div class="sec-label" style="margin-bottom:4px">📊 Anomaly Analytics</div>
+          <div class="sec-label" style="margin-bottom:4px">Anomaly Analytics</div>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
             <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 16px;">
               <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Total Anomalies</div>
@@ -552,7 +561,7 @@ nav {
       </div>
       <div id="view-status" class="view">
         <div class="vscroll" style="gap:10px;">
-          <div class="sec-label" style="margin-bottom:4px">🖥️ System Status</div>
+          <div class="sec-label" style="margin-bottom:4px">System Status</div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 18px;display:flex;align-items:center;gap:12px;">
             <div id="sys-dot" style="width:10px;height:10px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);flex-shrink:0;animation:pulse 2s infinite;"></div>
             <div>
@@ -560,7 +569,7 @@ nav {
               <div id="sys-detail" style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px;">Fetching system health from backend</div>
             </div>
             <div style="margin-left:auto;">
-              <a href="4-system-status.html" target="_blank" onclick="event.stopPropagation()" style="font-family:var(--font-mono);font-size:10px;color:var(--accent);text-decoration:none;border:1px solid rgba(0,212,255,.3);padding:4px 12px;border-radius:6px;">View Details →</a>
+              <a href="4-system-status.html" target="_blank" onclick="event.stopPropagation()" style="font-family:var(--font-mono);font-size:10px;color:var(--accent);text-decoration:none;border:1px solid rgba(0,212,255,.3);padding:4px 12px;border-radius:6px;">View Details</a>
             </div>
           </div>
           <div id="sys-components" style="display:flex;flex-direction:column;gap:6px;"></div>
@@ -568,9 +577,9 @@ nav {
       </div>
       <div id="view-profile" class="view">
         <div class="vscroll" style="gap:14px;">
-          <div class="sec-label" style="margin-bottom:4px">👤 Operator Profile</div>
+          <div class="sec-label" style="margin-bottom:4px">Operator Profile</div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:20px;display:flex;align-items:center;gap:16px;">
-            <div style="width:52px;height:52px;background:linear-gradient(135deg,var(--accent),#0077ff);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px;">👤</div>
+            <div style="width:52px;height:52px;background:linear-gradient(135deg,var(--accent),#0077ff);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px;">OP</div>
             <div>
               <div id="prof-name" style="font-size:15px;font-weight:600;">Operator</div>
               <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px;">AnomalyIQ System User</div>
@@ -604,12 +613,12 @@ nav {
             </div>
           </div>
           <button onclick="saveProfile()" style="background:var(--accent);border:none;color:#0f1117;font-family:var(--font-mono);font-size:11px;font-weight:600;padding:10px 24px;border-radius:8px;cursor:pointer;width:fit-content;">Save Settings</button>
-          <div id="prof-saved" style="font-family:var(--font-mono);font-size:10px;color:var(--ok);display:none;">✓ Settings saved</div>
+          <div id="prof-saved" style="font-family:var(--font-mono);font-size:10px;color:var(--ok);display:none;">Settings saved</div>
         </div>
       </div>
     </div>
 
-    <!-- CHATBOT PANEL — ORIGINAL LOGIC (job polling) RESTORED -->
+    <!-- CHATBOT PANEL â€” ORIGINAL LOGIC (job polling) RESTORED -->
     <div class="chat-panel">
       <div class="chat-head">
         <div class="chat-avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v2H8V6a4 4 0 0 1 4-4z"/><rect x="4" y="8" width="16" height="12" rx="2"/><circle cx="9" cy="14" r="1" fill="white"/><circle cx="15" cy="14" r="1" fill="white"/></svg></div>
@@ -619,7 +628,7 @@ nav {
       <div class="chat-msgs" id="chatMsgs">
       </div>
       <div class="chat-input-row">
-        <textarea class="chat-input" id="chatInput" placeholder="Ask about any machine…" rows="1"></textarea>
+        <textarea class="chat-input" id="chatInput" placeholder="Ask about any machine..." rows="1"></textarea>
         <button class="send-btn" onclick="sendMsg()"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg></button>
       </div>
     </div>
@@ -657,6 +666,16 @@ const breadcrumbMap = {
   'nb-profile': '/ Profile'
 };
 
+const hashMap = {
+  dashboard: 'nb-dashboard',
+  audit: 'nb-audit',
+  history: 'nb-history',
+  livefeed: 'nb-livefeed',
+  analytics: 'nb-analytics',
+  status: 'nb-status',
+  profile: 'nb-profile'
+};
+
 function switchToView(buttonId) {
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
   const clickedBtn = document.getElementById(buttonId);
@@ -671,6 +690,17 @@ function switchToView(buttonId) {
   
   const breadcrumb = document.getElementById('breadcrumb');
   if (breadcrumb && breadcrumbMap[buttonId]) breadcrumb.textContent = breadcrumbMap[buttonId];
+
+  const hashEntry = Object.entries(hashMap).find(([, id]) => id === buttonId);
+  if (hashEntry) {
+    const targetHash = `#${hashEntry[0]}`;
+    if (window.location.hash !== targetHash) {
+      history.replaceState(null, '', targetHash);
+    }
+  }
+
+  if (buttonId === 'nb-audit') loadEmbeddedAudit();
+  if (buttonId === 'nb-history') loadEmbeddedHistory();
 }
 
 Object.keys(viewMap).forEach(btnId => {
@@ -682,6 +712,17 @@ Object.keys(viewMap).forEach(btnId => {
     });
   }
 });
+
+function applyInitialViewFromHash() {
+  const key = (window.location.hash || '#dashboard').slice(1).toLowerCase();
+  const buttonId = hashMap[key] || 'nb-dashboard';
+  switchToView(buttonId);
+}
+
+window.addEventListener('hashchange', applyInitialViewFromHash);
+applyInitialViewFromHash();
+loadEmbeddedAudit();
+loadEmbeddedHistory();
 
 // ==================== ORIGINAL CHAT FUNCTIONS (RESTORED) ====================
 const CA_URL = 'http://localhost:8005';
@@ -713,21 +754,39 @@ function appendTyping() {
   return el;
 }
 
+function formatVisuals(result) {
+  const urls = [];
+  if (result?.visuals?.line_plot) urls.push({ label: 'Line Chart', url: result.visuals.line_plot });
+  if (result?.visuals?.heatmap) urls.push({ label: 'Heatmap', url: result.visuals.heatmap });
+  if (!urls.length && Array.isArray(result?.visual_url)) {
+    result.visual_url.forEach((url, i) => urls.push({ label: i === 0 ? 'Line Chart' : i === 1 ? 'Heatmap' : `Visual ${i + 1}`, url }));
+  }
+  if (!urls.length) return '';
+  return `<div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
+    ${urls.map(v => `<a href="${v.url}" target="_blank" style="display:block;text-decoration:none;color:var(--text);">
+      <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-bottom:4px;">${v.label}</div>
+      <img src="${v.url}" alt="${v.label}" style="width:100%;max-height:180px;object-fit:cover;border:1px solid var(--border);border-radius:6px;background:var(--surface2);" />
+    </a>`).join('')}
+  </div>`;
+}
+
 function formatResult(result) {
   if (typeof result === 'string') return result;
+  const payload = result?.result ?? result;
+  if (typeof payload === 'string') return `${payload}${formatVisuals(result)}`;
   let html = '';
-  if (result.Impact_analysis) html += `<strong>Impact Analysis</strong><br>${result.Impact_analysis}<br><br>`;
-  if (result.cascade_effects && result.cascade_effects.length) {
+  if (payload.Impact_analysis) html += `<strong>Impact Analysis</strong><br>${payload.Impact_analysis}<br><br>`;
+  if (payload.cascade_effects && payload.cascade_effects.length) {
     html += `<strong>Cascade Effects</strong><br>`;
-    result.cascade_effects.forEach((e, i) => {
+    payload.cascade_effects.forEach((e, i) => {
       const labels = ['Immediate', 'Short-term', 'Long-term'];
-      html += `• ${labels[i] || i+1}: ${e}<br>`;
+      html += `- ${labels[i] || i+1}: ${e}<br>`;
     });
     html += '<br>';
   }
-  if (result.solutions) html += `<strong>Recommended Action</strong><br>${result.solutions}`;
-  if (result.sources && result.sources.length) html += `<br><br><span style="font-size:10px;color:var(--muted);">Sources: ${result.sources.join(', ')}</span>`;
-  return html || JSON.stringify(result, null, 2);
+  if (payload.solutions) html += `<strong>Recommended Action</strong><br>${payload.solutions}`;
+  if (payload.sources && payload.sources.length) html += `<br><br><span style="font-size:10px;color:var(--muted);">Sources: ${payload.sources.join(', ')}</span>`;
+  return `${html || JSON.stringify(payload, null, 2)}${formatVisuals(result)}`;
 }
 
 async function pollJob(jobId, typingEl) {
@@ -741,23 +800,23 @@ async function pollJob(jobId, typingEl) {
       if (data.status === 'done') {
         typingEl.remove();
         const result = data.result;
-        const html = formatResult(result?.result ?? result);
+        const html = formatResult(result);
         appendMsg('sys', html, `SYSTEM · ${nowStr()}`);
         return;
       }
       if (data.status === 'error') {
         typingEl.remove();
-        appendMsg('sys', `<span style="color:var(--accent2)">⚠ Error: ${data.detail || 'Unknown error'}</span>`, `SYSTEM · ${nowStr()}`);
+        appendMsg('sys', `<span style="color:var(--accent2)">Warning: ${data.detail || 'Unknown error'}</span>`, `SYSTEM · ${nowStr()}`);
         return;
       }
     } catch (err) {
       typingEl.remove();
-      appendMsg('sys', `<span style="color:var(--accent2)">⚠ Lost connection: ${err.message}</span>`, `SYSTEM · ${nowStr()}`);
+      appendMsg('sys', `<span style="color:var(--accent2)">Lost connection: ${err.message}</span>`, `SYSTEM · ${nowStr()}`);
       return;
     }
   }
   typingEl.remove();
-  appendMsg('sys', `<span style="color:var(--warn)">⏱ Request timed out after ${POLL_TIMEOUT/1000}s</span>`, `SYSTEM · ${nowStr()}`);
+  appendMsg('sys', `<span style="color:var(--warn)">Request timed out after ${POLL_TIMEOUT/1000}s</span>`, `SYSTEM · ${nowStr()}`);
 }
 
 async function sendMsg() {
@@ -783,7 +842,7 @@ async function sendMsg() {
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       typingEl.remove();
-      appendMsg('sys', `<span style="color:var(--accent2)">⚠ Backend error ${res.status}: ${err.detail || res.statusText}</span>`, `SYSTEM · ${nowStr()}`);
+      appendMsg('sys', `<span style="color:var(--accent2)">Backend error ${res.status}: ${err.detail || res.statusText}</span>`, `SYSTEM · ${nowStr()}`);
       return;
     }
     
@@ -792,14 +851,14 @@ async function sendMsg() {
     
     if (!jobId) {
       typingEl.remove();
-      appendMsg('sys', `<span style="color:var(--accent2)">⚠ No job_id returned.</span>`, `SYSTEM · ${nowStr()}`);
+      appendMsg('sys', `<span style="color:var(--accent2)">No job_id returned.</span>`, `SYSTEM · ${nowStr()}`);
       return;
     }
     
     await pollJob(jobId, typingEl);
   } catch (err) {
     typingEl.remove();
-    appendMsg('sys', `<span style="color:var(--accent2)">⚠ Cannot reach backend at ${CA_URL}. Is it running?<br><span style="font-size:10px;">${err.message}</span></span>`, `SYSTEM · ${nowStr()}`);
+    appendMsg('sys', `<span style="color:var(--accent2)">Cannot reach backend at ${CA_URL}. Is it running?<br><span style="font-size:10px;">${err.message}</span></span>`, `SYSTEM · ${nowStr()}`);
   } finally {
     input.disabled = false;
     document.querySelector('.send-btn').disabled = false;
@@ -816,7 +875,97 @@ function toggleThread(id) {
   if (el) el.classList.toggle('open');
 }
 
-console.log('✅ Navigation fixed, AI chatbot original logic restored!');
+async function loadEmbeddedAudit() {
+  const backendUrl = 'http://localhost:8005';
+  const pane = document.querySelector('#view-audit .audit-card');
+  if (pane && !document.getElementById('miniAuditCount')) {
+    pane.innerHTML = '<div class="audit-head"><div class="audit-head-title">RECENT AUDIT TRAIL</div><div class="badge" id="miniAuditCount">Loading...</div></div><div class="audit-row" style="background:var(--surface2);font-size:9px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;"><div>Time</div><div>Stage</div><div>Description</div><div>Machine</div></div><div id="auditList"><div style="color:var(--muted);padding:12px 0;">Loading audit data...</div></div>';
+  }
+  const list = document.getElementById('auditList');
+  if (!list) return;
+  const count = document.getElementById('miniAuditCount');
+  try {
+    const res = await fetch(`${backendUrl}/audit/logs?limit=8`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const logs = data.logs || data.events || [];
+    if (count) count.textContent = `${logs.length} entries`;
+    if (!logs.length) {
+      list.innerHTML = '<div style="color:var(--muted);padding:12px 0;">No audit records yet.</div>';
+      return;
+    }
+    const stageClass = { DETECT:'detect', PROCESS:'process', SUMMARY:'summary', ANSWER:'answer', COMM:'process' };
+    list.innerHTML = logs.slice(0, 8).map(log => {
+      const details = log.details || {};
+      const stage = String(log.stage || log.event || 'DETECT').toUpperCase();
+      const ts = log.timestamp ? new Date(log.timestamp).toLocaleTimeString('en-GB') : '--';
+      const machine = details.machine_id || details.sensor_id || log.machine_id || '-';
+      const desc = details.description || details.summary || details.response || details.answer || log.event || 'Audit event';
+      const safe = value => String(value ?? '').replace(/[<>&]/g, '');
+      return `<div class="audit-row">
+        <div class="atime">${safe(ts)}</div>
+        <div class="stage ${stageClass[stage] || 'detect'}">${safe(stage)}</div>
+        <div class="adesc">${safe(desc)}</div>
+        <div class="amach">${safe(machine)}</div>
+      </div>`;
+    }).join('');
+  } catch (err) {
+    if (count) count.textContent = 'offline';
+    list.innerHTML = `<div style="color:var(--accent2);padding:12px 0;">Cannot load audit records: ${String(err.message).replace(/[<>&]/g, '')}</div>`;
+  }
+}
+
+function historyPreviewText(message) {
+  let content = String(message?.content ?? '');
+  if (message?.role === 'human') {
+    content = content.split('\n\nBackend context:')[0];
+    content = content.replace(/^\[Machine:\s*([^\]]+)\]\s*/i, '');
+  }
+  return content;
+}
+
+async function loadEmbeddedHistory() {
+  const backendUrl = 'http://localhost:8005';
+  const pane = document.querySelector('#view-history .vscroll');
+  if (pane && !document.getElementById('embeddedHistoryList')) {
+    pane.innerHTML = '<div class="sec-label" style="margin-bottom:4px" id="embeddedHistoryLabel">Conversation Records - loading...</div><div id="embeddedHistoryList" style="display:flex;flex-direction:column;gap:8px;"><div style="color:var(--muted);padding:12px 0;">Loading chat sessions...</div></div>';
+  }
+  const label = document.getElementById('embeddedHistoryLabel');
+  const list = document.getElementById('embeddedHistoryList');
+  if (!list) return;
+  try {
+    const res = await fetch(`${backendUrl}/chat/sessions`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const sessions = data.sessions || [];
+    if (label) label.textContent = `Conversation Records - ${sessions.length} session${sessions.length !== 1 ? 's' : ''}`;
+    if (!sessions.length) {
+      list.innerHTML = '<div style="color:var(--muted);padding:12px 0;">No chat sessions yet.</div>';
+      return;
+    }
+    const cards = await Promise.all(sessions.slice(0, 4).map(async sessionId => {
+      try {
+        const histRes = await fetch(`${backendUrl}/chat/history/${encodeURIComponent(sessionId)}`);
+        if (!histRes.ok) throw new Error('history unavailable');
+        const histData = await histRes.json();
+        const msgs = histData.messages || [];
+        const preview = msgs.length ? historyPreviewText(msgs[msgs.length - 1]).slice(0, 120) : 'No messages.';
+        return `<div class="hcard">
+          <div class="hcard-top"><span class="htag">${String(sessionId).replace(/[<>&]/g, '')}</span><span class="htime">${msgs.length} turns</span></div>
+          <div class="hpreview">${String(preview || 'No messages.').replace(/[<>&]/g, '')}</div>
+        </div>`;
+      } catch {
+        return `<div class="hcard"><div class="hcard-top"><span class="htag">${String(sessionId).replace(/[<>&]/g, '')}</span><span class="htime">--</span></div><div class="hpreview">Unable to load this session.</div></div>`;
+      }
+    }));
+    list.innerHTML = cards.join('');
+  } catch (err) {
+    if (label) label.textContent = 'Conversation Records - backend offline';
+    list.innerHTML = `<div style="color:var(--accent2);padding:12px 0;">Cannot load chat history: ${String(err.message).replace(/[<>&]/g, '')}</div>`;
+  }
+}
+
+console.log('Navigation fixed, AI chatbot original logic restored.');
 
 // ==================== LIVE SSE DATA ====================
 const STREAM_URL = 'http://localhost:8005/machines/stream';
@@ -831,7 +980,7 @@ const FIELD_RANGES = {
 };
 
 const THRESHOLDS = {
-  temperature:        { warn: 82,   alert: 88   },  // real data: 66~92°C
+  temperature:        { warn: 82,   alert: 88   },  // real data: 66~92Â°C
   vibration_level:    { warn: 4.0,  alert: 6.0  },  // real data: 1.2~7.2
   power_consumption:  { warn: 22,   alert: 26   },  // real data: 14~28 kW
   pressure:           { warn: 5.3,  alert: 5.6  },  // real data: 4.1~5.8 Pa
@@ -863,7 +1012,7 @@ function updateMachine(d) {
   const row = document.getElementById(`row-${id}`);
   if (!row) return;
 
-  // 更新机器类型显示
+  // æ›´æ–°æœºå™¨ç±»åž‹æ˜¾ç¤º
   if (d.machine_type) {
     const nameEl = document.getElementById(`name-${id}`);
     if (nameEl) nameEl.textContent = d.machine_type;
@@ -871,21 +1020,21 @@ function updateMachine(d) {
 
   const fields = ['temperature','vibration_level','power_consumption','pressure','material_flow_rate','cycle_time'];
 
-  // 计算当前所有字段中最严重的等级（如果没有 CNN label，则根据阈值计算）
+  // è®¡ç®—å½“å‰æ‰€æœ‰å­—æ®µä¸­æœ€ä¸¥é‡çš„ç­‰çº§ï¼ˆå¦‚æžœæ²¡æœ‰ CNN labelï¼Œåˆ™æ ¹æ®é˜ˆå€¼è®¡ç®—ï¼‰
   const worstLevel = d.label === 'needs_maintenance' ? 'alert' : 'ok';
   fields.forEach(f => {
     const val = d[f];
-    // 更新数值显示和进度条
+    // æ›´æ–°æ•°å€¼æ˜¾ç¤ºå’Œè¿›åº¦æ¡
     const el = document.getElementById(`${id}-${f}`);
     const bar = document.getElementById(`${id}-${f}-bar`);
     if (el) {
       el.textContent = typeof val === 'number' ? val.toFixed(f==='pressure'?0:2) : val;
-      el.className = `fv ok`;  // 数值颜色固定为 ok
+      el.className = `fv ok`;  // æ•°å€¼é¢œè‰²å›ºå®šä¸º ok
     }
     if (bar) {
       const pct = getPct(f, val);
       bar.style.width = pct + '%';
-      // 进度条颜色跟随最严重等级
+      // è¿›åº¦æ¡é¢œè‰²è·Ÿéšæœ€ä¸¥é‡ç­‰çº§
       bar.className = `bar ${worstLevel}`;
     }
   });
@@ -903,7 +1052,7 @@ function updateMachine(d) {
 
   const badge = row.querySelector('.abadge');
   if (worstLevel === 'alert') {
-    if (!badge) { const b = document.createElement('div'); b.className = 'abadge'; b.textContent = '⚠ ANOMALY'; row.appendChild(b); }
+    if (!badge) { const b = document.createElement('div'); b.className = 'abadge'; b.textContent = 'ANOMALY'; row.appendChild(b); }
   } else {
     if (badge) badge.remove();
   }
@@ -960,7 +1109,7 @@ function initChart() {
     data: {
       labels: [],
       datasets: [{
-        label: 'Temperature °C',
+        label: 'Temperature C',
         data: [],
         borderColor: '#00d4ff',
         backgroundColor: 'rgba(0,212,255,0.08)',
@@ -1151,14 +1300,14 @@ async function loadMiniStatus() {
     if (det) {
       const comps = Object.entries(data.components || {});
       const errs = comps.filter(([,v]) => v.status !== 'ok');
-      det.textContent = errs.length ? `Issues: ${errs.map(([k])=>k).join(', ')}` : `${comps.length} components checked — all healthy`;
+      det.textContent = errs.length ? `Issues: ${errs.map(([k])=>k).join(', ')}` : `${comps.length} components checked - all healthy`;
     }
     if (comp) {
       comp.innerHTML = Object.entries(data.components || {}).map(([name, info]) => {
         const c = colors[info.status] || 'var(--muted)';
         return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;">
           <span style="font-size:12px;">${name}</span>
-          <span style="font-family:var(--font-mono);font-size:10px;color:${c};">${info.status.toUpperCase()} — ${info.detail || ''}</span>
+          <span style="font-family:var(--font-mono);font-size:10px;color:${c};">${info.status.toUpperCase()} - ${info.detail || ''}</span>
         </div>`;
       }).join('');
     }
@@ -1169,7 +1318,7 @@ async function loadMiniStatus() {
     const dot = document.getElementById('sys-dot');
     if (dot) { dot.style.background = 'var(--muted)'; dot.style.boxShadow = 'none'; }
     if (ov)  ov.textContent = 'Backend offline';
-    if (det) det.textContent = 'Cannot reach main.py — retrying…';
+    if (det) det.textContent = 'Cannot reach main.py - retrying...';
   } finally {
     setTimeout(loadMiniStatus, 3000); // poll every 3s
   }
