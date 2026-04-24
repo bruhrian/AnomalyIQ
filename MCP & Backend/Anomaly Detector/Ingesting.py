@@ -1,4 +1,7 @@
 import json, pickle, requests
+import json
+import pickle
+import requests
 import time
 import numpy as np
 from pathlib import Path

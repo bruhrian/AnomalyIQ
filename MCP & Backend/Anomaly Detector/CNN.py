@@ -102,6 +102,8 @@ def predict_endpoint(body: WindowPayload):
 
         maintenance = 1 if maintenance_score >= 0.5 else 0
         confidence = maintenance_score if maintenance == 1 else 1.0 - maintenance_score
+        decoded_targets["maintenance_score_raw"] = float(maintenance_score_raw)
+        decoded_targets["maintenance_threshold"] = 0.5
 
         if maintenance == 1:
             visual_result = generate_visual(
@@ -119,8 +121,12 @@ def predict_endpoint(body: WindowPayload):
                 "confidence":   confidence,
                 "visual_url": [
                     visual_result["line_plot"],
-                    visual_result["bar_chart"],
+                    visual_result["heatmap"],
                 ],
+                "visuals": {
+                    "line_plot": visual_result["line_plot"],
+                    "heatmap": visual_result["heatmap"],
+                },
             }
             ca_payload["cnn_targets"] = decoded_targets
             ca_payload["stream_status"] = _publish_machine_state(ca_payload)
