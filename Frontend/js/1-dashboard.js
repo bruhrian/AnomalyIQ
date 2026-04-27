@@ -88,21 +88,114 @@ function appendTyping() {
   return el;
 }
 
-function formatResult(result) {
-  if (typeof result === 'string') return result;
-  let html = '';
-  if (result.Impact_analysis) html += `<strong>Impact Analysis</strong><br>${result.Impact_analysis}<br><br>`;
-  if (result.cascade_effects && result.cascade_effects.length) {
-    html += `<strong>Cascade Effects</strong><br>`;
-    result.cascade_effects.forEach((e, i) => {
-      const labels = ['Immediate', 'Short-term', 'Long-term'];
-      html += `- ${labels[i] || i+1}: ${e}<br>`;
-    });
-    html += '<br>';
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function formatInlineMarkdown(text) {
+  return escapeHtml(text)
+    .replace(/`([^`]+)`/g, '<code style="background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;padding:1px 6px;font-family:var(--font-mono);font-size:.92em;color:#ffb38a;">$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong style="color:var(--text);">$1</strong>');
+}
+
+function renderTableBlock(lines) {
+  const rows = lines
+    .map(line => line.trim())
+    .filter(line => line.includes('|'))
+    .map(line => line.replace(/^\|/, '').replace(/\|$/, '').split('|').map(cell => cell.trim()))
+    .filter(cells => cells.some(Boolean));
+  if (rows.length < 2) return `<p style="margin:0 0 12px 0;">${formatInlineMarkdown(lines.join(' '))}</p>`;
+  const hasDivider = rows[1].every(cell => /^:?-{3,}:?$/.test(cell));
+  const header = rows[0];
+  const body = hasDivider ? rows.slice(2) : rows.slice(1);
+  return `<div style="margin:14px 0 16px 0;overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:13px;line-height:1.45;">
+      <thead>
+        <tr>
+          ${header.map(cell => `<th style="text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text);font-weight:700;">${formatInlineMarkdown(cell)}</th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>
+        ${body.map(row => `<tr>${row.map(cell => `<td style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08);color:var(--text);vertical-align:top;">${formatInlineMarkdown(cell)}</td>`).join('')}</tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function renderRichText(text) {
+  const normalized = String(text ?? '').replace(/\r\n/g, '\n').trim();
+  if (!normalized) return '';
+  const blocks = normalized.split(/\n\s*\n/);
+  return blocks.map(block => {
+    const lines = block.split('\n').map(line => line.trim()).filter(Boolean);
+    if (!lines.length) return '';
+    if (lines.some(line => /\|/.test(line)) && lines.length >= 2) {
+      return renderTableBlock(lines);
+    }
+    if (lines.every(line => /^[-*•]\s+/.test(line))) {
+      return `<ul style="margin:0 0 14px 18px;padding:0;color:var(--text);">${lines.map(line => `<li style="margin:0 0 8px 0;padding-left:4px;">${formatInlineMarkdown(line.replace(/^[-*•]\s+/, ''))}</li>`).join('')}</ul>`;
+    }
+    if (lines.every(line => /^\d+[.)]\s+/.test(line))) {
+      return `<ol style="margin:0 0 14px 18px;padding:0;color:var(--text);">${lines.map(line => `<li style="margin:0 0 8px 0;padding-left:4px;">${formatInlineMarkdown(line.replace(/^\d+[.)]\s+/, ''))}</li>`).join('')}</ol>`;
+    }
+    if (lines.length === 1 && /^#{1,4}\s+/.test(lines[0])) {
+      const level = Math.min(4, (lines[0].match(/^#+/) || ['#'])[0].length);
+      const size = { 1: 22, 2: 19, 3: 16, 4: 14 }[level];
+      return `<div style="margin:2px 0 10px 0;font-size:${size}px;font-weight:700;color:var(--text);">${formatInlineMarkdown(lines[0].replace(/^#{1,4}\s+/, ''))}</div>`;
+    }
+    if (lines.length === 1 && /^[A-Za-z][A-Za-z /&-]{2,}:\s*$/.test(lines[0])) {
+      return `<div style="margin:2px 0 8px 0;font-size:15px;font-weight:700;color:var(--text);">${formatInlineMarkdown(lines[0].replace(/:\s*$/, ''))}</div>`;
+    }
+    return `<p style="margin:0 0 14px 0;color:var(--text);line-height:1.65;">${formatInlineMarkdown(lines.join(' '))}</p>`;
+  }).join('');
+}
+
+function renderSection(title, body) {
+  if (!body) return '';
+  return `<div style="margin:0 0 16px 0;">
+    <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">${escapeHtml(title)}</div>
+    ${renderRichText(body)}
+  </div>`;
+}
+
+function formatVisuals(result) {
+  const urls = [];
+  if (result?.visuals?.line_plot) urls.push({ label: 'Line Chart', url: result.visuals.line_plot });
+  if (result?.visuals?.heatmap) urls.push({ label: 'Heatmap', url: result.visuals.heatmap });
+  if (!urls.length && Array.isArray(result?.visual_url)) {
+    result.visual_url.forEach((url, i) => urls.push({ label: i === 0 ? 'Line Chart' : i === 1 ? 'Heatmap' : `Visual ${i + 1}`, url }));
   }
-  if (result.solutions) html += `<strong>Recommended Action</strong><br>${result.solutions}`;
-  if (result.sources && result.sources.length) html += `<br><br><span style="font-size:10px;color:var(--muted);">Sources: ${result.sources.join(', ')}</span>`;
-  return html || JSON.stringify(result, null, 2);
+  if (!urls.length) return '';
+  return `<div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
+    ${urls.map(v => `<a href="${v.url}" target="_blank" style="display:block;text-decoration:none;color:var(--text);">
+      <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-bottom:4px;">${v.label}</div>
+      <img src="${v.url}" alt="${v.label}" style="width:100%;max-height:180px;object-fit:cover;border:1px solid var(--border);border-radius:6px;background:var(--surface2);" />
+    </a>`).join('')}
+  </div>`;
+}
+
+function formatResult(result) {
+  if (typeof result === 'string') return `<div style="display:flex;flex-direction:column;gap:2px;">${renderRichText(result)}</div>`;
+  const payload = result?.result ?? result;
+  if (typeof payload === 'string') return `<div style="display:flex;flex-direction:column;gap:2px;">${renderRichText(payload)}${formatVisuals(result)}</div>`;
+  let html = '';
+  html += renderSection('Impact Analysis', payload.Impact_analysis);
+  if (payload.cascade_effects && payload.cascade_effects.length) {
+    const labels = ['Immediate', 'Short-term', 'Long-term'];
+    const cascadeText = payload.cascade_effects.map((e, i) => `- ${labels[i] || i + 1}: ${e}`).join('\n');
+    html += renderSection('Cascade Effects', cascadeText);
+  }
+  html += renderSection('Recommended Action', payload.solutions);
+  if (payload.sources && payload.sources.length) {
+    html += `<div style="margin-top:8px;font-size:11px;color:var(--muted);">Sources: ${payload.sources.map(escapeHtml).join(', ')}</div>`;
+  }
+  if (!html) html = renderRichText(JSON.stringify(payload, null, 2));
+  return `<div style="display:flex;flex-direction:column;gap:2px;">${html}${formatVisuals(result)}</div>`;
 }
 
 async function pollJob(jobId, typingEl) {
@@ -116,7 +209,7 @@ async function pollJob(jobId, typingEl) {
       if (data.status === 'done') {
         typingEl.remove();
         const result = data.result;
-        const html = formatResult(result?.result ?? result);
+        const html = formatResult(result);
         appendMsg('sys', html, `SYSTEM | ${nowStr()}`);
         return;
       }
