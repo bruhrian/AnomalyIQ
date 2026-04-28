@@ -3,9 +3,9 @@ import os
 import asyncio
 import threading
 import json
-import asyncio
 import importlib.util
 import time
+import re
 from uuid import uuid4
 from typing import Optional
 from contextlib import asynccontextmanager
@@ -27,14 +27,15 @@ GRAPH_DIR  = REPO_ROOT / "Data" / "Graphs"
 sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(AGENTS_DIR))
 
-from orchestrator import orchestrator_response
-from Agents.audit_agent import query_logs, _get_conn
+from Agents.orchestrator import orchestrator_response
+from Agents.audit_agent import query_logs, _get_conn, log_event
 from langchain_community.chat_message_histories import SQLChatMessageHistory
 
 STREAMING_URL = os.getenv("STREAMING_URL")
 MCP_URL       = os.getenv("mcp_server_ip")
 AGENTS_DB     = os.getenv("agents_memory")
 FRONTEND_DIR  = os.getenv("FRONTEND_DIR")
+CHAT_REQUEST_TIMEOUT_SECONDS = float(os.getenv("CHAT_REQUEST_TIMEOUT_SECONDS", "90"))
 
 if not STREAMING_URL:
     raise ValueError("❌ STREAMING_URL not set in .env")
@@ -56,10 +57,254 @@ _job_queue:     asyncio.Queue   = None
 _chat_queue:    asyncio.Queue   = None
 _ingest_running                  = False
 _latest_machine_state: dict[str, dict] = {}
+_latest_machine_snapshot: dict[str, dict] = {}
 
 
 def _machine_state_key(machine_id: str, machine_type: str) -> str:
     return f"{machine_id}::{machine_type}"
+
+
+def _machine_snapshot_key(machine_id: str, machine_type: str) -> str:
+    return f"{machine_id}::{machine_type}"
+
+
+def _iter_latest_states():
+    return list(_latest_machine_state.values())
+
+
+def _iter_known_machines():
+    merged: dict[str, dict] = {}
+    for snapshot in _latest_machine_snapshot.values():
+        key = _machine_state_key(str(snapshot.get("machine_id", "")), str(snapshot.get("machine_type", "")))
+        merged[key] = dict(snapshot)
+    for state in _latest_machine_state.values():
+        key = _machine_state_key(str(state.get("machine_id", "")), str(state.get("machine_type", "")))
+        base = merged.get(key, {})
+        base.update(state)
+        merged[key] = base
+    return list(merged.values())
+
+
+def _get_latest_snapshot(machine_id: str, machine_type: str) -> dict:
+    return _latest_machine_snapshot.get(_machine_snapshot_key(machine_id, machine_type), {})
+
+
+def _latest_log_by_event(machine_logs, event_name: str):
+    for log in machine_logs:
+        if str(getattr(log, "event", "")).upper() == event_name.upper():
+            return log
+    return None
+
+
+def _is_timeout_like_response(text: str, error: str = "") -> bool:
+    combined = f"{text or ''}\n{error or ''}".lower()
+    return "timed out" in combined or "timeout" in combined
+
+
+def _has_visual_urls(visual_urls: list[str] | None) -> bool:
+    return bool(visual_urls and any(str(url).strip() for url in visual_urls))
+
+
+def _remove_visual_evidence_section(text: str) -> str:
+    value = str(text or "")
+    value = re.sub(r"\n?Visual Evidence:\n(?:-.*(?:\n|$))*", "", value, flags=re.IGNORECASE)
+    value = re.sub(r"\n{3,}", "\n\n", value).strip()
+    return value
+
+
+def _build_anomaly_chat_response(machine_id: str, machine_type: str, machine_logs, target_visuals):
+    answer_log = _latest_log_by_event(machine_logs, "ANSWER") or _latest_log_by_event(machine_logs, "ANOMALY_ANSWERED")
+    summary_log = _latest_log_by_event(machine_logs, "SUMMARY")
+    detect_log = _latest_log_by_event(machine_logs, "DETECT") or _latest_log_by_event(machine_logs, "ANOMALY_DETECTED")
+    timeout_log = _latest_log_by_event(machine_logs, "ANSWER_TIMEOUT")
+
+    details = {}
+    valid_answer_log = None
+    if answer_log and getattr(answer_log, "details", None):
+        answer_details = answer_log.details or {}
+        answer_response = str(answer_details.get("response", "")).strip()
+        answer_error = str(answer_details.get("error", "")).strip()
+        if not _is_timeout_like_response(answer_response, answer_error):
+            valid_answer_log = answer_log
+
+    if valid_answer_log and getattr(valid_answer_log, "details", None):
+        details = valid_answer_log.details or {}
+    elif summary_log and getattr(summary_log, "details", None):
+        details = summary_log.details or {}
+    elif detect_log and getattr(detect_log, "details", None):
+        details = detect_log.details or {}
+    elif timeout_log and getattr(timeout_log, "details", None):
+        details = timeout_log.details or {}
+
+    if valid_answer_log and getattr(valid_answer_log, "details", None):
+        details = valid_answer_log.details or {}
+    label = details.get("label") or ((detect_log.details or {}).get("label") if detect_log and getattr(detect_log, "details", None) else details.get("label"))
+    confidence = details.get("confidence")
+    response_text = ""
+    if valid_answer_log and getattr(valid_answer_log, "details", None):
+        response_text = str((valid_answer_log.details or {}).get("response", "")).strip()
+    summary_text = ""
+    if summary_log and getattr(summary_log, "details", None):
+        summary_text = str((summary_log.details or {}).get("summary", "")).strip()
+
+    visuals = details.get("visuals") or {}
+    visual_url = details.get("visual_url") or target_visuals or []
+    if not visuals and isinstance(visual_url, list):
+        visuals = {
+            "line_plot": visual_url[0] if len(visual_url) > 0 else "",
+            "heatmap": visual_url[1] if len(visual_url) > 1 else "",
+        }
+
+    if not response_text:
+        response_text = (
+            "Summary:\n"
+            f"- {machine_id} ({machine_type}) has a recorded anomaly.\n"
+            f"- Current label: {label or 'needs_maintenance'}.\n\n"
+            "Likely Cause:\n"
+            f"- {summary_text if summary_text else 'The formal orchestrator answer is not ready yet, but the machine is already flagged as abnormal.'}\n\n"
+            "Recommended Actions:\n"
+            "1. Review the recorded anomaly details and attached visual evidence.\n"
+            "2. Inspect the affected machine before continuing production.\n"
+            "3. If the orchestrator answer is still pending, use this as a provisional response and refresh once processing completes.\n\n"
+            "Visual Evidence:\n"
+            f"- {'Visuals are attached for this anomaly.' if visual_url else 'No visuals are attached for this anomaly.'}"
+        )
+
+    return {
+        "result": response_text,
+        "visual_url": visual_url,
+        "visuals": visuals,
+        "resolved_machine_id": machine_id,
+        "resolved_machine_type": machine_type,
+        "anomaly_detected": True,
+        "label": label,
+        "confidence": confidence,
+    }
+
+
+def _build_provisional_anomaly_response(target_state: dict, target_snapshot: dict, target_visuals: list[str]) -> dict:
+    machine_id = str(target_state.get("machine_id") or "Unknown")
+    machine_type = str(target_state.get("machine_type") or "Unknown")
+    label = str(target_state.get("label") or "needs_maintenance")
+    confidence = target_state.get("confidence")
+
+    snapshot_lines = []
+    field_labels = {
+        "timestamp": "Latest timestamp",
+        "temperature": "Temperature C",
+        "vibration": "Vibration",
+        "power": "Power kW",
+        "pressure": "Pressure Pa",
+        "flow_rate": "Flow rate",
+    }
+    for key, pretty in field_labels.items():
+        if key in (target_snapshot or {}):
+            snapshot_lines.append(f"- {pretty}: {target_snapshot.get(key)}")
+
+    result_text = (
+        "Summary:\n"
+        f"- {machine_id} ({machine_type}) is currently flagged as {label}.\n"
+        f"- Confidence: {confidence if confidence is not None else 'unknown'}.\n\n"
+        "Likely Cause:\n"
+        "- A full orchestrator answer is still pending, but the current state already indicates a machine anomaly that needs operator attention.\n\n"
+        "Recommended Actions:\n"
+        "1. Review the attached visuals immediately.\n"
+        "2. Inspect the machine before continuing production.\n"
+        "3. Refresh again after the anomaly pipeline completes for the full orchestrator diagnosis.\n\n"
+        "Visual Evidence:\n"
+        f"- {'Visuals are attached below.' if target_visuals else 'No visuals are attached yet.'}"
+    )
+    if snapshot_lines:
+        result_text += "\n\nCurrent Machine Data:\n" + "\n".join(snapshot_lines)
+
+    return {
+        "result": result_text,
+        "visual_url": target_visuals,
+        "visuals": {
+            "line_plot": target_visuals[0] if len(target_visuals) > 0 else "",
+            "heatmap": target_visuals[1] if len(target_visuals) > 1 else "",
+        },
+        "resolved_machine_id": machine_id,
+        "resolved_machine_type": machine_type,
+        "anomaly_detected": True,
+        "label": label,
+        "confidence": confidence,
+        "provisional": True,
+    }
+
+
+def _build_current_state_response(target_machine_id: str, target_machine_type: str, target_snapshot: dict, target_visuals: list[str], anomaly_logs) -> dict:
+    basic_lines = [
+        f"Machine: {target_machine_id} ({target_machine_type})",
+        "Current status: normal",
+    ]
+    if target_snapshot.get("timestamp"):
+        basic_lines.append(f"Latest timestamp: {target_snapshot.get('timestamp')}")
+    field_labels = {
+        "temperature": "Temperature C",
+        "vibration": "Vibration",
+        "power": "Power kW",
+        "pressure": "Pressure Pa",
+        "flow_rate": "Flow rate",
+    }
+    for key, label in field_labels.items():
+        if key in target_snapshot:
+            basic_lines.append(f"{label}: {target_snapshot.get(key)}")
+
+    historical_note = (
+        "- Historical anomaly records exist for this machine, but the latest known state currently appears normal.\n"
+        if anomaly_logs else
+        "- No anomaly records are available for this machine right now.\n"
+    )
+    result_text = (
+        "Summary:\n"
+        f"- {target_machine_id} currently appears normal.\n"
+        f"{historical_note}\n"
+        "Current Machine Data:\n" +
+        "\n".join(f"- {line}" for line in basic_lines)
+    )
+    if _has_visual_urls(target_visuals):
+        result_text += "\n\nVisual Evidence:\n- Visuals are attached below."
+    return {
+        "result": result_text,
+        "visual_url": target_visuals if _has_visual_urls(target_visuals) else [],
+        "resolved_machine_id": target_machine_id,
+        "resolved_machine_type": target_machine_type,
+    }
+
+
+def _resolve_target_machine(question: str, fallback_machine_id: str | None = None) -> dict:
+    states = _iter_known_machines()
+    q = (question or "").lower()
+
+    explicit_id = re.search(r"\bm\d{3}\b", q)
+    if explicit_id:
+        wanted_id = explicit_id.group(0).upper()
+        matches = [s for s in states if str(s.get("machine_id", "")).upper() == wanted_id]
+        if matches:
+            return max(matches, key=lambda s: s.get("updated_at", 0))
+
+    aliases = {
+        "cnc": "CNC",
+        "conveyor": "Conveyor",
+        "welder": "Welder",
+        "drill": "Drill",
+    }
+    for token, machine_type in aliases.items():
+        if token in q:
+            matches = [s for s in states if str(s.get("machine_type", "")).lower() == machine_type.lower()]
+            if matches:
+                return max(matches, key=lambda s: s.get("updated_at", 0))
+
+    if fallback_machine_id:
+        matches = [s for s in states if str(s.get("machine_id", "")).lower() == fallback_machine_id.lower()]
+        if matches:
+            return max(matches, key=lambda s: s.get("updated_at", 0))
+
+    if states:
+        return max(states, key=lambda s: s.get("updated_at", 0))
+
+    return {"machine_id": fallback_machine_id or "M001", "machine_type": "Unknown", "visual_url": [], "label": "unknown"}
 
 
 def _start_ingesting():
@@ -139,6 +384,15 @@ def _graph_public_url(path_value: str) -> str:
         return path_value
 
 
+def _save_chat_turn(session_id: str, user_message: str, assistant_message: str) -> None:
+    try:
+        history = SQLChatMessageHistory(session_id=session_id, connection_string=AGENTS_DB)
+        history.add_user_message(user_message)
+        history.add_ai_message(assistant_message)
+    except Exception as e:
+        print(f"Warning: failed to save chat turn for {session_id}: {e}")
+
+
 class AnomalyAlert(BaseModel):
     machine_id:   str
     machine_type: str
@@ -188,6 +442,7 @@ async def anomaly(alert: AnomalyAlert):
         heatmap = alert.visuals.get("heatmap") or (alert.visual_url[1] if len(alert.visual_url) > 1 else "")
         line_plot_url = _graph_public_url(line_plot)
         heatmap_url = _graph_public_url(heatmap)
+        public_visuals = [v for v in [line_plot_url, heatmap_url] if v]
         anomaly_context = {
             "job_id": job_id,
             "machine_id": alert.machine_id,
@@ -200,6 +455,33 @@ async def anomaly(alert: AnomalyAlert):
                 "heatmap": heatmap_url,
             },
         }
+        audit_base = {
+            "job_id": job_id,
+            "sensor_id": alert.machine_id,
+            "machine_id": alert.machine_id,
+            "machine_type": alert.machine_type,
+            "label": alert.label,
+            "confidence": alert.confidence,
+            "cnn_targets": alert.cnn_targets,
+            "visual_url": public_visuals,
+            "visuals": anomaly_context["visuals"],
+        }
+        log_event(
+            agent="CNN",
+            event="DETECT",
+            details={
+                **audit_base,
+                "description": f"Anomaly detected for {alert.machine_id} ({alert.machine_type})",
+            },
+        )
+        log_event(
+            agent="CA",
+            event="PROCESS",
+            details={
+                **audit_base,
+                "description": "Orchestrator started anomaly analysis",
+            },
+        )
         _legacy_query = (
             f"ANOMALY ALERT — Machine {alert.machine_id} ({alert.machine_type})\n"
             f"Label: {alert.label} | Confidence: {alert.confidence:.1%}\n"
@@ -213,11 +495,75 @@ async def anomaly(alert: AnomalyAlert):
             "and a Visual Evidence section that explicitly references visuals.line_plot and visuals.heatmap.\n\n"
             f"ANOMALY_CONTEXT_JSON:\n{json.dumps(anomaly_context, indent=2)}"
         )
-        result = await orchestrator_response(query=query, session_id=f"anomaly-{alert.machine_id}")
+        anomaly_session_id = f"anomaly-{alert.machine_id}-{job_id[:8]}"
+        analysis_mode = "mcp_orchestrator"
+        result = await orchestrator_response(
+            query=query,
+            session_id=anomaly_session_id,
+            use_tools=True,
+            request_timeout_seconds=120,
+            persist_history=False,
+        )
+        result_text = str(result.get("result", "")) if isinstance(result, dict) else str(result)
+        result_error = str(result.get("error", "")) if isinstance(result, dict) else ""
+        is_timeout = _is_timeout_like_response(result_text, result_error)
+
+        if is_timeout:
+            fallback_result = await orchestrator_response(
+                query=query,
+                session_id=f"{anomaly_session_id}-fallback",
+                use_tools=False,
+                request_timeout_seconds=90,
+                persist_history=False,
+            )
+            fallback_text = str(fallback_result.get("result", "")) if isinstance(fallback_result, dict) else str(fallback_result)
+            fallback_error = str(fallback_result.get("error", "")) if isinstance(fallback_result, dict) else ""
+            if not _is_timeout_like_response(fallback_text, fallback_error):
+                result = fallback_result
+                result_text = fallback_text
+                result_error = fallback_error
+                is_timeout = False
+                analysis_mode = "fallback_orchestrator"
+
+        if not is_timeout:
+            summary_text = result_text.strip().split("\n\n")[0][:800] if result_text else "Analysis completed"
+            log_event(
+                agent="CA",
+                event="SUMMARY",
+                details={
+                    **audit_base,
+                    "summary": summary_text,
+                    "description": "Analysis summary generated",
+                    "analysis_mode": analysis_mode,
+                },
+            )
+            log_event(
+                agent="CA",
+                event="ANSWER",
+                details={
+                    **audit_base,
+                    "response": result_text[:4000],
+                    "description": "Returned anomaly response to operator",
+                    "analysis_mode": analysis_mode,
+                },
+            )
+        else:
+            log_event(
+                agent="CA",
+                event="ANSWER_TIMEOUT",
+                details={
+                    **audit_base,
+                    "response": result_text[:4000],
+                    "error": result_error[:4000],
+                    "description": "Orchestrator timed out before final anomaly answer was ready",
+                    "analysis_mode": analysis_mode,
+                },
+            )
         if isinstance(result, dict):
-            result["visual_url"] = [v for v in [line_plot_url, heatmap_url] if v]
+            result["visual_url"] = public_visuals
             result["visuals"] = anomaly_context["visuals"]
             result["anomaly_context"] = anomaly_context
+            result["analysis_mode"] = analysis_mode if not is_timeout else "timeout"
         return result
 
     await _job_queue.put((job_id, run))
@@ -237,6 +583,7 @@ async def qa(request: QARequest):
         return await orchestrator_response(
             query      = f"[Machine: {request.machine_id}] {request.question}",
             session_id = f"machine-{request.machine_id}",
+            history_user_message = request.question,
         )
 
     await _job_queue.put((job_id, run))
@@ -254,87 +601,150 @@ async def chat(req: ChatRequest):
 
     async def run():
         q_lower = req.question.lower()
-        if any(term in q_lower for term in ("backend", "connected", "connection", "health", "status")):
-            return {
+        target_state = _resolve_target_machine(req.question, req.machine_id)
+        target_machine_id = str(target_state.get("machine_id") or req.machine_id)
+        target_machine_type = str(target_state.get("machine_type") or "Unknown")
+        target_visuals = target_state.get("visual_url", [])
+        target_snapshot = _get_latest_snapshot(target_machine_id, target_machine_type)
+
+        backend_status_requested = (
+            ("backend" in q_lower or "system" in q_lower) and
+            any(term in q_lower for term in ("connected", "connection", "health", "status"))
+        )
+        if backend_status_requested:
+            result = {
                 "result": (
                     "Backend is connected. This request reached the backend /chat endpoint, "
                     f"agent queue size is {_job_queue.qsize() if _job_queue else 0}, "
-                    f"chat queue size is {_chat_queue.qsize() if _chat_queue else 0}."
+                    f"chat queue size is {_chat_queue.qsize() if _chat_queue else 0}.\n\n"
+                    f"Resolved target machine: {target_machine_id} ({target_machine_type})."
                 ),
                 "session_id": session_id,
                 "elapsed_time": 0,
+                "visual_url": target_visuals,
             }
+            _save_chat_turn(session_id, req.question, result["result"])
+            return result
 
-        if any(term in q_lower for term in ("anomaly", "anomalies", "maintenance", "abnormal")):
-            try:
-                recent = query_logs(limit=10)
-                result = recent.get("result")
-                logs = getattr(result, "logs", []) if result else []
-                anomaly_logs = [
-                    log for log in logs
-                    if (
-                        (str((log.details or {}).get("machine_id", "")).lower() == req.machine_id.lower()
-                         or str((log.details or {}).get("sensor_id", "")).lower() == req.machine_id.lower())
-                        and (
-                            str(log.event).lower() in {"detect", "anomaly_detected"}
-                            or "needs_maintenance" in str(log.details).lower()
-                        )
-                    )
-                ]
-                if anomaly_logs:
-                    lines = []
-                    for log in anomaly_logs[:5]:
-                        details = log.details or {}
-                        machine = details.get("machine_id") or details.get("sensor_id") or "unknown machine"
-                        lines.append(f"{log.timestamp}: {log.event} for {machine}")
-                    answer = "Recent anomaly records found:\n" + "\n".join(lines)
-                else:
-                    answer = "No recent anomaly records are available in the audit log context."
-                matching_states = [
-                    state for key, state in _latest_machine_state.items()
-                    if key.lower().startswith(f"{req.machine_id.lower()}::")
-                ]
-                latest_state = max(matching_states, key=lambda s: s.get("updated_at", 0), default={})
-                return {
-                    "result": answer,
-                    "session_id": session_id,
-                    "elapsed_time": 0,
-                    "visual_url": latest_state.get("visual_url", []),
-                }
-            except Exception as e:
-                return {
-                    "result": f"Could not read anomaly records from audit log: {str(e)}",
-                    "session_id": session_id,
-                    "error": str(e),
-                }
+        if q_lower.strip() in {"hello", "hi", "hey", "hello!", "hi!", "hey!"}:
+            result = {
+                "result": (
+                    f"Hello. I am operational and connected.\n\n"
+                    f"Resolved target machine: {target_machine_id} ({target_machine_type}).\n"
+                    "Ask me about anomaly risk, likely cause, recommended actions, or visual evidence."
+                ),
+                "session_id": session_id,
+                "elapsed_time": 0,
+                "visual_url": target_visuals,
+            }
+            _save_chat_turn(session_id, req.question, result["result"])
+            return result
 
-        context = "Backend API status: connected; this chat request reached /chat successfully."
+        snapshot_lines = []
+        if target_snapshot:
+            field_labels = {
+                "timestamp": "Latest timestamp",
+                "temperature": "Temperature C",
+                "vibration": "Vibration",
+                "power": "Power kW",
+                "pressure": "Pressure Pa",
+                "flow_rate": "Flow rate",
+            }
+            for key, label in field_labels.items():
+                if key in target_snapshot:
+                    snapshot_lines.append(f"{label}: {target_snapshot.get(key)}")
+
+        recent = None
+        logs = []
+        machine_logs = []
+        recent_global = None
         try:
-            recent = query_logs(limit=5)
+            recent = query_logs(sensor_id=target_machine_id, limit=20)
             result = recent.get("result")
-            logs = getattr(result, "logs", []) if result else []
-            if logs:
-                machine_logs = [
-                    log for log in logs
-                    if str((log.details or {}).get("machine_id", "")).lower() == req.machine_id.lower()
-                    or str((log.details or {}).get("sensor_id", "")).lower() == req.machine_id.lower()
-                ]
-                context_logs = machine_logs or logs[:2]
+            machine_logs = getattr(result, "logs", []) if result else []
+            recent_global = query_logs(limit=8)
+            global_result = recent_global.get("result")
+            logs = getattr(global_result, "logs", []) if global_result else []
+        except Exception:
+            machine_logs = []
+
+        anomaly_logs = [
+            log for log in machine_logs
+            if str(log.event).upper() in {"DETECT", "PROCESS", "SUMMARY", "ANSWER", "ANOMALY_DETECTED", "ANOMALY_ANSWERED"}
+            or "needs_maintenance" in str(log.details).lower()
+        ]
+
+        current_label = str(target_state.get("label", "unknown")).lower()
+
+        if current_label == "normal":
+            result = _build_current_state_response(
+                target_machine_id,
+                target_machine_type,
+                target_snapshot,
+                target_visuals,
+                anomaly_logs,
+            )
+            result["session_id"] = session_id
+            result["elapsed_time"] = 0
+            _save_chat_turn(session_id, req.question, str(result.get("result", "")))
+            return result
+
+        if anomaly_logs and any(term in q_lower for term in ("anomaly", "abnormal", "maintenance", "risk", "reason", "cause", "respond", "response", "why")):
+            result = _build_anomaly_chat_response(
+                target_machine_id,
+                target_machine_type,
+                machine_logs,
+                target_visuals,
+            )
+            result["session_id"] = session_id
+            result["elapsed_time"] = 0
+            _save_chat_turn(session_id, req.question, str(result.get("result", "")))
+            return result
+
+        if current_label not in {"normal", "unknown"} and any(term in q_lower for term in ("anomaly", "abnormal", "maintenance", "risk", "reason", "cause", "respond", "response", "why")):
+            result = _build_provisional_anomaly_response(target_state, target_snapshot, target_visuals)
+            result["session_id"] = session_id
+            result["elapsed_time"] = 0
+            _save_chat_turn(session_id, req.question, str(result.get("result", "")))
+            return result
+
+        context = (
+            "Backend API status: connected; this chat request reached /chat successfully.\n"
+            f"Resolved target machine: {target_machine_id}\n"
+            f"Resolved machine type: {target_machine_type}\n"
+            f"Latest state label: {target_state.get('label', 'unknown')}\n"
+            f"Latest confidence: {target_state.get('confidence', 'unknown')}\n"
+            f"Available visuals: {len(target_visuals)}\n"
+            "Interpretation rule: if latest state label is normal and there are no anomaly records, say the machine currently appears normal."
+        )
+        if snapshot_lines:
+            context += "\nLatest machine snapshot:\n" + "\n".join(f"- {line}" for line in snapshot_lines)
+        try:
+            if machine_logs or logs:
+                context_logs = machine_logs[:5] if machine_logs else logs[:2]
                 context += "\nRecent audit records:\n" + "\n".join(
                     f"- {log.timestamp} | {log.agent} | {log.event} | {log.details}"
-                    for log in context_logs[:5]
+                    for log in context_logs[:3]
                 )
             else:
                 context += "\nRecent audit records: none available."
         except Exception as e:
             context += f"\nRecent audit records unavailable: {str(e)}"
 
-        return await orchestrator_response(
-            query      = f"[Machine: {req.machine_id}] {req.question}\n\nBackend context:\n{context}",
+        result = await orchestrator_response(
+            query      = f"[Machine: {target_machine_id}] {req.question}\n\nBackend context:\n{context}",
             session_id = session_id,
             use_tools  = False,
-            request_timeout_seconds = 45,
+            request_timeout_seconds = CHAT_REQUEST_TIMEOUT_SECONDS,
+            history_user_message = req.question,
         )
+        if isinstance(result, dict):
+            if not _has_visual_urls(target_visuals) and isinstance(result.get("result"), str):
+                result["result"] = _remove_visual_evidence_section(result["result"])
+            result["visual_url"] = target_visuals if _has_visual_urls(target_visuals) else []
+            result["resolved_machine_id"] = target_machine_id
+            result["resolved_machine_type"] = target_machine_type
+        return result
 
     await _chat_queue.put((job_id, run))
     return {"job_id": job_id, "status": "queued", "session_id": session_id}
@@ -376,6 +786,10 @@ async def machines_stream():
                                 payload.setdefault("label", "normal")
                                 payload.setdefault("visual_url", [])
                                 payload.setdefault("state_source", "stream")
+                            if machine_id and machine_type:
+                                snapshot = dict(payload)
+                                snapshot["updated_at"] = time.time()
+                                _latest_machine_snapshot[_machine_snapshot_key(machine_id, machine_type)] = snapshot
                             yield f"data: {json.dumps(payload)}\n\n"
         except Exception as e:
             yield f"data: {json.dumps({'error': str(e)})}\n\n"
@@ -393,13 +807,33 @@ async def machine_state(update: MachineStateUpdate):
 
 
 @app.get("/audit/logs")
-async def audit_logs(agent: str = "", event: str = "", sensor_id: str = "", limit: int = 50):
+async def audit_logs(agent: str = "", event: str = "", sensor_id: str = "", limit: int = 200):
     try:
         res    = query_logs(agent=agent, event=event, sensor_id=sensor_id, limit=limit)
         result = res["result"]
         return {"count": result.count, "logs": [log.model_dump() for log in result.logs]}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/audit/stream")
+async def audit_stream(limit: int = 200):
+    async def event_gen():
+        last_signature = None
+        while True:
+            try:
+                res = query_logs(limit=limit)
+                result = res["result"]
+                logs = [log.model_dump() for log in result.logs]
+                signature = tuple((log.get("id"), log.get("timestamp")) for log in logs[:10])
+                if signature != last_signature:
+                    last_signature = signature
+                    yield f"data: {json.dumps({'count': len(logs), 'logs': logs})}\n\n"
+            except Exception as e:
+                yield f"data: {json.dumps({'error': str(e)})}\n\n"
+            await asyncio.sleep(2)
+
+    return StreamingResponse(event_gen(), media_type="text/event-stream")
 
 
 @app.get("/chat/sessions")
