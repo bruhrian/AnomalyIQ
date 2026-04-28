@@ -292,11 +292,42 @@ async function loadHistoryThread(sessionId, threadId) {
 
 loadHistorySessions();
 
-async function pollAudit() {
-  await loadAudit();
-  setTimeout(pollAudit, 5000);
+let auditStream = null;
+let auditFallbackTimer = null;
+
+function startAuditStream() {
+  if (auditStream) {
+    auditStream.close();
+    auditStream = null;
+  }
+  try {
+    auditStream = new EventSource(`${AUDIT_API}/audit/stream?limit=50`);
+    auditStream.onmessage = (evt) => {
+      try {
+        const data = JSON.parse(evt.data || '{}');
+        if (data.error) return;
+        _allRows = (data.logs || []).map(normalizeAuditLog);
+        document.getElementById('entryCount').textContent = `${_allRows.length} entries`;
+        renderRows(_allRows, _currentFilter);
+      } catch (e) {
+        console.log('Audit stream parse failed:', e.message);
+      }
+    };
+    auditStream.onerror = () => {
+      if (!auditFallbackTimer) {
+        auditFallbackTimer = setInterval(loadAudit, 5000);
+      }
+    };
+  } catch (e) {
+    console.log('Audit stream unavailable:', e.message);
+    if (!auditFallbackTimer) {
+      auditFallbackTimer = setInterval(loadAudit, 5000);
+    }
+  }
 }
-pollAudit();
+
+loadAudit();
+startAuditStream();
 
 // ==================== CHAT FUNCTIONS (ORIGINAL - UNCHANGED) ====================
 const CA_URL = 'http://localhost:8005';

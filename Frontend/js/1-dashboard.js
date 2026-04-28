@@ -58,7 +58,7 @@ Object.keys(viewMap).forEach(btnId => {
 // ==================== ORIGINAL CHAT FUNCTIONS (RESTORED) ====================
 const CA_URL = 'http://localhost:8005';
 const POLL_MS = 1500;
-const POLL_TIMEOUT = 180000;
+const POLL_TIMEOUT = 100000;
 let currentMachineId = 'M001';
 let currentSessionId = (window.crypto && crypto.randomUUID)
   ? crypto.randomUUID()
@@ -225,7 +225,7 @@ async function pollJob(jobId, typingEl) {
     }
   }
   typingEl.remove();
-  appendMsg('sys', `<span style="color:var(--warn)">TIMEOUT Request timed out after ${POLL_TIMEOUT/1000}s</span>`, `SYSTEM | ${nowStr()}`);
+  appendMsg('sys', `<span style="color:var(--warn)">TIMEOUT Request timed out while waiting for the backend response.</span>`, `SYSTEM | ${nowStr()}`);
 }
 
 async function sendMsg() {
