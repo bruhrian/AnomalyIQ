@@ -437,43 +437,44 @@ async def anomaly(alert: AnomalyAlert):
     _jobs[job_id] = {"status": "queued", "position": _job_queue.qsize() + 1}
     print(f"[CA] Anomaly received — machine: {alert.machine_id} | job: {job_id}")
 
+    line_plot = alert.visuals.get("line_plot") or (alert.visual_url[0] if len(alert.visual_url) > 0 else "")
+    heatmap = alert.visuals.get("heatmap") or (alert.visual_url[1] if len(alert.visual_url) > 1 else "")
+    line_plot_url = _graph_public_url(line_plot)
+    heatmap_url = _graph_public_url(heatmap)
+    public_visuals = [v for v in [line_plot_url, heatmap_url] if v]
+    anomaly_context = {
+        "job_id": job_id,
+        "machine_id": alert.machine_id,
+        "machine_type": alert.machine_type,
+        "label": alert.label,
+        "confidence": alert.confidence,
+        "cnn_targets": alert.cnn_targets,
+        "visuals": {
+            "line_plot": line_plot_url,
+            "heatmap": heatmap_url,
+        },
+    }
+    audit_base = {
+        "job_id": job_id,
+        "sensor_id": alert.machine_id,
+        "machine_id": alert.machine_id,
+        "machine_type": alert.machine_type,
+        "label": alert.label,
+        "confidence": alert.confidence,
+        "cnn_targets": alert.cnn_targets,
+        "visual_url": public_visuals,
+        "visuals": anomaly_context["visuals"],
+    }
+    log_event(
+        agent="CNN",
+        event="DETECT",
+        details={
+            **audit_base,
+            "description": f"Anomaly detected for {alert.machine_id} ({alert.machine_type})",
+        },
+    )
+
     async def run():
-        line_plot = alert.visuals.get("line_plot") or (alert.visual_url[0] if len(alert.visual_url) > 0 else "")
-        heatmap = alert.visuals.get("heatmap") or (alert.visual_url[1] if len(alert.visual_url) > 1 else "")
-        line_plot_url = _graph_public_url(line_plot)
-        heatmap_url = _graph_public_url(heatmap)
-        public_visuals = [v for v in [line_plot_url, heatmap_url] if v]
-        anomaly_context = {
-            "job_id": job_id,
-            "machine_id": alert.machine_id,
-            "machine_type": alert.machine_type,
-            "label": alert.label,
-            "confidence": alert.confidence,
-            "cnn_targets": alert.cnn_targets,
-            "visuals": {
-                "line_plot": line_plot_url,
-                "heatmap": heatmap_url,
-            },
-        }
-        audit_base = {
-            "job_id": job_id,
-            "sensor_id": alert.machine_id,
-            "machine_id": alert.machine_id,
-            "machine_type": alert.machine_type,
-            "label": alert.label,
-            "confidence": alert.confidence,
-            "cnn_targets": alert.cnn_targets,
-            "visual_url": public_visuals,
-            "visuals": anomaly_context["visuals"],
-        }
-        log_event(
-            agent="CNN",
-            event="DETECT",
-            details={
-                **audit_base,
-                "description": f"Anomaly detected for {alert.machine_id} ({alert.machine_type})",
-            },
-        )
         log_event(
             agent="CA",
             event="PROCESS",
