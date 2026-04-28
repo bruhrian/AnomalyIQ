@@ -201,7 +201,7 @@ def query_logs(
 ) -> dict:
     """
     Query audit logs with optional filters.
-    Returns up to `limit` most recent entries (capped at 500).
+    Returns up to `limit` most recent entries (capped at 200).
 
     Args:
         agent     : filter by agent name     (empty = all)
@@ -226,7 +226,7 @@ def query_logs(
             params.append(sensor_id)
 
         where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
-        params.append(min(limit, 500))
+        params.append(min(limit, 200))
 
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute(
