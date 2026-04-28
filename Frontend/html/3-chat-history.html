@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -133,18 +133,18 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
 .send-btn{width:32px;height:32px;background:var(--accent);border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
 .send-btn:hover{background:#00b8e6;transform:scale(1.05);}
 .send-btn svg{width:14px;height:14px;fill:#0f1117;}
-</style><title>AnomalyIQ — Chat History</title></head>
+</style><title>AnomalyIQ - Chat History</title></head>
 
 <div class="shell">
 <nav>
   <div class="nav-logo">
     <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0f1117" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
   </div>
-  <button class="nav-btn " id="nb-d">
+  <button class="nav-btn " id="nb-d" onclick="location.href='1-dashboard.html#dashboard'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     <div class="nav-tip">Dashboard</div>
   </button>
-  <button class="nav-btn " id="nb-a">
+  <button class="nav-btn " id="nb-a" onclick="location.href='2-audit-log.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
     <div class="nav-tip">Audit Log</div>
   </button>
@@ -153,120 +153,133 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
     <div class="nav-tip">Chat History</div>
   </button>
   <div class="nav-div"></div>
-  <button class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg><div class="nav-tip">Live Feed</div></button>
-  <button class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><div class="nav-tip">Analytics</div></button>
+  <button class="nav-btn" onclick="location.href='1-dashboard.html#livefeed'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg><div class="nav-tip">Live Feed</div></button>
+  <button class="nav-btn" onclick="location.href='1-dashboard.html#analytics'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><div class="nav-tip">Analytics</div></button>
   <div class="nav-space"></div>
   <div class="nav-div"></div>
-  <button class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/></svg><div class="nav-tip">Profile</div></button>
+  <button class="nav-btn" onclick="location.href='1-dashboard.html#profile'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/></svg><div class="nav-tip">Profile</div></button>
 </nav>
 <div class="main"><div class="topbar">
   <span class="tb-title">ANOMALYIQ</span>
   <span class="tb-crumb">/ Chat History</span>
   <div class="tb-space"></div>
   <div class="status-pill"><div class="sdot-live"></div>Monitoring active</div>
-  <div class="tb-clock" id="clk">09:41:03</div>
+  <div class="tb-clock" id="clk">--:--:--</div>
 </div><div class="body"><div class="center"><div class="vscroll" style="gap:8px">
-  <div class="sec-label" style="margin-bottom:4px">Conversation Records — 3 sessions today</div>
-  <div class="hcard" onclick="toggleThread('t1')">
-    <div class="hcard-top"><div class="htag">MCH-001 · Compressor A</div><div class="htime">09:41 — ongoing</div></div>
-    <div class="hpreview">⚠ Anomaly: vibration 12.4, temp 94°C, efficiency 34%, error rate 0.18, downtime 22 min, maintenance flag ON. Tap to view conversation…</div>
-    <div class="hfooter"><div class="hturns">4 turns</div><div style="flex:1"></div><div class="hwarn">⚠ Ongoing</div></div>
-    <div class="hthread" id="t1">
-      <div class="hmsg sys"><div class="hbubble"><strong>MCH-001</strong> anomaly — temp 94°C, vibration 12.4, efficiency 34%. Maintenance flag raised.</div><div class="hmeta">SYSTEM · 09:41:03</div></div>
-      <div class="hmsg sys"><div class="hbubble">Root cause: bearing wear. Estimated failure in <strong>6–10 hours</strong> (83% confidence). Recommend immediate inspection.</div><div class="hmeta">SYSTEM · 09:41:05</div></div>
-      <div class="hmsg user"><div class="hbubble">What's the current error rate?</div><div class="hmeta">OPERATOR · 09:42:11</div></div>
-      <div class="hmsg sys"><div class="hbubble">MCH-001 error rate: <strong>0.18</strong> (18% defects). Downtime 22 min. Production status: 0 — Inefficient.</div><div class="hmeta">SYSTEM · 09:42:13</div></div>
-    </div>
-  </div>
-  <div class="hcard" onclick="toggleThread('t2')">
-    <div class="hcard-top"><div class="htag">MCH-002 · Pump B</div><div class="htime">08:14 — 08:31</div></div>
-    <div class="hpreview">Temp 71°C warning, cycle time 135s. Coolant flow 1.20 slightly reduced — monitoring every 30 min. Efficiency 61%.</div>
-    <div class="hfooter"><div class="hturns">6 turns</div><div style="flex:1"></div><div class="hok">✓ Resolved</div></div>
-    <div class="hthread" id="t2">
-      <div class="hmsg sys"><div class="hbubble">MCH-002 temperature warning: 71°C. Cycle time elevated 135s. Thermal analysis initiated.</div><div class="hmeta">SYSTEM · 08:14:22</div></div>
-      <div class="hmsg user"><div class="hbubble">Is the coolant system okay?</div><div class="hmeta">OPERATOR · 08:16:04</div></div>
-      <div class="hmsg sys"><div class="hbubble">Coolant flow 1.20 (slightly reduced). Pressure 201000 Pa nominal. Not critical — monitor every 30 min.</div><div class="hmeta">SYSTEM · 08:16:07</div></div>
-      <div class="hmsg user"><div class="hbubble">What's the efficiency score?</div><div class="hmeta">OPERATOR · 08:18:30</div></div>
-      <div class="hmsg sys"><div class="hbubble">Efficiency: <strong>61</strong>. Status: 1 — Efficient. Error rate 0.07. Downtime 4 min. Situation stable.</div><div class="hmeta">SYSTEM · 08:18:33</div></div>
-      <div class="hmsg user"><div class="hbubble">Okay, keep monitoring.</div><div class="hmeta">OPERATOR · 08:31:00</div></div>
-    </div>
-  </div>
-  <div class="hcard" onclick="toggleThread('t3')">
-    <div class="hcard-top"><div class="htag">MCH-003 · Motor C</div><div class="htime">06:02 — 06:09</div></div>
-    <div class="hpreview">Power fluctuation ±0.4 kW. Confirmed load shift — not electrical. Efficiency 88%, error rate 0.02. No action required.</div>
-    <div class="hfooter"><div class="hturns">3 turns</div><div style="flex:1"></div><div class="hok">✓ Resolved</div></div>
-    <div class="hthread" id="t3">
-      <div class="hmsg sys"><div class="hbubble">MCH-003 power fluctuation ±0.4 kW. Investigating load shift vs. electrical fault.</div><div class="hmeta">SYSTEM · 06:02:11</div></div>
-      <div class="hmsg user"><div class="hbubble">Is it an electrical issue?</div><div class="hmeta">OPERATOR · 06:04:55</div></div>
-      <div class="hmsg sys"><div class="hbubble">Confirmed load shift — not electrical. Efficiency 88%, error rate 0.02, prod. status 1 (Efficient). No maintenance required.</div><div class="hmeta">SYSTEM · 06:04:58</div></div>
-    </div>
-  </div>
+  <div class="sec-label" style="margin-bottom:4px" id="sessionsLabel">Conversation Records - loading...</div>
 </div></div><div class="chat-panel">
   <div class="chat-head">
     <div class="chat-avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M12 2a4 4 0 0 1 4 4v2H8V6a4 4 0 0 1 4-4z"/><rect x="4" y="8" width="16" height="12" rx="2"/><circle cx="9" cy="14" r="1" fill="white"/><circle cx="15" cy="14" r="1" fill="white"/></svg></div>
     <div><div class="chat-name">AnomalyIQ AI</div><div class="chat-sub">Diagnostic assistant</div></div>
     <div class="chat-live"></div>
   </div>
-  <div class="chat-msgs">
-    <div class="msg sys"><div class="bubble">Monitoring <strong>4 machines</strong>. Anomaly on <strong>MCH-001</strong> — temp 94°C, vibration 12.4, efficiency 34%.</div><div class="msg-meta">SYSTEM · 09:41:03</div></div>
-    <div class="msg sys"><div class="msg-tag">ANOMALY DETECTED</div><div class="bubble">Maintenance flag active. Failure window <strong>6–10h</strong>. Root cause: bearing wear. Inspect now.</div><div class="msg-meta">SYSTEM · 09:41:05</div></div>
-    <div class="msg user"><div class="bubble">What's the error rate?</div><div class="msg-meta">OPERATOR · 09:42:11</div></div>
-    <div class="msg sys"><div class="bubble">MCH-001 error rate: <strong>0.18</strong>. Downtime: 22 min. Prod. status: 0 — Inefficient.</div><div class="msg-meta">SYSTEM · 09:42:13</div></div>
-  </div>
+  <div class="chat-msgs" id="chatMsgs"></div>
   <div class="chat-input-row">
-    <textarea class="chat-input" placeholder="Ask about any machine…" rows="1"></textarea>
+    <textarea class="chat-input" id="chatInput" placeholder="Ask about any machine..." rows="1"></textarea>
     <button class="send-btn"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg></button>
   </div>
 </div></div></div></div>
 <script>
 const BACKEND_URL = 'http://localhost:8005';
+document.getElementById('chatMsgs')?.replaceChildren();
 
 function tick(){const t=new Date().toLocaleTimeString('en-GB');const e=document.getElementById('clk');if(e)e.textContent=t;}
 tick();setInterval(tick,1000);
+loadSessions();
+setInterval(loadSessions, 10000);
 function setTab(el){el.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');}
 function toggleThread(id){document.getElementById(id).classList.toggle('open');}
 
-// ── Load real chat sessions from backend ──────────────────────────────────────
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function displayHistoryContent(message) {
+  let content = String(message?.content ?? '');
+  if (message?.role === 'human') {
+    content = content.split('\n\nBackend context:')[0];
+    content = content.replace(/^\[Machine:\s*([^\]]+)\]\s*/i, '');
+  }
+  return content;
+}
+
+function summarizeSessionMessages(messages) {
+  const userMsgs = messages.filter(m => String(m.role).toLowerCase() === 'human');
+  const aiMsgs = messages.filter(m => String(m.role).toLowerCase() !== 'human');
+  return {
+    latestUser: userMsgs.length ? displayHistoryContent(userMsgs[userMsgs.length - 1]) : 'No user prompt yet.',
+    latestAI: aiMsgs.length ? displayHistoryContent(aiMsgs[aiMsgs.length - 1]) : 'No assistant response yet.'
+  };
+}
+
+// â”€â”€ Load real chat sessions from backend â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function loadSessions() {
   try {
     const res  = await fetch(`${BACKEND_URL}/chat/sessions`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    const sessions = data.sessions || [];
-    if (sessions.length === 0) return; // keep static mock if no real data yet
+    const sessions = (data.sessions || []).filter(sessionId => !/^anomaly-/i.test(String(sessionId)));
 
-    // Replace static cards with real sessions
     const container = document.querySelector('.vscroll');
+    const label     = document.getElementById('sessionsLabel');
     if (!container) return;
 
-    // Keep the sec-label, replace the rest
-    const label = container.querySelector('.sec-label');
-    container.innerHTML = '';
-    if (label) container.appendChild(label);
+    // Remove old cards
+    container.querySelectorAll('.hcard').forEach(c => c.remove());
 
-    const header = document.createElement('div');
-    header.className = 'sec-label';
-    header.style.marginBottom = '4px';
-    header.textContent = `Conversation Records — ${sessions.length} sessions`;
-    container.insertBefore(header, container.firstChild);
+    if (label) label.textContent = `Conversation Records - ${sessions.length} session${sessions.length !== 1 ? 's' : ''}`;
+
+    if (sessions.length === 0) {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'color:var(--muted);font-family:var(--font-mono);font-size:10px;padding:12px 0;';
+      empty.textContent = 'No user chat sessions recorded yet.';
+      container.appendChild(empty);
+      return;
+    }
 
     for (const sessionId of sessions) {
+      const threadId = 'thread-' + sessionId.replace(/[^a-z0-9]/gi,'_');
       const card = document.createElement('div');
       card.className = 'hcard';
       card.innerHTML = `
         <div class="hcard-top">
           <div class="htag">${sessionId}</div>
-          <div class="htime">Click to load</div>
+          <div class="htime">tap to load</div>
         </div>
-        <div class="hpreview">Session ID: ${sessionId}</div>
-        <div class="hfooter"><div class="hturns">—</div><div style="flex:1"></div></div>
-        <div class="hthread" id="thread-${sessionId.replace(/[^a-z0-9]/gi,'_')}"></div>`;
+        <div class="hpreview" id="prev-${threadId}">Loading preview...</div>
+        <div class="hfooter"><div class="hturns" id="turns-${threadId}">-- turns</div><div style="flex:1"></div></div>
+        <div class="hthread" id="${threadId}"></div>`;
       card.onclick = () => loadThread(sessionId, card);
       container.appendChild(card);
+
+      try {
+        const histRes = await fetch(`${BACKEND_URL}/chat/history/${encodeURIComponent(sessionId)}`);
+        if (histRes.ok) {
+          const histData = await histRes.json();
+          const msgs = histData.messages || [];
+          const summary = summarizeSessionMessages(msgs);
+          const preview = document.getElementById(`prev-${threadId}`);
+          const turns = document.getElementById(`turns-${threadId}`);
+          if (preview) {
+            preview.innerHTML = `
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div><span style="color:var(--muted);font-family:var(--font-mono);font-size:9px;">Latest user</span><div>${escapeHtml(summary.latestUser).slice(0, 120)}</div></div>
+                <div><span style="color:var(--muted);font-family:var(--font-mono);font-size:9px;">Latest assistant</span><div>${escapeHtml(summary.latestAI).slice(0, 140)}</div></div>
+              </div>`;
+          }
+          if (turns) turns.textContent = `${msgs.length} turns`;
+        }
+      } catch (_) {}
     }
   } catch(e) {
-    // Backend not running — keep static mock data silently
-    console.log('Chat history: using mock data', e.message);
+    const label = document.getElementById('sessionsLabel');
+    if (label) label.textContent = 'Conversation Records - backend offline';
+    console.log('Chat history load failed:', e.message);
   }
 }
 
@@ -280,7 +293,7 @@ async function loadThread(sessionId, card) {
     return;
   }
 
-  thread.innerHTML = '<div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px 0;">Loading…</div>';
+  thread.innerHTML = '<div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px 0;">Loading...</div>';
   thread.classList.add('open');
 
   try {
@@ -288,16 +301,25 @@ async function loadThread(sessionId, card) {
     const data = await res.json();
     const msgs = data.messages || [];
 
-    // Update card preview
-    const preview = card.querySelector('.hpreview');
-    const footer  = card.querySelector('.hfooter');
-    if (preview && msgs.length) preview.textContent = msgs[0].content.substring(0, 100) + '…';
-    if (footer) footer.querySelector('.hturns').textContent = `${msgs.length} turns`;
+    const preview = document.getElementById(`prev-${threadId}`);
+    const turns   = document.getElementById(`turns-${threadId}`);
+    const summary = summarizeSessionMessages(msgs);
+    if (preview) {
+      preview.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div><span style="color:var(--muted);font-family:var(--font-mono);font-size:9px;">Latest user</span><div>${escapeHtml(summary.latestUser).slice(0, 120)}</div></div>
+          <div><span style="color:var(--muted);font-family:var(--font-mono);font-size:9px;">Latest assistant</span><div>${escapeHtml(summary.latestAI).slice(0, 140)}</div></div>
+        </div>`;
+    }
+    if (turns)   turns.textContent   = `${msgs.length} turns`;
 
-    thread.innerHTML = msgs.map(m => {
-      const cls = m.role === 'human' ? 'user' : 'sys';
-      return `<div class="hmsg ${cls}"><div class="hbubble">${m.content}</div><div class="hmeta">${m.role.toUpperCase()}</div></div>`;
-    }).join('');
+    thread.innerHTML = msgs.length
+      ? msgs.map(m => {
+          const cls = m.role === 'human' ? 'user' : 'sys';
+          const rendered = cls === 'user' ? escapeHtml(displayHistoryContent(m)) : renderRichText(displayHistoryContent(m));
+          return `<div class="hmsg ${cls}"><div class="hbubble">${rendered}</div><div class="hmeta">${escapeHtml(m.role.toUpperCase())}</div></div>`;
+        }).join('')
+      : '<div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px 0;">No messages in this session.</div>';
 
     if (msgs.length === 0) {
       thread.innerHTML = '<div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px 0;">No messages in this session.</div>';
@@ -307,21 +329,74 @@ async function loadThread(sessionId, card) {
   }
 }
 
-// Try to load real sessions, fall back to mock if backend is offline
-loadSessions();
-
-// ── Chat panel — real /qa endpoint ──────────────────────────────────────────
+// â”€â”€ Chat panel â€” real /qa endpoint â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const CA_URL = 'http://localhost:8005';
 const POLL_MS = 1500;
-const POLL_TIMEOUT = 60000;
+const POLL_TIMEOUT = 100000;
 let currentMachineId = 'M001';
+let currentSessionId = null;
 
 function nowStr(){return new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
 function appendMsg(cls,html,meta){const msgs=document.getElementById('chatMsgs');if(!msgs)return;const el=document.createElement('div');el.className=`msg ${cls}`;el.innerHTML=`<div class="bubble">${html}</div><div class="msg-meta">${meta}</div>`;msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;return el;}
 function appendTyping(){const msgs=document.getElementById('chatMsgs');if(!msgs)return;const el=document.createElement('div');el.className='msg sys';el.innerHTML='<div class="typing-wrap"><span></span><span></span><span></span></div>';msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;return el;}
-function formatResult(r){if(typeof r==='string')return r;let h='';if(r.Impact_analysis)h+=`<strong>Impact Analysis</strong><br>${r.Impact_analysis}<br><br>`;if(r.cascade_effects&&r.cascade_effects.length){h+='<strong>Cascade Effects</strong><br>';r.cascade_effects.forEach((e,i)=>{const l=['Immediate','Short-term','Long-term'];h+=`• ${l[i]||i+1}: ${e}<br>`;});h+='<br>';}if(r.solutions)h+=`<strong>Recommended Action</strong><br>${r.solutions}`;if(r.sources&&r.sources.length)h+=`<br><br><span style="font-size:10px;color:var(--muted);">Sources: ${r.sources.join(', ')}</span>`;return h||JSON.stringify(r,null,2);}
-async function pollJob(jobId,typingEl){const deadline=Date.now()+POLL_TIMEOUT;while(Date.now()<deadline){await new Promise(r=>setTimeout(r,POLL_MS));try{const res=await fetch(`${CA_URL}/jobs/${jobId}`);if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json();if(data.status==='done'){typingEl.remove();appendMsg('sys',formatResult(data.result?.result??data.result),`SYSTEM · ${nowStr()}`);return;}if(data.status==='error'){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">⚠ ${data.detail||'Error'}</span>`,`SYSTEM · ${nowStr()}`);return;}}catch(err){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">⚠ ${err.message}</span>`,`SYSTEM · ${nowStr()}`);return;}}typingEl.remove();appendMsg('sys','<span style="color:var(--warn)">⏱ Request timed out.</span>',`SYSTEM · ${nowStr()}`);}
-async function sendMsg(){const input=document.getElementById('chatInput');if(!input)return;const text=input.value.trim();if(!text)return;input.disabled=true;const btn=document.querySelector('.send-btn');if(btn)btn.disabled=true;appendMsg('user',text,`OPERATOR · ${nowStr()}`);input.value='';const typingEl=appendTyping();try{const res=await fetch(`${CA_URL}/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({machine_id:currentMachineId,question:text})});if(!res.ok){const err=await res.json().catch(()=>({}));typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">⚠ ${res.status}: ${err.detail||res.statusText}</span>`,`SYSTEM · ${nowStr()}`);return;}const data=await res.json();if(!data.job_id){typingEl.remove();appendMsg('sys','<span style="color:var(--accent2)">⚠ No job_id returned.</span>',`SYSTEM · ${nowStr()}`);return;}await pollJob(data.job_id,typingEl);}catch(err){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">⚠ Cannot reach backend: ${err.message}</span>`,`SYSTEM · ${nowStr()}`);}finally{input.disabled=false;if(btn)btn.disabled=false;input.focus();}}
+function formatResult(r){if(typeof r==='string')return r;let h='';if(r.Impact_analysis)h+=`<strong>Impact Analysis</strong><br>${r.Impact_analysis}<br><br>`;if(r.cascade_effects&&r.cascade_effects.length){h+='<strong>Cascade Effects</strong><br>';r.cascade_effects.forEach((e,i)=>{const l=['Immediate','Short-term','Long-term'];h+=`- ${l[i]||i+1}: ${e}<br>`;});h+='<br>';}if(r.solutions)h+=`<strong>Recommended Action</strong><br>${r.solutions}`;if(r.sources&&r.sources.length)h+=`<br><br><span style="font-size:10px;color:var(--muted);">Sources: ${r.sources.join(', ')}</span>`;return h||JSON.stringify(r,null,2);}
+async function pollJob(jobId,typingEl){const deadline=Date.now()+POLL_TIMEOUT;while(Date.now()<deadline){await new Promise(r=>setTimeout(r,POLL_MS));try{const res=await fetch(`${CA_URL}/jobs/${jobId}`);if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json();if(data.status==='done'){typingEl.remove();appendMsg('sys',formatResult(data.result?.result??data.result),`SYSTEM · ${nowStr()}`);return;}if(data.status==='error'){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">${data.detail||'Error'}</span>`,`SYSTEM · ${nowStr()}`);return;}}catch(err){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">${err.message}</span>`,`SYSTEM · ${nowStr()}`);return;}}typingEl.remove();appendMsg('sys','<span style="color:var(--warn)">Request timed out while waiting for the backend response.</span>',`SYSTEM · ${nowStr()}`);}
+async function sendMsg(){
+  const input = document.getElementById('chatInput');
+  if(!input) return;
+  let text = input.value.trim();
+  if(!text) return;
+  
+  // ç¡®ä¿ text æ˜¯å­—ç¬¦ä¸²ï¼Œä¸æ˜¯å¯¹è±¡
+  text = String(text);
+  
+  input.disabled=true;
+  const btn=document.querySelector('.send-btn');
+  if(btn) btn.disabled=true;
+  appendMsg('user', text, `OPERATOR · ${nowStr()}`);
+  input.value='';
+  const typingEl=appendTyping();
+  
+  try{
+    // æ˜Žç¡®æž„é€ è¦å‘é€çš„å¯¹è±¡ï¼Œç¡®ä¿æ²¡æœ‰é¢å¤–å±žæ€§
+    const payload = {
+      machine_id: String(currentMachineId),
+      question: text,
+      session_id: currentSessionId
+    };
+    // å¦‚æžœåŽç«¯æ”¯æŒ session_idï¼Œå¯ä»¥åŠ ä¸Šï¼ˆå¯é€‰ï¼‰
+    // payload.session_id = "chat-history-" + Date.now();
+    
+    const res=await fetch(`${CA_URL}/chat`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    
+    if(!res.ok){
+      const err=await res.json().catch(()=>({}));
+      typingEl.remove();
+      appendMsg('sys',`<span style="color:var(--accent2)">${res.status}: ${err.detail||res.statusText}</span>`,`SYSTEM · ${nowStr()}`);
+      return;
+    }
+    const data=await res.json();
+    if(data.session_id) currentSessionId = data.session_id;
+    if(!data.job_id){
+      typingEl.remove();
+      appendMsg('sys','<span style="color:var(--accent2)">No job_id returned.</span>',`SYSTEM · ${nowStr()}`);
+      return;
+    }
+    await pollJob(data.job_id, typingEl);
+    await loadSessions();
+  } catch(err){
+    typingEl.remove();
+    appendMsg('sys',`<span style="color:var(--accent2)">Cannot reach backend: ${err.message}</span>`,`SYSTEM · ${nowStr()}`);
+  } finally{
+    input.disabled=false;
+    if(btn) btn.disabled=false;
+    input.focus();
+  }
+}
 function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
 
 // Wire up the send button and textarea (static HTML doesn't have onclick)
@@ -331,4 +406,15 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btn)   btn.addEventListener('click', sendMsg);
   if (input) input.addEventListener('keydown', handleKey);
 });
+
+// Unified rich answer renderer
+function escapeHtml(text){return String(text??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function formatInlineMarkdown(text){return escapeHtml(text).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code style="background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-family:var(--font-mono);font-size:.95em;">$1</code>');}
+function renderTableBlock(lines){const rows=lines.map(line=>line.trim()).filter(Boolean).map(line=>line.split('|').map(cell=>cell.trim()).filter((cell,idx,arr)=>!(idx===0&&cell==='')&&!(idx===arr.length-1&&cell==='')));if(rows.length<2)return `<p style="margin:0 0 14px 0;color:var(--text);line-height:1.65;">${formatInlineMarkdown(lines.join(' '))}</p>`;const [header,...body]=rows.filter(row=>!row.every(cell=>/^:?-{3,}:?$/.test(cell)));if(!header||!body.length)return `<p style="margin:0 0 14px 0;color:var(--text);line-height:1.65;">${formatInlineMarkdown(lines.join(' '))}</p>`;return `<div style="overflow:auto;margin:0 0 14px 0;"><table style="width:100%;border-collapse:collapse;font-size:12px;color:var(--text);"><thead><tr>${header.map(cell=>`<th style="text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--muted);font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;">${formatInlineMarkdown(cell)}</th>`).join('')}</tr></thead><tbody>${body.map(row=>`<tr>${header.map((_,idx)=>`<td style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:top;">${formatInlineMarkdown(row[idx]||'')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;}
+function renderRichText(text){const normalized=String(text??'').replace(/\r\n/g,'\n').trim();if(!normalized)return '';const blocks=normalized.split(/\n\s*\n/);return blocks.map(block=>{const lines=block.split('\n').map(line=>line.trim()).filter(Boolean);if(!lines.length)return '';if(lines.some(line=>/\|/.test(line))&&lines.length>=2){return renderTableBlock(lines);}if(lines.every(line=>/^[-*•]\s+/.test(line))){return `<ul style="margin:0 0 14px 18px;padding:0;color:var(--text);">${lines.map(line=>`<li style="margin:0 0 8px 0;padding-left:4px;">${formatInlineMarkdown(line.replace(/^[-*•]\s+/,''))}</li>`).join('')}</ul>`;}if(lines.every(line=>/^\d+[.)]\s+/.test(line))){return `<ol style="margin:0 0 14px 18px;padding:0;color:var(--text);">${lines.map(line=>`<li style="margin:0 0 8px 0;padding-left:4px;">${formatInlineMarkdown(line.replace(/^\d+[.)]\s+/,''))}</li>`).join('')}</ol>`;}if(lines.length===1&&/^#{1,4}\s+/.test(lines[0])){const level=Math.min(4,(lines[0].match(/^#+/)||['#'])[0].length);const size={1:22,2:19,3:16,4:14}[level];return `<div style="margin:2px 0 10px 0;font-size:${size}px;font-weight:700;color:var(--text);">${formatInlineMarkdown(lines[0].replace(/^#{1,4}\s+/,''))}</div>`;}if(lines.length===1&&/^[A-Za-z][A-Za-z /&-]{2,}:\s*$/.test(lines[0])){return `<div style="margin:2px 0 8px 0;font-size:15px;font-weight:700;color:var(--text);">${formatInlineMarkdown(lines[0].replace(/:\s*$/,''))}</div>`;}return `<p style="margin:0 0 14px 0;color:var(--text);line-height:1.65;">${formatInlineMarkdown(lines.join(' '))}</p>`;}).join('');}
+function renderSection(title,body){if(!body)return '';return `<div style="margin:0 0 16px 0;"><div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">${escapeHtml(title)}</div>${renderRichText(body)}</div>`;}
+function formatVisuals(result){const urls=[];if(result?.visuals?.line_plot)urls.push({label:'Line Chart',url:result.visuals.line_plot});if(result?.visuals?.heatmap)urls.push({label:'Heatmap',url:result.visuals.heatmap});if(!urls.length&&Array.isArray(result?.visual_url)){result.visual_url.forEach((url,i)=>urls.push({label:i===0?'Line Chart':i===1?'Heatmap':`Visual ${i+1}`,url}));}if(!urls.length)return '';return `<div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">${urls.map(v=>`<a href="${v.url}" target="_blank" style="display:block;text-decoration:none;color:var(--text);"><div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-bottom:4px;">${v.label}</div><img src="${v.url}" alt="${v.label}" style="width:100%;max-height:180px;object-fit:cover;border:1px solid var(--border);border-radius:6px;background:var(--surface2);" /></a>`).join('')}</div>`;}
+function formatResult(result){if(typeof result==='string')return `<div style="display:flex;flex-direction:column;gap:2px;">${renderRichText(result)}</div>`;const payload=result?.result??result;if(typeof payload==='string')return `<div style="display:flex;flex-direction:column;gap:2px;">${renderRichText(payload)}${formatVisuals(result)}</div>`;let html='';html+=renderSection('Impact Analysis',payload.Impact_analysis);if(payload.cascade_effects&&payload.cascade_effects.length){const labels=['Immediate','Short-term','Long-term'];const cascadeText=payload.cascade_effects.map((e,i)=>`- ${labels[i]||i+1}: ${e}`).join('\n');html+=renderSection('Cascade Effects',cascadeText);}html+=renderSection('Recommended Action',payload.solutions);if(payload.sources&&payload.sources.length){html+=`<div style="margin-top:8px;font-size:11px;color:var(--muted);">Sources: ${payload.sources.map(escapeHtml).join(', ')}</div>`;}if(!html)html=renderRichText(JSON.stringify(payload,null,2));return `<div style="display:flex;flex-direction:column;gap:2px;">${html}${formatVisuals(result)}</div>`;}
+async function pollJob(jobId,typingEl){const deadline=Date.now()+POLL_TIMEOUT;while(Date.now()<deadline){await new Promise(r=>setTimeout(r,POLL_MS));try{const res=await fetch(`${CA_URL}/jobs/${jobId}`);if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json();if(data.status==='done'){typingEl.remove();appendMsg('sys',formatResult(data.result),`SYSTEM · ${nowStr()}`);return;}if(data.status==='error'){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">${data.detail||'Error'}</span>`,`SYSTEM · ${nowStr()}`);return;}}catch(err){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">${err.message}</span>`,`SYSTEM · ${nowStr()}`);return;}}typingEl.remove();appendMsg('sys','<span style="color:var(--warn)">Request timed out while waiting for the backend response.</span>',`SYSTEM · ${nowStr()}`);}
 </script></body></html>
+
