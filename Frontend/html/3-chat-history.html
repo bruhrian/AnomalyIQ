@@ -208,13 +208,22 @@ function displayHistoryContent(message) {
   return content;
 }
 
+function summarizeSessionMessages(messages) {
+  const userMsgs = messages.filter(m => String(m.role).toLowerCase() === 'human');
+  const aiMsgs = messages.filter(m => String(m.role).toLowerCase() !== 'human');
+  return {
+    latestUser: userMsgs.length ? displayHistoryContent(userMsgs[userMsgs.length - 1]) : 'No user prompt yet.',
+    latestAI: aiMsgs.length ? displayHistoryContent(aiMsgs[aiMsgs.length - 1]) : 'No assistant response yet.'
+  };
+}
+
 // â”€â”€ Load real chat sessions from backend â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function loadSessions() {
   try {
     const res  = await fetch(`${BACKEND_URL}/chat/sessions`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    const sessions = data.sessions || [];
+    const sessions = (data.sessions || []).filter(sessionId => !/^anomaly-/i.test(String(sessionId)));
 
     const container = document.querySelector('.vscroll');
     const label     = document.getElementById('sessionsLabel');
@@ -228,7 +237,7 @@ async function loadSessions() {
     if (sessions.length === 0) {
       const empty = document.createElement('div');
       empty.style.cssText = 'color:var(--muted);font-family:var(--font-mono);font-size:10px;padding:12px 0;';
-      empty.textContent = 'No chat sessions recorded yet. Sessions appear after first anomaly or chat.';
+      empty.textContent = 'No user chat sessions recorded yet.';
       container.appendChild(empty);
       return;
     }
@@ -242,11 +251,30 @@ async function loadSessions() {
           <div class="htag">${sessionId}</div>
           <div class="htime">tap to load</div>
         </div>
-        <div class="hpreview" id="prev-${threadId}">Tap to load messages...</div>
+        <div class="hpreview" id="prev-${threadId}">Loading preview...</div>
         <div class="hfooter"><div class="hturns" id="turns-${threadId}">-- turns</div><div style="flex:1"></div></div>
         <div class="hthread" id="${threadId}"></div>`;
       card.onclick = () => loadThread(sessionId, card);
       container.appendChild(card);
+
+      try {
+        const histRes = await fetch(`${BACKEND_URL}/chat/history/${encodeURIComponent(sessionId)}`);
+        if (histRes.ok) {
+          const histData = await histRes.json();
+          const msgs = histData.messages || [];
+          const summary = summarizeSessionMessages(msgs);
+          const preview = document.getElementById(`prev-${threadId}`);
+          const turns = document.getElementById(`turns-${threadId}`);
+          if (preview) {
+            preview.innerHTML = `
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div><span style="color:var(--muted);font-family:var(--font-mono);font-size:9px;">Latest user</span><div>${escapeHtml(summary.latestUser).slice(0, 120)}</div></div>
+                <div><span style="color:var(--muted);font-family:var(--font-mono);font-size:9px;">Latest assistant</span><div>${escapeHtml(summary.latestAI).slice(0, 140)}</div></div>
+              </div>`;
+          }
+          if (turns) turns.textContent = `${msgs.length} turns`;
+        }
+      } catch (_) {}
     }
   } catch(e) {
     const label = document.getElementById('sessionsLabel');
@@ -275,16 +303,21 @@ async function loadThread(sessionId, card) {
 
     const preview = document.getElementById(`prev-${threadId}`);
     const turns   = document.getElementById(`turns-${threadId}`);
+    const summary = summarizeSessionMessages(msgs);
     if (preview) {
-      const firstDisplay = msgs.length ? displayHistoryContent(msgs[0]) : '';
-      preview.textContent = firstDisplay ? firstDisplay.substring(0,100) + '...' : 'No messages.';
+      preview.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div><span style="color:var(--muted);font-family:var(--font-mono);font-size:9px;">Latest user</span><div>${escapeHtml(summary.latestUser).slice(0, 120)}</div></div>
+          <div><span style="color:var(--muted);font-family:var(--font-mono);font-size:9px;">Latest assistant</span><div>${escapeHtml(summary.latestAI).slice(0, 140)}</div></div>
+        </div>`;
     }
     if (turns)   turns.textContent   = `${msgs.length} turns`;
 
     thread.innerHTML = msgs.length
       ? msgs.map(m => {
           const cls = m.role === 'human' ? 'user' : 'sys';
-          return `<div class="hmsg ${cls}"><div class="hbubble">${escapeHtml(displayHistoryContent(m))}</div><div class="hmeta">${escapeHtml(m.role.toUpperCase())}</div></div>`;
+          const rendered = cls === 'user' ? escapeHtml(displayHistoryContent(m)) : renderRichText(displayHistoryContent(m));
+          return `<div class="hmsg ${cls}"><div class="hbubble">${rendered}</div><div class="hmeta">${escapeHtml(m.role.toUpperCase())}</div></div>`;
         }).join('')
       : '<div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px 0;">No messages in this session.</div>';
 
@@ -299,7 +332,7 @@ async function loadThread(sessionId, card) {
 // â”€â”€ Chat panel â€” real /qa endpoint â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const CA_URL = 'http://localhost:8005';
 const POLL_MS = 1500;
-const POLL_TIMEOUT = 70000;
+const POLL_TIMEOUT = 100000;
 let currentMachineId = 'M001';
 let currentSessionId = null;
 
@@ -307,7 +340,7 @@ function nowStr(){return new Date().toLocaleTimeString('en-GB',{hour:'2-digit',m
 function appendMsg(cls,html,meta){const msgs=document.getElementById('chatMsgs');if(!msgs)return;const el=document.createElement('div');el.className=`msg ${cls}`;el.innerHTML=`<div class="bubble">${html}</div><div class="msg-meta">${meta}</div>`;msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;return el;}
 function appendTyping(){const msgs=document.getElementById('chatMsgs');if(!msgs)return;const el=document.createElement('div');el.className='msg sys';el.innerHTML='<div class="typing-wrap"><span></span><span></span><span></span></div>';msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;return el;}
 function formatResult(r){if(typeof r==='string')return r;let h='';if(r.Impact_analysis)h+=`<strong>Impact Analysis</strong><br>${r.Impact_analysis}<br><br>`;if(r.cascade_effects&&r.cascade_effects.length){h+='<strong>Cascade Effects</strong><br>';r.cascade_effects.forEach((e,i)=>{const l=['Immediate','Short-term','Long-term'];h+=`- ${l[i]||i+1}: ${e}<br>`;});h+='<br>';}if(r.solutions)h+=`<strong>Recommended Action</strong><br>${r.solutions}`;if(r.sources&&r.sources.length)h+=`<br><br><span style="font-size:10px;color:var(--muted);">Sources: ${r.sources.join(', ')}</span>`;return h||JSON.stringify(r,null,2);}
-async function pollJob(jobId,typingEl){const deadline=Date.now()+POLL_TIMEOUT;while(Date.now()<deadline){await new Promise(r=>setTimeout(r,POLL_MS));try{const res=await fetch(`${CA_URL}/jobs/${jobId}`);if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json();if(data.status==='done'){typingEl.remove();appendMsg('sys',formatResult(data.result?.result??data.result),`SYSTEM · ${nowStr()}`);return;}if(data.status==='error'){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">${data.detail||'Error'}</span>`,`SYSTEM · ${nowStr()}`);return;}}catch(err){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">${err.message}</span>`,`SYSTEM · ${nowStr()}`);return;}}typingEl.remove();appendMsg('sys','<span style="color:var(--warn)">Request timed out.</span>',`SYSTEM · ${nowStr()}`);}
+async function pollJob(jobId,typingEl){const deadline=Date.now()+POLL_TIMEOUT;while(Date.now()<deadline){await new Promise(r=>setTimeout(r,POLL_MS));try{const res=await fetch(`${CA_URL}/jobs/${jobId}`);if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json();if(data.status==='done'){typingEl.remove();appendMsg('sys',formatResult(data.result?.result??data.result),`SYSTEM · ${nowStr()}`);return;}if(data.status==='error'){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">${data.detail||'Error'}</span>`,`SYSTEM · ${nowStr()}`);return;}}catch(err){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">${err.message}</span>`,`SYSTEM · ${nowStr()}`);return;}}typingEl.remove();appendMsg('sys','<span style="color:var(--warn)">Request timed out while waiting for the backend response.</span>',`SYSTEM · ${nowStr()}`);}
 async function sendMsg(){
   const input = document.getElementById('chatInput');
   if(!input) return;
@@ -382,6 +415,6 @@ function renderRichText(text){const normalized=String(text??'').replace(/\r\n/g,
 function renderSection(title,body){if(!body)return '';return `<div style="margin:0 0 16px 0;"><div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">${escapeHtml(title)}</div>${renderRichText(body)}</div>`;}
 function formatVisuals(result){const urls=[];if(result?.visuals?.line_plot)urls.push({label:'Line Chart',url:result.visuals.line_plot});if(result?.visuals?.heatmap)urls.push({label:'Heatmap',url:result.visuals.heatmap});if(!urls.length&&Array.isArray(result?.visual_url)){result.visual_url.forEach((url,i)=>urls.push({label:i===0?'Line Chart':i===1?'Heatmap':`Visual ${i+1}`,url}));}if(!urls.length)return '';return `<div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">${urls.map(v=>`<a href="${v.url}" target="_blank" style="display:block;text-decoration:none;color:var(--text);"><div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-bottom:4px;">${v.label}</div><img src="${v.url}" alt="${v.label}" style="width:100%;max-height:180px;object-fit:cover;border:1px solid var(--border);border-radius:6px;background:var(--surface2);" /></a>`).join('')}</div>`;}
 function formatResult(result){if(typeof result==='string')return `<div style="display:flex;flex-direction:column;gap:2px;">${renderRichText(result)}</div>`;const payload=result?.result??result;if(typeof payload==='string')return `<div style="display:flex;flex-direction:column;gap:2px;">${renderRichText(payload)}${formatVisuals(result)}</div>`;let html='';html+=renderSection('Impact Analysis',payload.Impact_analysis);if(payload.cascade_effects&&payload.cascade_effects.length){const labels=['Immediate','Short-term','Long-term'];const cascadeText=payload.cascade_effects.map((e,i)=>`- ${labels[i]||i+1}: ${e}`).join('\n');html+=renderSection('Cascade Effects',cascadeText);}html+=renderSection('Recommended Action',payload.solutions);if(payload.sources&&payload.sources.length){html+=`<div style="margin-top:8px;font-size:11px;color:var(--muted);">Sources: ${payload.sources.map(escapeHtml).join(', ')}</div>`;}if(!html)html=renderRichText(JSON.stringify(payload,null,2));return `<div style="display:flex;flex-direction:column;gap:2px;">${html}${formatVisuals(result)}</div>`;}
-async function pollJob(jobId,typingEl){const deadline=Date.now()+POLL_TIMEOUT;while(Date.now()<deadline){await new Promise(r=>setTimeout(r,POLL_MS));try{const res=await fetch(`${CA_URL}/jobs/${jobId}`);if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json();if(data.status==='done'){typingEl.remove();appendMsg('sys',formatResult(data.result),`SYSTEM · ${nowStr()}`);return;}if(data.status==='error'){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">${data.detail||'Error'}</span>`,`SYSTEM · ${nowStr()}`);return;}}catch(err){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">${err.message}</span>`,`SYSTEM · ${nowStr()}`);return;}}typingEl.remove();appendMsg('sys','<span style="color:var(--warn)">Request timed out.</span>',`SYSTEM · ${nowStr()}`);}
+async function pollJob(jobId,typingEl){const deadline=Date.now()+POLL_TIMEOUT;while(Date.now()<deadline){await new Promise(r=>setTimeout(r,POLL_MS));try{const res=await fetch(`${CA_URL}/jobs/${jobId}`);if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json();if(data.status==='done'){typingEl.remove();appendMsg('sys',formatResult(data.result),`SYSTEM · ${nowStr()}`);return;}if(data.status==='error'){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">${data.detail||'Error'}</span>`,`SYSTEM · ${nowStr()}`);return;}}catch(err){typingEl.remove();appendMsg('sys',`<span style="color:var(--accent2)">${err.message}</span>`,`SYSTEM · ${nowStr()}`);return;}}typingEl.remove();appendMsg('sys','<span style="color:var(--warn)">Request timed out while waiting for the backend response.</span>',`SYSTEM · ${nowStr()}`);}
 </script></body></html>
 

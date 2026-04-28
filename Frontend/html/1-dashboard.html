@@ -677,6 +677,10 @@ const hashMap = {
 };
 
 function switchToView(buttonId) {
+  if (buttonId === 'nb-audit') {
+    window.location.href = '/ui/2-audit-log.html';
+    return;
+  }
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
   const clickedBtn = document.getElementById(buttonId);
   if (clickedBtn) clickedBtn.classList.add('active');
@@ -715,6 +719,10 @@ Object.keys(viewMap).forEach(btnId => {
 
 function applyInitialViewFromHash() {
   const key = (window.location.hash || '#dashboard').slice(1).toLowerCase();
+  if (key === 'audit') {
+    window.location.replace('/ui/2-audit-log.html');
+    return;
+  }
   const buttonId = hashMap[key] || 'nb-dashboard';
   switchToView(buttonId);
 }
@@ -727,8 +735,11 @@ loadEmbeddedHistory();
 // ==================== ORIGINAL CHAT FUNCTIONS (RESTORED) ====================
 const CA_URL = 'http://localhost:8005';
 const POLL_MS = 1500;
-const POLL_TIMEOUT = 60000;
+const POLL_TIMEOUT = 100000;
 let currentMachineId = 'M001';
+let hasShownStartupGuide = false;
+let anomalyReminderShown = false;
+const activeAnomalyMachines = new Set();
 
 function nowStr() {
   return new Date().toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
@@ -752,6 +763,58 @@ function appendTyping() {
   msgs.appendChild(el);
   msgs.scrollTop = msgs.scrollHeight;
   return el;
+}
+
+function appendStartupGuide() {
+  if (hasShownStartupGuide) return;
+  hasShownStartupGuide = true;
+  appendMsg(
+    'sys',
+    `
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="font-weight:600;color:var(--text);">Welcome. This chat is for quick machine questions and anomaly guidance.</div>
+        <div style="color:var(--text);line-height:1.6;">
+          If an anomaly appears, open <strong>Audit Log</strong> to view the detailed orchestrator analysis, likely cause, recommended response, and charts.
+        </div>
+        <div>
+          <button onclick="switchToView('nb-audit')" style="background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.35);color:var(--accent);font-family:var(--font-mono);font-size:10px;padding:7px 10px;border-radius:7px;cursor:pointer;">
+            Open Audit Log
+          </button>
+        </div>
+      </div>
+    `,
+    `SYSTEM · ${nowStr()}`
+  );
+}
+
+function syncAnomalyReminder() {
+  const count = activeAnomalyMachines.size;
+  if (count > 0 && !anomalyReminderShown) {
+    anomalyReminderShown = true;
+    const ids = Array.from(activeAnomalyMachines).sort();
+    appendMsg(
+      'sys',
+      `
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="color:var(--ok);font-weight:700;">Orchestrator reminder: 1 or more anomalies are active.</div>
+          <div style="line-height:1.6;color:var(--text);">
+            Detected machine${ids.length === 1 ? '' : 's'}: <strong>${escapeHtml(ids.join(', '))}</strong>.
+            Please check <strong>Audit Log</strong> for the detailed anomaly analysis, possible reasons, recommended response, and charts.
+          </div>
+          <div>
+            <button onclick="switchToView('nb-audit')" style="background:rgba(0,232,122,.12);border:1px solid rgba(0,232,122,.35);color:var(--ok);font-family:var(--font-mono);font-size:10px;padding:7px 10px;border-radius:7px;cursor:pointer;">
+              Review In Audit Log
+            </button>
+          </div>
+        </div>
+      `,
+      `SYSTEM · ${nowStr()}`
+    );
+  }
+
+  if (count === 0) {
+    anomalyReminderShown = false;
+  }
 }
 
 function escapeHtml(value) {
@@ -880,7 +943,7 @@ async function pollJob(jobId, typingEl) {
     }
   }
   typingEl.remove();
-  appendMsg('sys', `<span style="color:var(--warn)">Request timed out after ${POLL_TIMEOUT/1000}s</span>`, `SYSTEM · ${nowStr()}`);
+  appendMsg('sys', `<span style="color:var(--warn)">Request timed out while waiting for the backend response.</span>`, `SYSTEM · ${nowStr()}`);
 }
 
 async function sendMsg() {
@@ -933,6 +996,7 @@ async function sendMsg() {
 function handleKey(e) { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } }
 
 document.getElementById('chatInput').addEventListener('keydown', handleKey);
+appendStartupGuide();
 
 function toggleThread(id) {
   const el = document.getElementById(id);
@@ -988,6 +1052,17 @@ function historyPreviewText(message) {
   return content;
 }
 
+function summarizeSessionMessages(messages) {
+  const userMsgs = messages.filter(m => String(m.role).toLowerCase() === 'human');
+  const aiMsgs = messages.filter(m => String(m.role).toLowerCase() !== 'human');
+  const latestUser = userMsgs.length ? historyPreviewText(userMsgs[userMsgs.length - 1]) : '';
+  const latestAI = aiMsgs.length ? historyPreviewText(aiMsgs[aiMsgs.length - 1]) : '';
+  return {
+    latestUser: latestUser || 'No user prompt yet.',
+    latestAI: latestAI || 'No assistant response yet.'
+  };
+}
+
 async function loadEmbeddedHistory() {
   const backendUrl = 'http://localhost:8005';
   const pane = document.querySelector('#view-history .vscroll');
@@ -1001,10 +1076,10 @@ async function loadEmbeddedHistory() {
     const res = await fetch(`${backendUrl}/chat/sessions`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    const sessions = data.sessions || [];
+    const sessions = (data.sessions || []).filter(sessionId => !/^anomaly-/i.test(String(sessionId)));
     if (label) label.textContent = `Conversation Records - ${sessions.length} session${sessions.length !== 1 ? 's' : ''}`;
     if (!sessions.length) {
-      list.innerHTML = '<div style="color:var(--muted);padding:12px 0;">No chat sessions yet.</div>';
+      list.innerHTML = '<div style="color:var(--muted);padding:12px 0;">No user chat sessions yet.</div>';
       return;
     }
     const cards = await Promise.all(sessions.slice(0, 4).map(async sessionId => {
@@ -1013,10 +1088,13 @@ async function loadEmbeddedHistory() {
         if (!histRes.ok) throw new Error('history unavailable');
         const histData = await histRes.json();
         const msgs = histData.messages || [];
-        const preview = msgs.length ? historyPreviewText(msgs[msgs.length - 1]).slice(0, 120) : 'No messages.';
+        const summary = summarizeSessionMessages(msgs);
         return `<div class="hcard">
           <div class="hcard-top"><span class="htag">${String(sessionId).replace(/[<>&]/g, '')}</span><span class="htime">${msgs.length} turns</span></div>
-          <div class="hpreview">${String(preview || 'No messages.').replace(/[<>&]/g, '')}</div>
+          <div class="hpreview" style="display:flex;flex-direction:column;gap:6px;">
+            <div><span style="color:var(--muted);font-family:var(--font-mono);font-size:9px;">Latest user</span><div>${String(summary.latestUser).replace(/[<>&]/g, '').slice(0, 110)}</div></div>
+            <div><span style="color:var(--muted);font-family:var(--font-mono);font-size:9px;">Latest assistant</span><div>${String(summary.latestAI).replace(/[<>&]/g, '').slice(0, 120)}</div></div>
+          </div>
         </div>`;
       } catch {
         return `<div class="hcard"><div class="hcard-top"><span class="htag">${String(sessionId).replace(/[<>&]/g, '')}</span><span class="htime">--</span></div><div class="hpreview">Unable to load this session.</div></div>`;
@@ -1338,7 +1416,10 @@ window.updateMachine = function(d) {
   _origUpdateM(d);
   const newRow = document.getElementById('row-' + d.machine_id);
   const newLevel = newRow ? (newRow.classList.contains('s-alert') ? 'alert' : newRow.classList.contains('s-warn') ? 'warn' : 'ok') : 'ok';
+  if (newLevel !== 'ok') activeAnomalyMachines.add(d.machine_id);
+  else activeAnomalyMachines.delete(d.machine_id);
   if (newLevel !== 'ok' && newLevel !== prevLevel) recordAnomaly(d.machine_id, newLevel);
+  syncAnomalyReminder();
 };
 
 // ==================== SYSTEM STATUS (mini) ====================

@@ -63,7 +63,7 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
 .bar.alert{background:var(--accent2);box-shadow:0 0 5px var(--accent2);}
 .abadge{position:absolute;top:6px;right:8px;font-family:var(--font-mono);font-size:8px;background:rgba(255,107,53,.13);border:1px solid rgba(255,107,53,.4);color:var(--accent2);padding:2px 6px;border-radius:4px;letter-spacing:.06em;}
 .audit-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;overflow:hidden;min-height:0;}
-#auditBody{max-height:calc(100vh - 330px);overflow-y:auto;}
+#auditBody{max-height:calc(100vh - 250px);overflow-y:auto;}
 #auditBody::-webkit-scrollbar{width:5px;}
 #auditBody::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 .audit-head{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--surface2);}
@@ -80,6 +80,10 @@ nav{width:60px;flex-shrink:0;background:var(--surface);border-right:1px solid va
 .stage.answer{background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.25);color:var(--accent2);}
 .adesc{color:var(--text);font-size:10px;line-height:1.4;}
 .amach{color:var(--muted);font-size:9px;text-align:right;}
+.audit-title{font-size:11px;color:var(--text);margin-bottom:4px;}
+.audit-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:5px;}
+.audit-detail{font-family:var(--font-sans);font-size:11px;color:var(--muted);line-height:1.45;white-space:normal;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;}
+.kv-chip{display:inline-flex;align-items:center;padding:2px 7px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid var(--border);font-family:var(--font-mono);font-size:9px;color:var(--muted);}
 .tabs{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:3px;width:fit-content;}
 .tab{padding:5px 13px;border-radius:5px;font-size:10px;font-family:var(--font-mono);cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .18s;}
 .tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.35);}
@@ -307,6 +311,160 @@ function describeAuditRow(log, stage, details) {
   return details.message || details.query || log.event || 'Agent communication';
 }
 
+function fmtPct(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return '-';
+  return `${Math.round(num * 100)}%`;
+}
+
+function shortId(value) {
+  const text = String(value || '-');
+  return text.length > 12 ? `${text.substring(0, 8)}...` : text;
+}
+
+function renderAuditVisuals(details) {
+  const visuals = [];
+  if (details?.visuals?.line_plot) visuals.push({ label: 'Line Chart', url: details.visuals.line_plot });
+  if (details?.visuals?.heatmap) visuals.push({ label: 'Heatmap', url: details.visuals.heatmap });
+  if (!visuals.length && Array.isArray(details?.visual_url)) {
+    details.visual_url.forEach((url, i) => {
+      visuals.push({ label: i === 0 ? 'Line Chart' : i === 1 ? 'Heatmap' : `Visual ${i + 1}`, url });
+    });
+  }
+  if (!visuals.length) return '';
+  return `
+    <div style="margin-top:10px;">
+      <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;color:var(--muted);margin-bottom:6px;">VISUAL EVIDENCE</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
+        ${visuals.map(v => `
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px;">
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-bottom:6px;">${escapeHtml(v.label)}</div>
+            <img src="${v.url}" alt="${escapeHtml(v.label)}" style="display:block;width:100%;max-height:220px;object-fit:cover;border-radius:6px;border:1px solid var(--border);background:var(--bg);" />
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function renderAuditAnalysis(item) {
+  const responseText = item.details?.response || item.details?.answer || item.description || '';
+  if (!responseText) return '';
+  return `
+    <div style="margin-top:8px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.18);border-radius:8px;padding:12px;">
+      <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;color:var(--accent);margin-bottom:8px;">ORCHESTRATOR ANALYSIS</div>
+      ${renderRichText(responseText)}
+    </div>`;
+}
+
+function extractSection(text, heading, nextHeadings) {
+  const normalized = String(text || '').replace(/\r\n/g, '\n');
+  const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const next = nextHeadings.map(h => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  const pattern = next
+    ? new RegExp(`${escaped}:?\\s*([\\s\\S]*?)(?=\\n(?:${next}):?|$)`, 'i')
+    : new RegExp(`${escaped}:?\\s*([\\s\\S]*)$`, 'i');
+  const match = normalized.match(pattern);
+  return match ? match[1].trim() : '';
+}
+
+function renderDiagnosticCard(item) {
+  const d = item.details || {};
+  const responseText = String(d.response || d.answer || '').trim();
+  const isTimeoutAnswer = /timed out|timeout/i.test(responseText);
+  if (!responseText && !d.label && !d.machine_id) return '';
+
+  const whatAnomaly = [
+    d.machine_id || item.machine_id || '-',
+    d.machine_type || item.machine_type || '-',
+    d.label || 'needs_maintenance',
+    d.confidence != null ? `confidence ${fmtPct(d.confidence)}` : '',
+  ].filter(Boolean).join(' | ');
+
+  const summary = extractSection(responseText, 'Summary', ['Likely Cause', 'Risks', 'Recommended Actions', 'Visual Evidence']);
+  const likelyCause = isTimeoutAnswer
+    ? 'The orchestrator did not finish in time for this historical record, so no completed root-cause narrative was stored here.'
+    : (extractSection(responseText, 'Likely Cause', ['Risks', 'Recommended Actions', 'Visual Evidence']) || summary);
+  const recommended = isTimeoutAnswer
+    ? 'Review the current visuals and refresh after a successful anomaly run, or trigger a fresh anomaly analysis if needed.'
+    : (extractSection(responseText, 'Recommended Actions', ['Visual Evidence']) || extractSection(responseText, 'Recommended Action', ['Visual Evidence']));
+  const risks = isTimeoutAnswer
+    ? 'A finished operator-facing explanation is missing for this old record, so use the charts and the latest anomaly state as the immediate reference.'
+    : extractSection(responseText, 'Risks', ['Recommended Actions', 'Visual Evidence']);
+
+  const sectionCard = (title, body) => {
+    if (!body) return '';
+    return `
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;">
+        <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;color:var(--muted);margin-bottom:7px;">${escapeHtml(title)}</div>
+        ${renderRichText(body)}
+      </div>`;
+  };
+
+  return `
+    <div style="margin-top:8px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.18);border-radius:10px;padding:12px;">
+      <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;color:var(--accent);margin-bottom:10px;">DIAGNOSTIC CARD</div>
+      <div style="display:grid;gap:10px;">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;">
+          <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;color:var(--muted);margin-bottom:7px;">DETECTED ANOMALY</div>
+          <div style="font-size:13px;line-height:1.55;color:var(--text);">${escapeHtml(whatAnomaly)}</div>
+        </div>
+        ${sectionCard('POSSIBLE ROOT CAUSE', likelyCause)}
+        ${sectionCard('OPERATIONAL RISK', risks)}
+        ${sectionCard('RECOMMENDED RESPONSE', recommended)}
+      </div>
+    </div>`;
+}
+
+function getStageSummary(row) {
+  const d = row.details || {};
+  if (row.stage === 'DETECT') {
+    const visualCount = Array.isArray(d.visual_url) ? d.visual_url.length : 0;
+    return `
+      <div class="audit-title">CNN detection result: ${escapeHtml(d.label || 'unknown')}</div>
+      <div class="audit-meta">
+        <span class="kv-chip">confidence ${escapeHtml(fmtPct(d.confidence))}</span>
+        <span class="kv-chip">${visualCount} visual${visualCount === 1 ? '' : 's'}</span>
+        <span class="kv-chip">job ${escapeHtml(shortId(row.job_id))}</span>
+      </div>
+      <div class="audit-detail">${escapeHtml(row.description)}</div>`;
+  }
+  if (row.stage === 'PROCESS') {
+    return `
+      <div class="audit-title">Orchestrator accepted anomaly job</div>
+      <div class="audit-meta">
+        <span class="kv-chip">agent ${escapeHtml(row.agent)}</span>
+        <span class="kv-chip">job ${escapeHtml(shortId(row.job_id))}</span>
+      </div>
+      <div class="audit-detail">${escapeHtml(row.description)}</div>`;
+  }
+  if (row.stage === 'SUMMARY') {
+    return `
+      <div class="audit-title">Analysis summary generated</div>
+      <div class="audit-meta">
+        <span class="kv-chip">agent ${escapeHtml(row.agent)}</span>
+        <span class="kv-chip">job ${escapeHtml(shortId(row.job_id))}</span>
+      </div>
+      <div class="audit-detail">${escapeHtml(d.summary || row.description)}</div>`;
+  }
+  if (row.stage === 'ANSWER') {
+    const visualCount = Array.isArray(d.visual_url) ? d.visual_url.length : 0;
+    return `
+      <div class="audit-title">Operator-facing response recorded</div>
+      <div class="audit-meta">
+        <span class="kv-chip">agent ${escapeHtml(row.agent)}</span>
+        <span class="kv-chip">job ${escapeHtml(shortId(row.job_id))}</span>
+        <span class="kv-chip">${visualCount} visual${visualCount === 1 ? '' : 's'}</span>
+      </div>
+      <div class="audit-detail">${escapeHtml((d.response || row.description || '').substring(0, 260))}</div>`;
+  }
+  return `
+    <div class="audit-title">${escapeHtml(row.description)}</div>
+    <div class="audit-meta">
+      <span class="kv-chip">agent ${escapeHtml(row.agent)}</span>
+      <span class="kv-chip">event ${escapeHtml(row.stage)}</span>
+    </div>`;
+}
+
 async function loadAudit() {
   const body = document.getElementById('auditBody');
   body.innerHTML = '<div style="padding:16px;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--muted);">Loading...</div>';
@@ -355,7 +513,7 @@ function renderRows(rows, filter) {
     const ts = r.created_at ? new Date(r.created_at).toLocaleTimeString('en-GB') : '-';
     const cls = STAGE_CLASS[r.stage] || 'process';
     return `<div class="audit-row" style="cursor:pointer;" onclick="drillIn('${escapeHtml(r.event_id)}','${escapeHtml(r.job_id)}')">
-      <div class="atime">${ts}</div><div class="stage ${cls}">${r.stage}</div><div class="adesc">${escapeHtml(r.description).substring(0,140)}</div><div class="amach"><div>${escapeHtml(r.machine_id)}</div><span>${escapeHtml(r.machine_type)}</span></div>
+      <div class="atime">${ts}</div><div class="stage ${cls}">${r.stage}</div><div class="adesc">${getStageSummary(r)}</div><div class="amach"><div>${escapeHtml(r.machine_id)}</div><span>${escapeHtml(r.machine_type)}</span></div>
     </div>`;
   }).join('');
 }
@@ -408,21 +566,40 @@ function drillIn(eventId, jobId) {
     .filter(item => item.job_id === jobId || item.event_id === eventId)
     .sort((a,b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
 
-  if (trail.length === 0) {
+  const selected = trail.find(item => String(item.event_id) === String(eventId)) || trail[trail.length - 1];
+  const orderedTrail = selected && selected.stage === 'ANSWER'
+    ? [selected, ...trail.filter(item => item !== selected)]
+    : trail;
+
+  if (orderedTrail.length === 0) {
     rows.innerHTML = '<div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px 0;">No related audit rows found.</div>';
     return;
   }
 
-  rows.innerHTML = trail.map(item => {
+  rows.innerHTML = orderedTrail.map(item => {
     const ts = item.created_at ? new Date(item.created_at).toLocaleTimeString('en-GB') : '--';
     const cls = STAGE_CLASS[item.stage] || 'process';
+    const visualsHtml = renderAuditVisuals(item.details || {});
+    const responseHtml = item.stage === 'ANSWER'
+      ? renderDiagnosticCard(item)
+      : item.stage === 'SUMMARY'
+        ? `<div style="margin-top:8px;">${renderRichText(item.details?.summary || item.description)}</div>`
+        : '';
     const detailJson = escapeHtml(JSON.stringify(item.details || {}, null, 2));
+    const headerHtml = item.stage === 'ANSWER'
+      ? `<div style="font-size:10px;margin-bottom:8px;"><strong>[${escapeHtml(item.agent)}]</strong> Operator-facing anomaly response</div>`
+      : `<div style="font-size:10px;"><strong>[${escapeHtml(item.agent)}]</strong> ${escapeHtml(item.description)}</div>`;
     return `<div style="padding:10px 0;border-bottom:1px solid var(--border);display:grid;grid-template-columns:70px 82px 1fr;gap:10px;">
       <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);">${ts}</div>
       <div class="stage ${cls}" style="font-size:9px;">${item.stage}</div>
       <div>
-        <div style="font-size:10px;"><strong>[${escapeHtml(item.agent)}]</strong> ${escapeHtml(item.description)}</div>
-        <pre style="white-space:pre-wrap;margin-top:6px;color:var(--muted);font-size:9px;line-height:1.35;">${detailJson}</pre>
+        ${headerHtml}
+        ${responseHtml}
+        ${item.stage === 'ANSWER' ? visualsHtml : visualsHtml}
+        <details style="margin-top:8px;">
+          <summary style="cursor:pointer;font-family:var(--font-mono);font-size:10px;color:var(--muted);">Raw details</summary>
+          <pre style="white-space:pre-wrap;margin-top:6px;color:var(--muted);font-size:9px;line-height:1.35;">${detailJson}</pre>
+        </details>
       </div>
     </div>`;
   }).join('');
@@ -430,8 +607,56 @@ function drillIn(eventId, jobId) {
 
 function toggleThread(id) { document.getElementById(id)?.classList.toggle('open'); }
 
+let auditStream = null;
+let auditFallbackTimer = null;
+
+function startAuditStream() {
+  if (auditStream) {
+    auditStream.close();
+    auditStream = null;
+  }
+  try {
+    auditStream = new EventSource(`${AUDIT_API}/audit/stream?limit=200`);
+    auditStream.onmessage = (evt) => {
+      try {
+        const data = JSON.parse(evt.data || '{}');
+        if (data.error) return;
+        _allRows = (data.logs || []).map(log => {
+          const details = log.details || {};
+          const stage = normalizeStage(log);
+          return {
+            event_id: String(log.id ?? log.event_id ?? details.job_id ?? ''),
+            job_id: details.job_id || String(log.id ?? ''),
+            agent: log.agent || details.agent || 'SYSTEM',
+            machine_id: log.machine_id || details.machine_id || details.sensor_id || '-',
+            machine_type: details.machine_type || log.machine_type || '-',
+            stage,
+            description: describeAuditRow(log, stage, details),
+            created_at: log.timestamp || log.created_at,
+            details,
+          };
+        });
+        document.getElementById('entryCount').textContent = `${_allRows.length} entries`;
+        renderRows(_allRows, _currentFilter);
+      } catch (e) {
+        console.log('Audit stream parse failed:', e.message);
+      }
+    };
+    auditStream.onerror = () => {
+      if (!auditFallbackTimer) {
+        auditFallbackTimer = setInterval(loadAudit, 5000);
+      }
+    };
+  } catch (e) {
+    console.log('Audit stream unavailable:', e.message);
+    if (!auditFallbackTimer) {
+      auditFallbackTimer = setInterval(loadAudit, 5000);
+    }
+  }
+}
+
 loadAudit();
-setInterval(loadAudit, 30000);
+startAuditStream();
 
 // ==================== CHAT FUNCTIONS (ORIGINAL - UNCHANGED) ====================
 const CA_URL = 'http://localhost:8005';
