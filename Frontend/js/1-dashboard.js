@@ -785,24 +785,40 @@ window.updateMachine = function(d) {
 
 // ==================== SYSTEM STATUS (mini) ====================
 let miniOnline = false;
+const MINI_HEALTH_URL = `${CA_URL}/health`;
+const MINI_SYSTEM_HEALTH_URL = `${CA_URL}/system/health`;
+
+function fetchJsonWithTimeout(url, timeoutMs) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { signal: controller.signal })
+    .finally(() => clearTimeout(timer))
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    });
+}
 
 async function loadMiniStatus() {
-  try {
-    const controller = new AbortController();
-    setTimeout(() => controller.abort(), 4000);
-    const res = await fetch('http://localhost:8005/system/health', { signal: controller.signal });
-    const data = await res.json();
-    const overall = data.overall || 'unknown';
-    miniOnline = true;
+  const dot = document.getElementById('sys-dot');
+  const ov  = document.getElementById('sys-overall');
+  const det = document.getElementById('sys-detail');
+  const comp = document.getElementById('sys-components');
+  const colors = { ok:'var(--ok)', degraded:'var(--warn)', error:'var(--accent2)' };
 
-    const dot = document.getElementById('sys-dot');
-    const ov  = document.getElementById('sys-overall');
-    const det = document.getElementById('sys-detail');
-    const comp = document.getElementById('sys-components');
-    const colors = { ok:'var(--ok)', degraded:'var(--warn)', error:'var(--accent2)' };
-    const labels = { ok:'All systems operational', degraded:'Some services degraded', error:'Connection errors detected' };
+  try {
+    await fetchJsonWithTimeout(MINI_HEALTH_URL, 2500);
+    miniOnline = true;
+    if (dot) { dot.style.background = 'var(--ok)'; dot.style.boxShadow = '0 0 8px var(--ok)'; }
+    if (ov)  ov.textContent = 'Backend online';
+    if (det) det.textContent = 'main.py health check OK - loading components...';
+
+    const data = await fetchJsonWithTimeout(MINI_SYSTEM_HEALTH_URL, 9000);
+    const overall = data.overall || 'unknown';
+
+    const labels = { ok:'All systems operational', degraded:'Some services degraded', error:'Backend online - service issues detected' };
     if (dot) { dot.style.background = colors[overall] || 'var(--muted)'; dot.style.boxShadow = `0 0 8px ${colors[overall] || 'var(--muted)'}`; }
-    if (ov)  ov.textContent = labels[overall] || 'Unknown';
+    if (ov)  ov.textContent = labels[overall] || 'Backend online';
     if (det) {
       const comps = Object.entries(data.components || {});
       const errs = comps.filter(([,v]) => v.status !== 'ok');
@@ -818,13 +834,16 @@ async function loadMiniStatus() {
       }).join('');
     }
   } catch(e) {
-    miniOnline = false;
-    const ov  = document.getElementById('sys-overall');
-    const det = document.getElementById('sys-detail');
-    const dot = document.getElementById('sys-dot');
-    if (dot) { dot.style.background = 'var(--muted)'; dot.style.boxShadow = 'none'; }
-    if (ov)  ov.textContent = 'Backend offline';
-    if (det) det.textContent = 'Cannot reach main.py - retrying...';
+    if (miniOnline) {
+      if (dot) { dot.style.background = 'var(--warn)'; dot.style.boxShadow = '0 0 8px var(--warn)'; }
+      if (ov)  ov.textContent = 'Backend online';
+      if (det) det.textContent = `Component health unavailable - ${e.name === 'AbortError' ? 'timed out' : e.message}`;
+    } else {
+      if (dot) { dot.style.background = 'var(--muted)'; dot.style.boxShadow = 'none'; }
+      if (ov)  ov.textContent = 'Backend offline';
+      if (det) det.textContent = 'Cannot reach main.py - retrying...';
+      if (comp) comp.innerHTML = '';
+    }
   } finally {
     setTimeout(loadMiniStatus, 3000); // poll every 3s
   }

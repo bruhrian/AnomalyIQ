@@ -1,5 +1,16 @@
 const BACKEND_URL = 'http://localhost:8005';
 
+function fetchJsonWithTimeout(url, timeoutMs) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { signal: controller.signal })
+    .finally(() => clearTimeout(timer))
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    });
+}
+
 // ── Clock ──
 function tick() {
   const t = new Date().toLocaleTimeString('en-GB');
@@ -69,9 +80,10 @@ function applyStatus(name, status, detail, latencyMs) {
 // ── Fetch real health from backend ──
 async function loadHealth() {
   try {
-    const res  = await fetch(`${BACKEND_URL}/system/health`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
+    await fetchJsonWithTimeout(`${BACKEND_URL}/health`, 2500);
+    applyStatus('Backend', 'ok', 'Running', 0);
+
+    const data = await fetchJsonWithTimeout(`${BACKEND_URL}/system/health`, 9000);
     const components = data.components || {};
 
     Object.entries(components).forEach(([name, info]) => {
@@ -100,10 +112,27 @@ async function loadHealth() {
     }
 
   } catch(e) {
-    // Backend itself is unreachable
-    ['UI','MCP','PostgreSQL','Neo4j','DataSimulator','Backend'].forEach(n => {
-      if (n !== 'UI') applyStatus(n, 'error', 'Backend unreachable');
-    });
+    try {
+      await fetchJsonWithTimeout(`${BACKEND_URL}/health`, 2500);
+      applyStatus('Backend', 'ok', 'Running', 0);
+      ['MCP','PostgreSQL','Neo4j','DataSimulator'].forEach(n => {
+        applyStatus(n, 'degraded', `Component health unavailable - ${e.name === 'AbortError' ? 'timed out' : e.message}`);
+      });
+      const errBadge = document.getElementById('statusErrorCount');
+      const okBadge = document.getElementById('statusHealthyCount');
+      if (errBadge) errBadge.textContent = 'component health unavailable';
+      if (okBadge) okBadge.textContent = 'Backend healthy';
+      const pill = document.getElementById('topPill');
+      const pillText = document.getElementById('pillText');
+      if (pill && pillText) {
+        pill.className = 'status-pill has-warn';
+        pillText.textContent = 'Backend connected';
+      }
+    } catch {
+      ['UI','MCP','PostgreSQL','Neo4j','DataSimulator','Backend'].forEach(n => {
+        if (n !== 'UI') applyStatus(n, 'error', 'Backend unreachable');
+      });
+    }
   }
 }
 

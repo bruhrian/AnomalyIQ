@@ -83,7 +83,9 @@ function renderAuditVisuals(details) {
         ${visuals.map(v => `
           <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px;">
             <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-bottom:6px;">${escapeHtml(v.label)}</div>
-            <img src="${v.url}" alt="${escapeHtml(v.label)}" style="display:block;width:100%;max-height:220px;object-fit:cover;border-radius:6px;border:1px solid var(--border);background:var(--bg);" />
+            <a href="${v.url}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" style="display:block;">
+              <img src="${v.url}" alt="${escapeHtml(v.label)}" style="display:block;width:100%;max-height:220px;object-fit:cover;border-radius:6px;border:1px solid var(--border);background:var(--bg);cursor:zoom-in;" />
+            </a>
           </div>
         `).join('')}
       </div>
