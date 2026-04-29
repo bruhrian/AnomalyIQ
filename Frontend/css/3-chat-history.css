@@ -1,4 +1,4 @@
-﻿:root{--bg:#0f1117;--surface:#181c27;--surface2:#1f2436;--border:#2a3048;--accent:#00d4ff;--accent2:#ff6b35;--warn:#ffb800;--ok:#00e87a;--text:#e8eaf0;--muted:#6b7394;--font-mono:'IBM Plex Mono',monospace;--font-sans:'IBM Plex Sans',sans-serif;}
+:root{--bg:#0f1117;--surface:#181c27;--surface2:#1f2436;--border:#2a3048;--accent:#00d4ff;--accent2:#ff6b35;--warn:#ffb800;--ok:#00e87a;--text:#e8eaf0;--muted:#6b7394;--font-mono:'IBM Plex Mono',monospace;--font-sans:'IBM Plex Sans',sans-serif;}
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;font-family:var(--font-sans);background:var(--bg);color:var(--text);overflow:hidden;}
 .shell{display:flex;height:100vh;overflow:hidden;}

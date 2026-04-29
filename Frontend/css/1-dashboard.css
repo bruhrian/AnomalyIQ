@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --bg: #0f1117;
   --surface: #181c27;
   --surface2: #1f2436;
@@ -15,10 +15,10 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body { height:100%; font-family:var(--font-sans); background:var(--bg); color:var(--text); overflow:hidden; }
 
-/* SHELL: nav | main */
+/* â•â•â• SHELL: nav | main â•â•â• */
 .shell { display:flex; height:100vh; overflow:hidden; }
 
-/* LEFT NAV */
+/* â”€â”€ LEFT NAV â”€â”€ */
 nav {
   width:60px; flex-shrink:0;
   background:var(--surface); border-right:1px solid var(--border);
@@ -50,7 +50,7 @@ nav {
 .nav-div   { width:30px; height:1px; background:var(--border); margin:5px 0; flex-shrink:0; }
 .nav-space { flex:1; }
 
-/* MAIN: topbar | body */
+/* â”€â”€ MAIN: topbar | body â”€â”€ */
 .main { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
 
 .topbar {
@@ -71,10 +71,10 @@ nav {
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .tb-clock { font-family:var(--font-mono); font-size:11px; color:var(--muted); }
 
-/* BODY: center-panel | chat-panel */
+/* â”€â”€ BODY: center-panel | chat-panel â”€â”€ */
 .body { flex:1; display:flex; overflow:hidden; min-height:0; }
 
-/* CENTER PANEL - swaps content */
+/* CENTER PANEL â€” swaps content */
 .center {
   flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0;
 }
@@ -93,7 +93,9 @@ nav {
 
 .sec-label { font-family:var(--font-mono); font-size:9px; letter-spacing:.12em; color:var(--muted); text-transform:uppercase; }
 
-/* VIEW 1 - MACHINE DASHBOARD */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   VIEW 1 â€” MACHINE DASHBOARD
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .mrow {
   background:var(--surface); border:1px solid var(--border);
   border-radius:9px; display:flex; overflow:hidden; position:relative;
@@ -144,7 +146,9 @@ nav {
   color:var(--accent2); padding:2px 6px; border-radius:4px; letter-spacing:.06em;
 }
 
-/* VIEW 2 - AUDIT LOG */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   VIEW 2 â€” AUDIT LOG
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .audit-card { background:var(--surface); border:1px solid var(--border); border-radius:9px; overflow:hidden; }
 .audit-head {
   padding:10px 16px; border-bottom:1px solid var(--border);
@@ -176,7 +180,9 @@ nav {
 .tab { padding:5px 13px; border-radius:5px; font-size:10px; font-family:var(--font-mono); cursor:pointer; border:none; background:transparent; color:var(--muted); transition:all .18s; }
 .tab.active { background:var(--surface); color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,.35); }
 
-/* VIEW 3 - CHAT HISTORY */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   VIEW 3 â€” CHAT HISTORY
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .hcard {
   background:var(--surface); border:1px solid var(--border);
   border-radius:9px; padding:14px 16px; cursor:pointer; transition:border-color .2s;
@@ -205,7 +211,9 @@ nav {
 .hmeta { font-family:var(--font-mono); font-size:9px; color:var(--muted); padding:0 3px; }
 .hmsg.user .hmeta { text-align:right; }
 
-/* RIGHT - CHATBOT PANEL (always visible) */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   RIGHT â€” CHATBOT PANEL (always visible)
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .chat-panel {
   width:290px; flex-shrink:0;
   background:var(--surface); border-left:1px solid var(--border);
