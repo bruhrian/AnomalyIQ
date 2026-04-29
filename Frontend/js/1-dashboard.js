@@ -1,12 +1,10 @@
-﻿// ==================== CLOCK (unchanged from original) ====================
+// ==================== CLOCK (unchanged from original) ====================
 function tick() {
   const t = new Date().toLocaleTimeString('en-GB');
   const el = document.getElementById('clk'); if(el) el.textContent = t;
   ['ts1','ts2','ts3','ts4'].forEach(id => { const e=document.getElementById(id); if(e) e.textContent=t; });
 }
 tick(); setInterval(tick, 1000);
-const dashInitEl = document.getElementById('dashInitTime');
-if (dashInitEl) dashInitEl.textContent = new Date().toLocaleTimeString('en-GB');
 
 // ==================== NAVIGATION (FIXED - added) ====================
 const viewMap = {
@@ -29,7 +27,21 @@ const breadcrumbMap = {
   'nb-profile': '/ Profile'
 };
 
+const hashMap = {
+  dashboard: 'nb-dashboard',
+  audit: 'nb-audit',
+  history: 'nb-history',
+  livefeed: 'nb-livefeed',
+  analytics: 'nb-analytics',
+  status: 'nb-status',
+  profile: 'nb-profile'
+};
+
 function switchToView(buttonId) {
+  if (buttonId === 'nb-audit') {
+    window.location.href = '/ui/2-audit-log.html';
+    return;
+  }
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
   const clickedBtn = document.getElementById(buttonId);
   if (clickedBtn) clickedBtn.classList.add('active');
@@ -43,6 +55,17 @@ function switchToView(buttonId) {
   
   const breadcrumb = document.getElementById('breadcrumb');
   if (breadcrumb && breadcrumbMap[buttonId]) breadcrumb.textContent = breadcrumbMap[buttonId];
+
+  const hashEntry = Object.entries(hashMap).find(([, id]) => id === buttonId);
+  if (hashEntry) {
+    const targetHash = `#${hashEntry[0]}`;
+    if (window.location.hash !== targetHash) {
+      history.replaceState(null, '', targetHash);
+    }
+  }
+
+  if (buttonId === 'nb-audit') loadEmbeddedAudit();
+  if (buttonId === 'nb-history') loadEmbeddedHistory();
 }
 
 Object.keys(viewMap).forEach(btnId => {
@@ -55,14 +78,29 @@ Object.keys(viewMap).forEach(btnId => {
   }
 });
 
+function applyInitialViewFromHash() {
+  const key = (window.location.hash || '#dashboard').slice(1).toLowerCase();
+  if (key === 'audit') {
+    window.location.replace('/ui/2-audit-log.html');
+    return;
+  }
+  const buttonId = hashMap[key] || 'nb-dashboard';
+  switchToView(buttonId);
+}
+
+window.addEventListener('hashchange', applyInitialViewFromHash);
+applyInitialViewFromHash();
+loadEmbeddedAudit();
+loadEmbeddedHistory();
+
 // ==================== ORIGINAL CHAT FUNCTIONS (RESTORED) ====================
 const CA_URL = 'http://localhost:8005';
 const POLL_MS = 1500;
-const POLL_TIMEOUT = 100000;
-let currentMachineId = 'M001';
-let currentSessionId = (window.crypto && crypto.randomUUID)
-  ? crypto.randomUUID()
-  : `chat-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+const POLL_TIMEOUT = 130000;
+let currentMachineId = '';
+let hasShownStartupGuide = false;
+let anomalyReminderShown = false;
+const activeAnomalyMachines = new Set();
 
 function nowStr() {
   return new Date().toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
@@ -86,6 +124,58 @@ function appendTyping() {
   msgs.appendChild(el);
   msgs.scrollTop = msgs.scrollHeight;
   return el;
+}
+
+function appendStartupGuide() {
+  if (hasShownStartupGuide) return;
+  hasShownStartupGuide = true;
+  appendMsg(
+    'sys',
+    `
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="font-weight:600;color:var(--text);">Welcome. This chat is for quick machine questions and anomaly guidance.</div>
+        <div style="color:var(--text);line-height:1.6;">
+          If an anomaly appears, open <strong>Audit Log</strong> to view the detailed orchestrator analysis, likely cause, recommended response, and charts.
+        </div>
+        <div>
+          <button onclick="switchToView('nb-audit')" style="background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.35);color:var(--accent);font-family:var(--font-mono);font-size:10px;padding:7px 10px;border-radius:7px;cursor:pointer;">
+            Open Audit Log
+          </button>
+        </div>
+      </div>
+    `,
+    `SYSTEM · ${nowStr()}`
+  );
+}
+
+function syncAnomalyReminder() {
+  const count = activeAnomalyMachines.size;
+  if (count > 0 && !anomalyReminderShown) {
+    anomalyReminderShown = true;
+    const ids = Array.from(activeAnomalyMachines).sort();
+    appendMsg(
+      'sys',
+      `
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="color:var(--ok);font-weight:700;">Orchestrator reminder: 1 or more anomalies are active.</div>
+          <div style="line-height:1.6;color:var(--text);">
+            Detected machine${ids.length === 1 ? '' : 's'}: <strong>${escapeHtml(ids.join(', '))}</strong>.
+            Please check <strong>Audit Log</strong> for the detailed anomaly analysis, possible reasons, recommended response, and charts.
+          </div>
+          <div>
+            <button onclick="switchToView('nb-audit')" style="background:rgba(0,232,122,.12);border:1px solid rgba(0,232,122,.35);color:var(--ok);font-family:var(--font-mono);font-size:10px;padding:7px 10px;border-radius:7px;cursor:pointer;">
+              Review In Audit Log
+            </button>
+          </div>
+        </div>
+      `,
+      `SYSTEM · ${nowStr()}`
+    );
+  }
+
+  if (count === 0) {
+    anomalyReminderShown = false;
+  }
 }
 
 function escapeHtml(value) {
@@ -115,14 +205,8 @@ function renderTableBlock(lines) {
   const body = hasDivider ? rows.slice(2) : rows.slice(1);
   return `<div style="margin:14px 0 16px 0;overflow-x:auto;">
     <table style="width:100%;border-collapse:collapse;font-size:13px;line-height:1.45;">
-      <thead>
-        <tr>
-          ${header.map(cell => `<th style="text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text);font-weight:700;">${formatInlineMarkdown(cell)}</th>`).join('')}
-        </tr>
-      </thead>
-      <tbody>
-        ${body.map(row => `<tr>${row.map(cell => `<td style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08);color:var(--text);vertical-align:top;">${formatInlineMarkdown(cell)}</td>`).join('')}</tr>`).join('')}
-      </tbody>
+      <thead><tr>${header.map(cell => `<th style="text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text);font-weight:700;">${formatInlineMarkdown(cell)}</th>`).join('')}</tr></thead>
+      <tbody>${body.map(row => `<tr>${row.map(cell => `<td style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08);color:var(--text);vertical-align:top;">${formatInlineMarkdown(cell)}</td>`).join('')}</tr>`).join('')}</tbody>
     </table>
   </div>`;
 }
@@ -134,9 +218,7 @@ function renderRichText(text) {
   return blocks.map(block => {
     const lines = block.split('\n').map(line => line.trim()).filter(Boolean);
     if (!lines.length) return '';
-    if (lines.some(line => /\|/.test(line)) && lines.length >= 2) {
-      return renderTableBlock(lines);
-    }
+    if (lines.some(line => /\|/.test(line)) && lines.length >= 2) return renderTableBlock(lines);
     if (lines.every(line => /^[-*•]\s+/.test(line))) {
       return `<ul style="margin:0 0 14px 18px;padding:0;color:var(--text);">${lines.map(line => `<li style="margin:0 0 8px 0;padding-left:4px;">${formatInlineMarkdown(line.replace(/^[-*•]\s+/, ''))}</li>`).join('')}</ul>`;
     }
@@ -157,10 +239,7 @@ function renderRichText(text) {
 
 function renderSection(title, body) {
   if (!body) return '';
-  return `<div style="margin:0 0 16px 0;">
-    <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">${escapeHtml(title)}</div>
-    ${renderRichText(body)}
-  </div>`;
+  return `<div style="margin:0 0 16px 0;"><div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">${escapeHtml(title)}</div>${renderRichText(body)}</div>`;
 }
 
 function formatVisuals(result) {
@@ -210,22 +289,22 @@ async function pollJob(jobId, typingEl) {
         typingEl.remove();
         const result = data.result;
         const html = formatResult(result);
-        appendMsg('sys', html, `SYSTEM | ${nowStr()}`);
+        appendMsg('sys', html, `SYSTEM · ${nowStr()}`);
         return;
       }
       if (data.status === 'error') {
         typingEl.remove();
-        appendMsg('sys', `<span style="color:var(--accent2)">WARN Error: ${data.detail || 'Unknown error'}</span>`, `SYSTEM | ${nowStr()}`);
+        appendMsg('sys', `<span style="color:var(--accent2)">Warning: ${data.detail || 'Unknown error'}</span>`, `SYSTEM · ${nowStr()}`);
         return;
       }
     } catch (err) {
       typingEl.remove();
-      appendMsg('sys', `<span style="color:var(--accent2)">WARN Lost connection: ${err.message}</span>`, `SYSTEM | ${nowStr()}`);
+      appendMsg('sys', `<span style="color:var(--accent2)">Lost connection: ${err.message}</span>`, `SYSTEM · ${nowStr()}`);
       return;
     }
   }
   typingEl.remove();
-  appendMsg('sys', `<span style="color:var(--warn)">TIMEOUT Request timed out while waiting for the backend response.</span>`, `SYSTEM | ${nowStr()}`);
+  appendMsg('sys', `<span style="color:var(--warn)">Request timed out while waiting for the backend response.</span>`, `SYSTEM · ${nowStr()}`);
 }
 
 async function sendMsg() {
@@ -236,7 +315,7 @@ async function sendMsg() {
   input.disabled = true;
   document.querySelector('.send-btn').disabled = true;
   
-  appendMsg('user', text, `OPERATOR | ${nowStr()}`);
+  appendMsg('user', text, `OPERATOR · ${nowStr()}`);
   input.value = '';
   
   const typingEl = appendTyping();
@@ -245,30 +324,29 @@ async function sendMsg() {
     const res = await fetch(`${CA_URL}/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ machine_id: currentMachineId, question: text, session_id: currentSessionId }),
+      body: JSON.stringify({ machine_id: currentMachineId || '', question: text }),
     });
     
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       typingEl.remove();
-      appendMsg('sys', `<span style="color:var(--accent2)">WARN Backend error ${res.status}: ${err.detail || res.statusText}</span>`, `SYSTEM | ${nowStr()}`);
+      appendMsg('sys', `<span style="color:var(--accent2)">Backend error ${res.status}: ${err.detail || res.statusText}</span>`, `SYSTEM · ${nowStr()}`);
       return;
     }
     
     const data = await res.json();
     const jobId = data.job_id;
-    if (data.session_id) currentSessionId = data.session_id;
     
     if (!jobId) {
       typingEl.remove();
-      appendMsg('sys', `<span style="color:var(--accent2)">WARN No job_id returned.</span>`, `SYSTEM | ${nowStr()}`);
+      appendMsg('sys', `<span style="color:var(--accent2)">No job_id returned.</span>`, `SYSTEM · ${nowStr()}`);
       return;
     }
     
     await pollJob(jobId, typingEl);
   } catch (err) {
     typingEl.remove();
-    appendMsg('sys', `<span style="color:var(--accent2)">WARN Cannot reach backend at ${CA_URL}. Is it running?<br><span style="font-size:10px;">${err.message}</span></span>`, `SYSTEM | ${nowStr()}`);
+    appendMsg('sys', `<span style="color:var(--accent2)">Cannot reach backend at ${CA_URL}. Is it running?<br><span style="font-size:10px;">${err.message}</span></span>`, `SYSTEM · ${nowStr()}`);
   } finally {
     input.disabled = false;
     document.querySelector('.send-btn').disabled = false;
@@ -279,10 +357,115 @@ async function sendMsg() {
 function handleKey(e) { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } }
 
 document.getElementById('chatInput').addEventListener('keydown', handleKey);
+appendStartupGuide();
 
 function toggleThread(id) {
   const el = document.getElementById(id);
   if (el) el.classList.toggle('open');
+}
+
+async function loadEmbeddedAudit() {
+  const backendUrl = 'http://localhost:8005';
+  const pane = document.querySelector('#view-audit .audit-card');
+  if (pane && !document.getElementById('miniAuditCount')) {
+    pane.innerHTML = '<div class="audit-head"><div class="audit-head-title">RECENT AUDIT TRAIL</div><div class="badge" id="miniAuditCount">Loading...</div></div><div class="audit-row" style="background:var(--surface2);font-size:9px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;"><div>Time</div><div>Stage</div><div>Description</div><div>Machine</div></div><div id="auditList"><div style="color:var(--muted);padding:12px 0;">Loading audit data...</div></div>';
+  }
+  const list = document.getElementById('auditList');
+  if (!list) return;
+  const count = document.getElementById('miniAuditCount');
+  try {
+    const res = await fetch(`${backendUrl}/audit/logs?limit=8`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const logs = data.logs || data.events || [];
+    if (count) count.textContent = `${logs.length} entries`;
+    if (!logs.length) {
+      list.innerHTML = '<div style="color:var(--muted);padding:12px 0;">No audit records yet.</div>';
+      return;
+    }
+    const stageClass = { DETECT:'detect', PROCESS:'process', SUMMARY:'summary', ANSWER:'answer', COMM:'process' };
+    list.innerHTML = logs.slice(0, 8).map(log => {
+      const details = log.details || {};
+      const stage = String(log.stage || log.event || 'DETECT').toUpperCase();
+      const ts = log.timestamp ? new Date(log.timestamp).toLocaleTimeString('en-GB') : '--';
+      const machine = details.machine_id || details.sensor_id || log.machine_id || '-';
+      const desc = details.description || details.summary || details.response || details.answer || log.event || 'Audit event';
+      const safe = value => String(value ?? '').replace(/[<>&]/g, '');
+      return `<div class="audit-row">
+        <div class="atime">${safe(ts)}</div>
+        <div class="stage ${stageClass[stage] || 'detect'}">${safe(stage)}</div>
+        <div class="adesc">${safe(desc)}</div>
+        <div class="amach">${safe(machine)}</div>
+      </div>`;
+    }).join('');
+  } catch (err) {
+    if (count) count.textContent = 'offline';
+    list.innerHTML = `<div style="color:var(--accent2);padding:12px 0;">Cannot load audit records: ${String(err.message).replace(/[<>&]/g, '')}</div>`;
+  }
+}
+
+function historyPreviewText(message) {
+  let content = String(message?.content ?? '');
+  if (message?.role === 'human') {
+    content = content.split('\n\nBackend context:')[0];
+    content = content.replace(/^\[Machine:\s*([^\]]+)\]\s*/i, '');
+  }
+  return content;
+}
+
+function summarizeSessionMessages(messages) {
+  const userMsgs = messages.filter(m => String(m.role).toLowerCase() === 'human');
+  const aiMsgs = messages.filter(m => String(m.role).toLowerCase() !== 'human');
+  const latestUser = userMsgs.length ? historyPreviewText(userMsgs[userMsgs.length - 1]) : '';
+  const latestAI = aiMsgs.length ? historyPreviewText(aiMsgs[aiMsgs.length - 1]) : '';
+  return {
+    latestUser: latestUser || 'No user prompt yet.',
+    latestAI: latestAI || 'No assistant response yet.'
+  };
+}
+
+async function loadEmbeddedHistory() {
+  const backendUrl = 'http://localhost:8005';
+  const pane = document.querySelector('#view-history .vscroll');
+  if (pane && !document.getElementById('embeddedHistoryList')) {
+    pane.innerHTML = '<div class="sec-label" style="margin-bottom:4px" id="embeddedHistoryLabel">Conversation Records - loading...</div><div id="embeddedHistoryList" style="display:flex;flex-direction:column;gap:8px;"><div style="color:var(--muted);padding:12px 0;">Loading chat sessions...</div></div>';
+  }
+  const label = document.getElementById('embeddedHistoryLabel');
+  const list = document.getElementById('embeddedHistoryList');
+  if (!list) return;
+  try {
+    const res = await fetch(`${backendUrl}/chat/sessions`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const sessions = (data.sessions || []).filter(sessionId => !/^anomaly-/i.test(String(sessionId)));
+    if (label) label.textContent = `Conversation Records - ${sessions.length} session${sessions.length !== 1 ? 's' : ''}`;
+    if (!sessions.length) {
+      list.innerHTML = '<div style="color:var(--muted);padding:12px 0;">No user chat sessions yet.</div>';
+      return;
+    }
+    const cards = await Promise.all(sessions.slice(0, 4).map(async sessionId => {
+      try {
+        const histRes = await fetch(`${backendUrl}/chat/history/${encodeURIComponent(sessionId)}`);
+        if (!histRes.ok) throw new Error('history unavailable');
+        const histData = await histRes.json();
+        const msgs = histData.messages || [];
+        const summary = summarizeSessionMessages(msgs);
+        return `<div class="hcard">
+          <div class="hcard-top"><span class="htag">${String(sessionId).replace(/[<>&]/g, '')}</span><span class="htime">${msgs.length} turns</span></div>
+          <div class="hpreview" style="display:flex;flex-direction:column;gap:6px;">
+            <div><span style="color:var(--muted);font-family:var(--font-mono);font-size:9px;">Latest user</span><div>${String(summary.latestUser).replace(/[<>&]/g, '').slice(0, 110)}</div></div>
+            <div><span style="color:var(--muted);font-family:var(--font-mono);font-size:9px;">Latest assistant</span><div>${String(summary.latestAI).replace(/[<>&]/g, '').slice(0, 120)}</div></div>
+          </div>
+        </div>`;
+      } catch {
+        return `<div class="hcard"><div class="hcard-top"><span class="htag">${String(sessionId).replace(/[<>&]/g, '')}</span><span class="htime">--</span></div><div class="hpreview">Unable to load this session.</div></div>`;
+      }
+    }));
+    list.innerHTML = cards.join('');
+  } catch (err) {
+    if (label) label.textContent = 'Conversation Records - backend offline';
+    list.innerHTML = `<div style="color:var(--accent2);padding:12px 0;">Cannot load chat history: ${String(err.message).replace(/[<>&]/g, '')}</div>`;
+  }
 }
 
 console.log('Navigation fixed, AI chatbot original logic restored.');
@@ -300,7 +483,7 @@ const FIELD_RANGES = {
 };
 
 const THRESHOLDS = {
-  temperature:        { warn: 82,   alert: 88   },  // real data: 66~92C
+  temperature:        { warn: 82,   alert: 88   },  // real data: 66~92Â°C
   vibration_level:    { warn: 4.0,  alert: 6.0  },  // real data: 1.2~7.2
   power_consumption:  { warn: 22,   alert: 26   },  // real data: 14~28 kW
   pressure:           { warn: 5.3,  alert: 5.6  },  // real data: 4.1~5.8 Pa
@@ -332,7 +515,7 @@ function updateMachine(d) {
   const row = document.getElementById(`row-${id}`);
   if (!row) return;
 
-  // Update machine type dynamically from SSE stream
+  // æ›´æ–°æœºå™¨ç±»åž‹æ˜¾ç¤º
   if (d.machine_type) {
     const nameEl = document.getElementById(`name-${id}`);
     if (nameEl) nameEl.textContent = d.machine_type;
@@ -340,18 +523,23 @@ function updateMachine(d) {
 
   const fields = ['temperature','vibration_level','power_consumption','pressure','material_flow_rate','cycle_time'];
 
-// Use CNN label directly - no threshold logic needed
+  // è®¡ç®—å½“å‰æ‰€æœ‰å­—æ®µä¸­æœ€ä¸¥é‡çš„ç­‰çº§ï¼ˆå¦‚æžœæ²¡æœ‰ CNN labelï¼Œåˆ™æ ¹æ®é˜ˆå€¼è®¡ç®—ï¼‰
   const worstLevel = d.label === 'needs_maintenance' ? 'alert' : 'ok';
-
   fields.forEach(f => {
     const val = d[f];
-    if (val == null) return;
-    const el  = document.getElementById(`${id}-${f}`);
+    // æ›´æ–°æ•°å€¼æ˜¾ç¤ºå’Œè¿›åº¦æ¡
+    const el = document.getElementById(`${id}-${f}`);
     const bar = document.getElementById(`${id}-${f}-bar`);
-    // Bar colour follows CNN label, not individual thresholds
-    const barCls = worstLevel === 'alert' ? 'alert' : 'ok';
-    if (el)  { el.textContent = typeof val === 'number' ? val.toFixed(f==='pressure'?0:2) : val; el.className = `fv ${barCls}`; }
-    if (bar) { bar.style.width = getPct(f, val) + '%'; bar.className = `bar ${barCls}`; }
+    if (el) {
+      el.textContent = typeof val === 'number' ? val.toFixed(f==='pressure'?0:2) : val;
+      el.className = `fv ok`;  // æ•°å€¼é¢œè‰²å›ºå®šä¸º ok
+    }
+    if (bar) {
+      const pct = getPct(f, val);
+      bar.style.width = pct + '%';
+      // è¿›åº¦æ¡é¢œè‰²è·Ÿéšæœ€ä¸¥é‡ç­‰çº§
+      bar.className = `bar ${worstLevel}`;
+    }
   });
 
   const tsEl = document.getElementById(`${id}-timestamp`);
@@ -367,7 +555,7 @@ function updateMachine(d) {
 
   const badge = row.querySelector('.abadge');
   if (worstLevel === 'alert') {
-if (!badge) { const b = document.createElement('div'); b.className = 'abadge'; b.textContent = '⚠ ANOMALY'; row.appendChild(b); }
+    if (!badge) { const b = document.createElement('div'); b.className = 'abadge'; b.textContent = 'ANOMALY'; row.appendChild(b); }
   } else {
     if (badge) badge.remove();
   }
@@ -389,12 +577,29 @@ startStream();
 // ==================== LIVE CHART ====================
 const MAX_POINTS = 60;
 const chartBuffers = {};
-['M001','M002','M003','M004'].forEach(id => {
-  chartBuffers[id] = {};
-  ['temperature','vibration_level','power_consumption','pressure','material_flow_rate','cycle_time'].forEach(f => {
-    chartBuffers[id][f] = [];
-  });
-});
+const CHART_FIELDS = ['temperature','vibration_level','power_consumption','pressure','material_flow_rate','cycle_time'];
+
+function getMachineKey(d) {
+  return `${d.machine_id || 'unknown'}::${d.machine_type || 'unknown'}`;
+}
+
+function ensureChartMachine(d) {
+  const key = getMachineKey(d);
+  if (!chartBuffers[key]) {
+    chartBuffers[key] = {};
+    CHART_FIELDS.forEach(f => { chartBuffers[key][f] = []; });
+  }
+
+  const select = document.getElementById('chartMachine');
+  if (select && !Array.from(select.options).some(opt => opt.value === key)) {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = `${d.machine_id || 'unknown'}`;
+    select.appendChild(opt);
+    if (!select.value) select.value = key;
+  }
+  return key;
+}
 
 let liveChart = null;
 
@@ -435,7 +640,7 @@ function initChart() {
 
 function updateChart() {
   if (!liveChart) return;
-  const machine = document.getElementById('chartMachine')?.value || 'M001';
+  const machine = document.getElementById('chartMachine')?.value || Object.keys(chartBuffers)[0];
   const field   = document.getElementById('chartField')?.value   || 'temperature';
   const buf = chartBuffers[machine]?.[field] || [];
 
@@ -461,16 +666,15 @@ function updateChart() {
 const _origUpdate = updateMachine;
 window.updateMachine = function(d) {
   _origUpdate(d);
-  const id = d.machine_id;
-  if (!chartBuffers[id]) return;
-  ['temperature','vibration_level','power_consumption','pressure','material_flow_rate','cycle_time'].forEach(f => {
+  const key = ensureChartMachine(d);
+  CHART_FIELDS.forEach(f => {
     if (d[f] == null) return;
-    chartBuffers[id][f].push({ v: d[f], t: d.timestamp });
-    if (chartBuffers[id][f].length > MAX_POINTS) chartBuffers[id][f].shift();
+    chartBuffers[key][f].push({ v: d[f], t: d.timestamp });
+    if (chartBuffers[key][f].length > MAX_POINTS) chartBuffers[key][f].shift();
   });
   const selM = document.getElementById('chartMachine')?.value;
   const selF = document.getElementById('chartField')?.value;
-  if (id === selM) updateChart();
+  if (key === selM) updateChart();
 };
 
 document.getElementById('chartMachine')?.addEventListener('change', updateChart);
@@ -478,7 +682,7 @@ document.getElementById('chartField')?.addEventListener('change', updateChart);
 
 // ==================== ANALYTICS ====================
 const anomalyStats = { M001:0, M002:0, M003:0, M004:0 };
-const latestLevels = { M001:'ok', M002:'ok', M003:'ok', M004:'ok' };
+let totalAnomalies = 0, alertCount = 0, warnCount = 0, okCount = 0;
 let barChart = null;
 const anomalyLog = [];
 
@@ -524,15 +728,19 @@ function initBarChart() {
   });
 }
 
-function updateAnalyticsFromState() {
+function recordAnomaly(machineId, level) {
   const ids = ['M001','M002','M003','M004'];
-  ids.forEach(id => {
-    anomalyStats[id] = latestLevels[id] === 'alert' ? 1 : 0;
-  });
-  const alertCount = ids.filter(id => latestLevels[id] === 'alert').length;
-  const warnCount = ids.filter(id => latestLevels[id] === 'warn').length;
-  const okCount = ids.filter(id => latestLevels[id] === 'ok').length;
-  const totalAnomalies = alertCount + warnCount;
+  const idx = ids.indexOf(machineId);
+  if (idx < 0) return;
+  anomalyStats[machineId] = (anomalyStats[machineId] || 0) + 1;
+  totalAnomalies++;
+  if (level === 'alert') alertCount++;
+  else if (level === 'warn') warnCount++;
+  else okCount++;
+
+  const t = new Date().toLocaleTimeString('en-GB');
+  anomalyLog.unshift({ t, id: machineId, level });
+  if (anomalyLog.length > 20) anomalyLog.pop();
 
   document.getElementById('an-total').textContent = totalAnomalies;
   document.getElementById('an-alert').textContent = alertCount;
@@ -543,19 +751,13 @@ function updateAnalyticsFromState() {
     const vals = ids.map(id => anomalyStats[id] || 0);
     barChart.data.datasets[0].data = vals;
     barChart.update('none');
+    // Update legend counts
     ids.forEach(id => {
       const el = document.getElementById('leg-' + id);
       if (el) el.textContent = anomalyStats[id] || 0;
     });
-  }
-}
 
-function recordAnomaly(machineId, level) {
-  const ids = ['M001','M002','M003','M004'];
-  if (!ids.includes(machineId)) return;
-  const t = new Date().toLocaleTimeString('en-GB');
-  anomalyLog.unshift({ t, id: machineId, level });
-  if (anomalyLog.length > 20) anomalyLog.pop();
+  }
 
   const colors = { alert:'var(--accent2)', warn:'var(--warn)', ok:'var(--ok)' };
   document.getElementById('an-list').innerHTML = anomalyLog.slice(0,10).map(e =>
@@ -575,9 +777,10 @@ window.updateMachine = function(d) {
   _origUpdateM(d);
   const newRow = document.getElementById('row-' + d.machine_id);
   const newLevel = newRow ? (newRow.classList.contains('s-alert') ? 'alert' : newRow.classList.contains('s-warn') ? 'warn' : 'ok') : 'ok';
-  latestLevels[d.machine_id] = newLevel;
-  updateAnalyticsFromState();
+  if (newLevel !== 'ok') activeAnomalyMachines.add(d.machine_id);
+  else activeAnomalyMachines.delete(d.machine_id);
   if (newLevel !== 'ok' && newLevel !== prevLevel) recordAnomaly(d.machine_id, newLevel);
+  syncAnomalyReminder();
 };
 
 // ==================== SYSTEM STATUS (mini) ====================
@@ -621,7 +824,7 @@ async function loadMiniStatus() {
     const dot = document.getElementById('sys-dot');
     if (dot) { dot.style.background = 'var(--muted)'; dot.style.boxShadow = 'none'; }
     if (ov)  ov.textContent = 'Backend offline';
-  if (det) det.textContent = 'Cannot reach main.py - retrying...';
+    if (det) det.textContent = 'Cannot reach main.py - retrying...';
   } finally {
     setTimeout(loadMiniStatus, 3000); // poll every 3s
   }
