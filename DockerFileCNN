@@ -1,0 +1,25 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# System dependencies for tensorflow + compilation
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    libhdf5-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY MCP_Backend/ ./MCP_Backend/
+COPY Databases_Models/ ./Databases_Models/
+COPY Data/ ./Data/
+COPY .env .
+
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app:/app/MCP_Backend/Anomaly_Detector
+
+EXPOSE 8001
+
+CMD ["uvicorn", "MCP_Backend.Anomaly_Detector.CNN:app", "--host", "0.0.0.0", "--port", "8001"]
