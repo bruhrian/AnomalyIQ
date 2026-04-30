@@ -25,21 +25,24 @@ from dotenv import load_dotenv
 
 from llama_index.core import SQLDatabase, Settings
 from llama_index.core.query_engine import NLSQLTableQueryEngine
-from llama_index.llms.ollama import Ollama
-from sqlalchemy import create_engine, text
+from llama_index.llms.openai import OpenAI
+from sqlalchemy import create_engine
 
 load_dotenv()
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 DB_CONFIG = {
-    "host":     os.getenv("POSTGRES_HOST",     "localhost"),
+    "host":     os.getenv("POSTGRES_HOST"),
     "port":     int(os.getenv("POSTGRES_PORT", "5432")),
-    "dbname":   os.getenv("PG_AUDIT",       "audit_db"),
-    "user":     os.getenv("POSTGRES_USER",     "postgres"),
-    "password": os.getenv("POSTGRES_PASSWORD", ""),
+    "dbname":   os.getenv("PG_AUDIT"),
+    "user":     os.getenv("POSTGRES_USER"),
+    "password": os.getenv("POSTGRES_PASSWORD"),
 }
 
-MODEL = "gemma4:e4b"   # same model as ESA
+MODEL = os.getenv("MODEL")
+BASE_URL = os.getenv("BASE_URL")
+API_KEY = os.getenv("API_KEY")
+AUDIT_QUERY_TIMEOUT_SECONDS = float(os.getenv("AUDIT_QUERY_TIMEOUT_SECONDS", "60"))
 
 # SQLAlchemy connection string for LlamaIndex
 DB_URL = (
@@ -83,7 +86,7 @@ _nl_engine = None
 def _get_nl_engine():
     global _nl_engine
     if _nl_engine is None:
-        Settings.llm = Ollama(model=MODEL, request_timeout=120.0)
+        Settings.llm = OpenAI(model=MODEL, api_key=API_KEY, base_url=BASE_URL)
         engine      = create_engine(DB_URL)
         sql_db      = SQLDatabase(engine, include_tables=["audit_logs"])
         _nl_engine  = NLSQLTableQueryEngine(
@@ -200,7 +203,7 @@ def query_logs(
 ) -> dict:
     """
     Query audit logs with optional filters.
-    Returns up to `limit` most recent entries (capped at 500).
+    Returns up to `limit` most recent entries (capped at 200).
 
     Args:
         agent     : filter by agent name     (empty = all)
@@ -225,7 +228,7 @@ def query_logs(
             params.append(sensor_id)
 
         where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
-        params.append(min(limit, 500))
+        params.append(min(limit, 200))
 
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute(
@@ -291,7 +294,7 @@ def query_logs(
 
 # ── 3. audit_query — NLP-to-SQL ───────────────────────────────────────────────
 
-def audit_query(question: str) -> dict:
+def audit_query(question: str = "", query: str = "") -> dict:
     """
     Natural language query against the audit_logs table.
     Uses LlamaIndex NLSQLTableQueryEngine (text-to-SQL) under the hood.
@@ -305,6 +308,7 @@ def audit_query(question: str) -> dict:
     Args:
         question : plain English question about the audit log
     """
+    question = query or question
     start = time.time()
     try:
         engine   = _get_nl_engine()
