@@ -13,13 +13,14 @@ import os, sys, time, psycopg2
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env", override=True)
 ORCHESTRATOR_PROMPT_PATH = os.getenv('orc_prompt')
 MODEL = os.getenv("MODEL")     
-DIRECT_CHAT_MODEL = os.getenv("DIRECT_CHAT_MODEL") or MODEL
+DIRECT_CHAT_MODEL = MODEL
 MCP_SERVER_IP = os.getenv('mcp_server_ip')
 DEFAULT_SESSION_ID = "orchestrator-default-session"
 REQUEST_TIMEOUT_SECONDS = float(os.getenv("ORCHESTRATOR_TIMEOUT_SECONDS", "180"))
 MAX_HISTORY_MESSAGES = int(os.getenv("ORCHESTRATOR_MAX_HISTORY_MESSAGES", "12"))
 DIRECT_CHAT_TIMEOUT_SECONDS = float(os.getenv("ORCHESTRATOR_DIRECT_TIMEOUT_SECONDS", "90"))
 DIRECT_CHAT_MAX_HISTORY_MESSAGES = int(os.getenv("DIRECT_CHAT_MAX_HISTORY_MESSAGES", "4"))
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 
 DB_CONN = os.getenv('agents_memory')
 if not DB_CONN:
@@ -27,35 +28,6 @@ if not DB_CONN:
 else:
     print(f"✅ Postgres connection string loaded.")
 
-
-DEFAULT_TOOL_PROMPT = """You are AnomalyIQ AI, the orchestrator for an industrial anomaly detection and predictive maintenance system.
-
-You may use available MCP tools when they are available and useful.
-
-Answer in a clear operator-facing format:
-
-Summary:
-- 1-2 short bullets
-
-Likely Cause:
-- short bullets grounded in the available context
-
-Risks:
-- short bullets about impact or cascade effects
-
-Recommended Actions:
-1. concrete next steps
-
-Visual Evidence:
-- explicitly mention whether a line plot and heatmap are available
-- if visuals are available, explain how they support the diagnosis
-
-Rules:
-- Focus on the machine named in the request or anomaly context.
-- Do not ask for raw data that is already provided.
-- If context is limited, say what is known and what remains uncertain.
-- Be concise, practical, and specific.
-"""
 
 def init_postgres_db(conn_string: str = DB_CONN) -> bool:
     try:
@@ -101,11 +73,13 @@ def get_trimmed_messages(history: SQLChatMessageHistory, max_messages: int = MAX
 
 
 def load_orchestrator_prompt() -> str:
-    if ORCHESTRATOR_PROMPT_PATH and Path(ORCHESTRATOR_PROMPT_PATH).exists():
-        with open(ORCHESTRATOR_PROMPT_PATH, "r", encoding="utf-8") as f:
-            return f.read()
-    print("Warning: orc_prompt file not found. Falling back to built-in orchestrator prompt.")
-    return DEFAULT_TOOL_PROMPT
+    if not ORCHESTRATOR_PROMPT_PATH:
+        raise ValueError("❌ orc_prompt not set in .env")
+    path = Path(ORCHESTRATOR_PROMPT_PATH)
+    if not path.exists():
+        raise FileNotFoundError(f"❌ Prompt file not found: {path}")
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
 
 async def orchestrator_response(
     query: str,
@@ -136,7 +110,7 @@ async def orchestrator_response(
     system_prompt = load_orchestrator_prompt()
 
     effective_timeout = request_timeout_seconds or REQUEST_TIMEOUT_SECONDS
-    llm = ChatOllama(model=MODEL, request_timeout=effective_timeout)
+    llm = ChatOllama(model=MODEL, base_url=OLLAMA_BASE_URL)
 
     history = get_session_history(session_id, conn_string) if persist_history else None
     trimmed_history = get_trimmed_messages(history) if history else []
@@ -147,7 +121,7 @@ async def orchestrator_response(
         direct_trimmed_history = get_trimmed_messages(history, DIRECT_CHAT_MAX_HISTORY_MESSAGES) if history else []
         direct_messages_in = direct_trimmed_history + [HumanMessage(content=query)]
         direct_timeout = min(effective_timeout, DIRECT_CHAT_TIMEOUT_SECONDS)
-        direct_llm = ChatOllama(model=DIRECT_CHAT_MODEL, request_timeout=direct_timeout)
+        direct_llm = ChatOllama(model=DIRECT_CHAT_MODEL, base_url=OLLAMA_BASE_URL)
         direct_chat_prompt = (
             "You are AnomalyIQ AI, a diagnostic assistant inside the operator UI.\n"
             "Answer the operator directly, clearly, and in a practical operator-facing style.\n"
