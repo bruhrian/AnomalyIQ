@@ -1,0 +1,369 @@
+﻿﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AnomalyIQ - Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/1-dashboard.css">
+</head>
+<body>
+<div class="shell">
+
+<nav>
+  <div class="nav-logo">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0f1117" stroke-width="2.5" stroke-linecap="round">
+      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+    </svg>
+  </div>
+  <button class="nav-btn active" id="nb-dashboard">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+      <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+    </svg>
+    <div class="nav-tip">Dashboard</div>
+  </button>
+  <button class="nav-btn" id="nb-audit">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/>
+    </svg>
+    <div class="nav-tip">Audit Log</div>
+  </button>
+  <button class="nav-btn" id="nb-history">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+    <div class="nav-tip">Chat History</div>
+  </button>
+  <div class="nav-div"></div>
+  <button class="nav-btn" id="nb-livefeed">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+    </svg>
+    <div class="nav-tip">Live Feed</div>
+  </button>
+  <button class="nav-btn" id="nb-analytics">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+    </svg>
+    <div class="nav-tip">Analytics</div>
+  </button>
+  <button class="nav-btn" id="nb-status">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
+    </svg>
+    <div class="nav-tip">System Status</div>
+  </button>
+  <div class="nav-space"></div>
+  <div class="nav-div"></div>
+  <button class="nav-btn" id="nb-profile">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/>
+    </svg>
+    <div class="nav-tip">Profile</div>
+  </button>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <span class="tb-title">ANOMALYIQ</span>
+    <span class="tb-crumb" id="breadcrumb">/ Machine Monitor</span>
+    <div class="tb-space"></div>
+    <div class="status-pill"><div class="sdot-live"></div>Monitoring active</div>
+    <div class="tb-clock" id="clk">--:--:--</div>
+  </div>
+  <div class="body">
+    <div class="center">
+      <!-- VIEW: DASHBOARD -->
+      <div id="view-dashboard" class="view active">
+        <div class="vscroll">
+          <div class="sec-label" style="margin-bottom:4px">Machine Fleet - 4 active units</div>
+
+          <!-- M001 CNC -->
+          <div class="mrow" id="row-M001" data-machine-id="M001">
+            <div class="mrow-label">
+              <div class="mrow-id" id="name-M001">-</div>
+              <div class="mrow-name">M001</div>
+              <div class="mrow-st"><span class="dot ok" id="dot-M001"></span><span id="status-M001" style="color:var(--ok)">Normal</span></div>
+            </div>
+            <div class="mrow-fields">
+              <div class="field"><div class="fn">Timestamp</div><div class="fv ok" id="M001-timestamp">--:--:--</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
+              <div class="field"><div class="fn">Temperature C</div><div class="fv ok" id="M001-temperature">--</div><div class="bar-bg"><div class="bar ok" id="M001-temperature-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Vibration</div><div class="fv ok" id="M001-vibration_level">--</div><div class="bar-bg"><div class="bar ok" id="M001-vibration_level-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Power kW</div><div class="fv ok" id="M001-power_consumption">--</div><div class="bar-bg"><div class="bar ok" id="M001-power_consumption-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok" id="M001-pressure">--</div><div class="bar-bg"><div class="bar ok" id="M001-pressure-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Flow Rate</div><div class="fv ok" id="M001-material_flow_rate">--</div><div class="bar-bg"><div class="bar ok" id="M001-material_flow_rate-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Cycle Time s</div><div class="fv ok" id="M001-cycle_time">--</div><div class="bar-bg"><div class="bar ok" id="M001-cycle_time-bar" style="width:0%"></div></div></div>
+            </div>
+          </div>
+
+          <!-- M002 Conveyor -->
+          <div class="mrow" id="row-M002" data-machine-id="M002">
+            <div class="mrow-label">
+              <div class="mrow-id" id="name-M002">-</div>
+              <div class="mrow-name">M002</div>
+              <div class="mrow-st"><span class="dot ok" id="dot-M002"></span><span id="status-M002" style="color:var(--ok)">Normal</span></div>
+            </div>
+            <div class="mrow-fields">
+              <div class="field"><div class="fn">Timestamp</div><div class="fv ok" id="M002-timestamp">--:--:--</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
+              <div class="field"><div class="fn">Temperature C</div><div class="fv ok" id="M002-temperature">--</div><div class="bar-bg"><div class="bar ok" id="M002-temperature-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Vibration</div><div class="fv ok" id="M002-vibration_level">--</div><div class="bar-bg"><div class="bar ok" id="M002-vibration_level-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Power kW</div><div class="fv ok" id="M002-power_consumption">--</div><div class="bar-bg"><div class="bar ok" id="M002-power_consumption-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok" id="M002-pressure">--</div><div class="bar-bg"><div class="bar ok" id="M002-pressure-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Flow Rate</div><div class="fv ok" id="M002-material_flow_rate">--</div><div class="bar-bg"><div class="bar ok" id="M002-material_flow_rate-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Cycle Time s</div><div class="fv ok" id="M002-cycle_time">--</div><div class="bar-bg"><div class="bar ok" id="M002-cycle_time-bar" style="width:0%"></div></div></div>
+            </div>
+          </div>
+
+          <!-- M003 Drill -->
+          <div class="mrow" id="row-M003" data-machine-id="M003">
+            <div class="mrow-label">
+              <div class="mrow-id" id="name-M003">-</div>
+              <div class="mrow-name">M003</div>
+              <div class="mrow-st"><span class="dot ok" id="dot-M003"></span><span id="status-M003" style="color:var(--ok)">Normal</span></div>
+            </div>
+            <div class="mrow-fields">
+              <div class="field"><div class="fn">Timestamp</div><div class="fv ok" id="M003-timestamp">--:--:--</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
+              <div class="field"><div class="fn">Temperature C</div><div class="fv ok" id="M003-temperature">--</div><div class="bar-bg"><div class="bar ok" id="M003-temperature-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Vibration</div><div class="fv ok" id="M003-vibration_level">--</div><div class="bar-bg"><div class="bar ok" id="M003-vibration_level-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Power kW</div><div class="fv ok" id="M003-power_consumption">--</div><div class="bar-bg"><div class="bar ok" id="M003-power_consumption-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok" id="M003-pressure">--</div><div class="bar-bg"><div class="bar ok" id="M003-pressure-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Flow Rate</div><div class="fv ok" id="M003-material_flow_rate">--</div><div class="bar-bg"><div class="bar ok" id="M003-material_flow_rate-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Cycle Time s</div><div class="fv ok" id="M003-cycle_time">--</div><div class="bar-bg"><div class="bar ok" id="M003-cycle_time-bar" style="width:0%"></div></div></div>
+            </div>
+          </div>
+
+          <!-- M004 Welder -->
+          <div class="mrow" id="row-M004" data-machine-id="M004">
+            <div class="mrow-label">
+              <div class="mrow-id" id="name-M004">-</div>
+              <div class="mrow-name">M004</div>
+              <div class="mrow-st"><span class="dot ok" id="dot-M004"></span><span id="status-M004" style="color:var(--ok)">Normal</span></div>
+            </div>
+            <div class="mrow-fields">
+              <div class="field"><div class="fn">Timestamp</div><div class="fv ok" id="M004-timestamp">--:--:--</div><div class="bar-bg"><div class="bar ok" style="width:100%"></div></div></div>
+              <div class="field"><div class="fn">Temperature C</div><div class="fv ok" id="M004-temperature">--</div><div class="bar-bg"><div class="bar ok" id="M004-temperature-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Vibration</div><div class="fv ok" id="M004-vibration_level">--</div><div class="bar-bg"><div class="bar ok" id="M004-vibration_level-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Power kW</div><div class="fv ok" id="M004-power_consumption">--</div><div class="bar-bg"><div class="bar ok" id="M004-power_consumption-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Pressure Pa</div><div class="fv ok" id="M004-pressure">--</div><div class="bar-bg"><div class="bar ok" id="M004-pressure-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Flow Rate</div><div class="fv ok" id="M004-material_flow_rate">--</div><div class="bar-bg"><div class="bar ok" id="M004-material_flow_rate-bar" style="width:0%"></div></div></div>
+              <div class="field"><div class="fn">Cycle Time s</div><div class="fv ok" id="M004-cycle_time">--</div><div class="bar-bg"><div class="bar ok" id="M004-cycle_time-bar" style="width:0%"></div></div></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- VIEW: AUDIT LOG -->
+      <div id="view-audit" class="view">
+        <div class="vscroll">
+          <div class="audit-card">
+            <div class="audit-head">
+              <div class="audit-head-title">RECENT AUDIT TRAIL</div>
+              <div class="badge" id="miniAuditCount">Loading...</div>
+            </div>
+            <div class="audit-row" style="background:var(--surface2);font-size:9px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;">
+              <div>Time</div>
+              <div>Stage</div>
+              <div>Description</div>
+              <div>Machine</div>
+            </div>
+            <div id="auditList">
+              <div style="color:var(--muted);padding:12px 0;">Loading audit data...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: CHAT HISTORY -->
+      <div id="view-history" class="view">
+        <div class="vscroll">
+          <div class="sec-label" style="margin-bottom:4px" id="embeddedHistoryLabel">Conversation Records - loading...</div>
+          <div id="embeddedHistoryList" style="display:flex;flex-direction:column;gap:8px;">
+            <div style="color:var(--muted);padding:12px 0;">Loading chat sessions...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional views (livefeed, analytics, status, profile) - add as needed -->
+      <div id="view-livefeed" class="view">
+        <div class="vscroll" style="gap:14px;">
+          <div class="sec-label" style="margin-bottom:4px">Live Telemetry - Real-time sensor data</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 14px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:10px;">
+              <span style="color:var(--muted)">Machine ID:</span>
+              <select id="chartMachine" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:10px;padding:3px 8px;border-radius:5px;outline:none;">
+              </select>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 14px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:10px;">
+              <span style="color:var(--muted)">Sensor Field:</span>
+              <select id="chartField" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:10px;padding:3px 8px;border-radius:5px;outline:none;">
+                <option value="temperature">Temperature C</option>
+                <option value="vibration_level">Vibration</option>
+                <option value="power_consumption">Power kW</option>
+                <option value="pressure">Pressure Pa</option>
+                <option value="material_flow_rate">Flow Rate</option>
+                <option value="cycle_time">Cycle Time s</option>
+              </select>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 14px;font-family:var(--font-mono);font-size:10px;color:var(--muted);">
+              Points: <span id="chartCount" style="color:var(--accent)">0</span> / 60
+            </div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:16px;flex-shrink:0;">
+            <canvas id="liveChart" height="220"></canvas>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:12px 16px;">
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Current</div>
+              <div id="statCurrent" style="font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--accent)">--</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:12px 16px;">
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Min</div>
+              <div id="statMin" style="font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--ok)">--</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:12px 16px;">
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Max</div>
+              <div id="statMax" style="font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--accent2)">--</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="view-analytics" class="view">
+        <div class="vscroll" style="gap:14px;">
+          <div class="sec-label" style="margin-bottom:4px">Anomaly Analytics</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 16px;">
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Total Anomalies</div>
+              <div id="an-total" style="font-family:var(--font-mono);font-size:26px;font-weight:600;color:var(--accent)">0</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 16px;">
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Alerts</div>
+              <div id="an-alert" style="font-family:var(--font-mono);font-size:26px;font-weight:600;color:var(--accent2)">0</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 16px;">
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Warnings</div>
+              <div id="an-warn" style="font-family:var(--font-mono);font-size:26px;font-weight:600;color:var(--warn)">0</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 16px;">
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Normal</div>
+              <div id="an-ok" style="font-family:var(--font-mono);font-size:26px;font-weight:600;color:var(--ok)">0</div>
+            </div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:16px;">
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Anomalies by Machine</div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <canvas id="barChart" height="160" style="width:100%;max-height:160px;"></canvas>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--font-mono);">
+                  <div style="width:10px;height:10px;border-radius:2px;background:#00d4ff;"></div>
+                  <span style="font-size:9px;color:var(--muted);">M001</span>
+                  <span id="leg-M001" style="font-size:14px;font-weight:600;color:var(--text);">0</span>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--font-mono);">
+                  <div style="width:10px;height:10px;border-radius:2px;background:#ff6b35;"></div>
+                  <span style="font-size:9px;color:var(--muted);">M002</span>
+                  <span id="leg-M002" style="font-size:14px;font-weight:600;color:var(--text);">0</span>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--font-mono);">
+                  <div style="width:10px;height:10px;border-radius:2px;background:#00e87a;"></div>
+                  <span style="font-size:9px;color:var(--muted);">M003</span>
+                  <span id="leg-M003" style="font-size:14px;font-weight:600;color:var(--text);">0</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;">
+                  <div style="width:10px;height:10px;border-radius:2px;background:#ffb800;flex-shrink:0;"></div>
+                  <span style="color:var(--muted);flex:1;">M004</span>
+                  <span id="leg-M004" style="color:var(--text);font-weight:600;">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:16px;">
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Recent Anomaly Events</div>
+            <div id="an-list" style="display:flex;flex-direction:column;gap:6px;font-family:var(--font-mono);font-size:10px;">
+              <div style="color:var(--muted);padding:8px 0;">Loading...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="view-status" class="view">
+        <div class="vscroll" style="gap:10px;">
+          <div class="sec-label" style="margin-bottom:4px">System Status</div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 18px;display:flex;align-items:center;gap:12px;">
+            <div id="sys-dot" style="width:10px;height:10px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);flex-shrink:0;animation:pulse 2s infinite;"></div>
+            <div>
+              <div id="sys-overall" style="font-size:13px;font-weight:500;">Checking...</div>
+              <div id="sys-detail" style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px;">Fetching system health from backend</div>
+            </div>
+            <div style="margin-left:auto;">
+              <a href="4-system-status.html" target="_blank" onclick="event.stopPropagation()" style="font-family:var(--font-mono);font-size:10px;color:var(--accent);text-decoration:none;border:1px solid rgba(0,212,255,.3);padding:4px 12px;border-radius:6px;">View Details</a>
+            </div>
+          </div>
+          <div id="sys-components" style="display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+      </div>
+      <div id="view-profile" class="view">
+        <div class="vscroll" style="gap:14px;">
+          <div class="sec-label" style="margin-bottom:4px">Operator Profile</div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:20px;display:flex;align-items:center;gap:16px;">
+            <div style="width:52px;height:52px;background:linear-gradient(135deg,var(--accent),#0077ff);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px;">OP</div>
+            <div>
+              <div id="prof-name" style="font-size:15px;font-weight:600;">Operator</div>
+              <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px;">AnomalyIQ System User</div>
+            </div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;overflow:hidden;">
+            <div style="padding:10px 16px;background:var(--surface2);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:.05em;">SETTINGS</div>
+            <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-size:12px;font-weight:500;">Display Name</div>
+                <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px;">Shown in chat messages</div>
+              </div>
+              <input id="inp-name" type="text" value="Operator" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:11px;padding:5px 10px;border-radius:6px;outline:none;width:140px;" oninput="document.getElementById('prof-name').textContent=this.value||'Operator'"/>
+            </div>
+            <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-size:12px;font-weight:500;">Backend URL</div>
+                <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px;">main.py address</div>
+              </div>
+              <input id="inp-url" type="text" value="http://localhost:8005" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:11px;padding:5px 10px;border-radius:6px;outline:none;width:200px;"/>
+            </div>
+            <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-size:12px;font-weight:500;">Alert Notifications</div>
+                <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px;">Show anomaly alerts in chat</div>
+              </div>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" id="inp-notif" checked style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;"/>
+                <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted);">Enabled</span>
+              </label>
+            </div>
+          </div>
+          <button onclick="saveProfile()" style="background:var(--accent);border:none;color:#0f1117;font-family:var(--font-mono);font-size:11px;font-weight:600;padding:10px 24px;border-radius:8px;cursor:pointer;width:fit-content;">Save Settings</button>
+          <div id="prof-saved" style="font-family:var(--font-mono);font-size:10px;color:var(--ok);display:none;">Settings saved</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHATBOT PANEL â€” ORIGINAL LOGIC (job polling) RESTORED -->
+    <div class="chat-panel">
+      <div class="chat-head">
+        <div class="chat-avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v2H8V6a4 4 0 0 1 4-4z"/><rect x="4" y="8" width="16" height="12" rx="2"/><circle cx="9" cy="14" r="1" fill="white"/><circle cx="15" cy="14" r="1" fill="white"/></svg></div>
+        <div><div class="chat-name">AnomalyIQ AI</div><div class="chat-sub">Diagnostic assistant</div></div>
+        <div class="chat-live"></div>
+      </div>
+      <div class="chat-msgs" id="chatMsgs">
+      </div>
+      <div class="chat-input-row">
+        <textarea class="chat-input" id="chatInput" placeholder="Ask about any machine..." rows="1"></textarea>
+        <button class="send-btn" onclick="sendMsg()"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg></button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script src="/js/1-dashboard.js"></script>
+</body>
+</html>

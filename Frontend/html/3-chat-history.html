@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/3-chat-history.css"><title>AnomalyIQ - Chat History</title></head>
+
+<div class="shell">
+<nav>
+  <div class="nav-logo">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0f1117" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+  </div>
+  <button class="nav-btn " id="nb-d" onclick="location.href='1-dashboard.html#dashboard'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    <div class="nav-tip">Dashboard</div>
+  </button>
+  <button class="nav-btn " id="nb-a" onclick="location.href='2-audit-log.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+    <div class="nav-tip">Audit Log</div>
+  </button>
+  <button class="nav-btn active" id="nb-h">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <div class="nav-tip">Chat History</div>
+  </button>
+  <div class="nav-div"></div>
+  <button class="nav-btn" onclick="location.href='1-dashboard.html#livefeed'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg><div class="nav-tip">Live Feed</div></button>
+  <button class="nav-btn" onclick="location.href='1-dashboard.html#analytics'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><div class="nav-tip">Analytics</div></button>
+  <div class="nav-space"></div>
+  <div class="nav-div"></div>
+  <button class="nav-btn" onclick="location.href='1-dashboard.html#profile'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/></svg><div class="nav-tip">Profile</div></button>
+</nav>
+<div class="main"><div class="topbar">
+  <span class="tb-title">ANOMALYIQ</span>
+  <span class="tb-crumb">/ Chat History</span>
+  <div class="tb-space"></div>
+  <div class="status-pill"><div class="sdot-live"></div>Monitoring active</div>
+  <div class="tb-clock" id="clk">--:--:--</div>
+</div><div class="body"><div class="center"><div class="vscroll" style="gap:8px">
+  <div class="sec-label" style="margin-bottom:4px" id="sessionsLabel">Conversation Records - loading...</div>
+</div></div><div class="chat-panel">
+  <div class="chat-head">
+    <div class="chat-avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M12 2a4 4 0 0 1 4 4v2H8V6a4 4 0 0 1 4-4z"/><rect x="4" y="8" width="16" height="12" rx="2"/><circle cx="9" cy="14" r="1" fill="white"/><circle cx="15" cy="14" r="1" fill="white"/></svg></div>
+    <div><div class="chat-name">AnomalyIQ AI</div><div class="chat-sub">Diagnostic assistant</div></div>
+    <div class="chat-live"></div>
+  </div>
+  <div class="chat-msgs" id="chatMsgs"></div>
+  <div class="chat-input-row">
+    <textarea class="chat-input" id="chatInput" placeholder="Ask about any machine..." rows="1"></textarea>
+    <button class="send-btn"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg></button>
+  </div>
+</div></div></div></div>
+<script src="/js/3-chat-history.js"></script></body></html>
+
