@@ -1,6 +1,9 @@
 import json
 import os
+import re
 from pathlib import Path
+from datetime import datetime
+from uuid import uuid4
 
 import matplotlib
 matplotlib.use("Agg")
@@ -33,6 +36,16 @@ FEATURE_LABELS = {
 }
 
 FEATURE_INDEX = {name: idx for idx, name in enumerate(FEATURE_COLUMNS)}
+
+
+def _safe_slug(value: str) -> str:
+    return re.sub(r"[^A-Za-z0-9_-]+", "_", str(value)).strip("_") or "unknown"
+
+
+def _visual_stem(machine_id: str, machine_type: str) -> str:
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+    suffix = uuid4().hex[:8]
+    return f"{_safe_slug(machine_id)}_{_safe_slug(machine_type)}_{timestamp}_{suffix}"
 
 
 def _decode_machine_ids(data: np.ndarray) -> list[str]:
@@ -165,7 +178,8 @@ def generate_visual(
         bbox=dict(boxstyle="round,pad=0.45", facecolor="#f8fafc", edgecolor="#d1d5db"),
     )
     fig.tight_layout(rect=(0, 0.08, 1, 1))
-    line_path = GRAPH_DIR / f"{machine_id}_{machine_type}_line_plot.png"
+    file_stem = _visual_stem(machine_id, machine_type)
+    line_path = GRAPH_DIR / f"{file_stem}_line_plot.png"
     fig.savefig(line_path, dpi=140)
     plt.close(fig)
 
@@ -196,7 +210,7 @@ def generate_visual(
         bbox=dict(boxstyle="round,pad=0.45", facecolor="#fff7f7", edgecolor="#fecaca"),
     )
     fig.tight_layout(rect=(0, 0.08, 1, 1))
-    heatmap_path = GRAPH_DIR / f"{machine_id}_{machine_type}_heatmap.png"
+    heatmap_path = GRAPH_DIR / f"{file_stem}_heatmap.png"
     fig.savefig(heatmap_path, dpi=140)
     plt.close(fig)
 

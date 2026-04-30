@@ -92,7 +92,7 @@ def _build_window(buffer: deque, machine_type: str) -> dict:
     }
 
 _machine_buffers: dict[tuple, deque] = defaultdict(lambda: deque(maxlen=T_IN))
-_window_store:    dict[str, list[list[float]]] = {}
+_window_store:    dict[tuple[str, str], list[list[float]]] = {}
 
 def _send_window(machine_id: str, machine_type: str, window: list) -> None:
     arr = np.array(window)
@@ -137,7 +137,7 @@ def ingest_data(payload: dict, machine_id: str, machine_type: str, timestamp: st
         }
 
     window = _build_window(buf, machine_type)
-    _window_store[machine_id] = window["window"]
+    _window_store[key] = window["window"]
     _send_window(machine_id, machine_type, window["window"])
 
     return {
