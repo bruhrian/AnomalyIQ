@@ -137,7 +137,7 @@ def generate_visual(
 
     # Line chart
     fig, ax = plt.subplots(figsize=(12.5, 7.2))
-    colors = ["#7f1d1d", "#991b1b", "#b91c1c", "#dc2626", "#ef4444"]
+    colors = ["#2563eb", "#16a34a", "#f97316", "#9333ea", "#dc2626"]
     for i, feature in enumerate(top_features):
         ax.plot(
             time_steps,
