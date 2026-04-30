@@ -8,21 +8,19 @@ from lightrag.utils import setup_logger
 from huggingface_hub import login
 import neo4j
 from dotenv import load_dotenv
-import nest_asyncio
-nest_asyncio.apply()
 
 load_dotenv()
 HF_TOKEN = os.getenv('HF_TOKEN')
 
 
-WORKING_DIR = r"D:\brian\2pdf"
+WORKING_DIR = os.getenv('WORKING_DIR')
 setup_logger("lightrag", level="INFO")
 os.makedirs(WORKING_DIR, exist_ok=True)
 
 # Storage Mode (for querying, e.g., "hybrid")
 MODE = "hybrid" 
 COMPLETION_MODEL = "gemma4:e4b"
-EMBEDDING_MODEL = "nomic-embed-text"
+EMBEDDING_MODEL = "mxbai-embed-large"
 RERANK_MODEL = "BAAI/bge-reranker-v2-m3"
 
 FOLDER_PATH = r"D:\brian\2pdf"
@@ -53,7 +51,7 @@ rag = LightRAG(
     llm_model_name=COMPLETION_MODEL,                      
     llm_model_kwargs={"options": {"num_ctx": 32768}},
     embedding_func=EmbeddingFunc(
-        embedding_dim=768,
+        embedding_dim=1024,
         max_token_size=8192,
         func=lambda texts: ollama_embed(
             texts,
@@ -110,10 +108,3 @@ async def process_folder(folder_path: str):
         
         print(f"Inserting {pdf_file} into LightRAG...")
         await rag.ainsert(doc_text)
-
-def rag_query(query: str) -> str:
-    loop = asyncio.get_event_loop()
-    return loop.run_until_complete(rag.aquery(
-        query=query,
-        param=QueryParam(mode=MODE)
-    ))
