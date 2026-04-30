@@ -26,15 +26,15 @@ from collections import defaultdict, deque
 T_IN  = 30
 T_OUT = 15
 
-STREAM_URL = "http://127.0.0.1:8000/stream"
-INFER_URL  = "http://127.0.0.1:8001/predict"
+STREAM_URL = "http://streaming:8000/stream"
+INFER_URL  = "http://cnn:8001/predict"
 
 BASE_DIR = Path(__file__).resolve().parent.parent  # MCP & Backend/
 
-CNC_SCALER_PATH      = BASE_DIR.parent / "Databases & Models" / "Models" / "phase_5.3" / "CNC"      / "aggregated" / "scaler_X.pkl"
-CONVEYOR_SCALER_PATH = BASE_DIR.parent / "Databases & Models" / "Models" / "phase_5.3" / "Conveyor" / "aggregated" / "scaler_X.pkl"
-DRILL_SCALER_PATH    = BASE_DIR.parent / "Databases & Models" / "Models" / "phase_5.3" / "Drill"    / "aggregated" / "scaler_X.pkl"
-WELDER_SCALER_PATH   = BASE_DIR.parent / "Databases & Models" / "Models" / "phase_5.3" / "Welder"   / "aggregated" / "scaler_X.pkl"
+CNC_SCALER_PATH      = BASE_DIR.parent / "Databases_Models" / "Models" / "phase_5.3" / "CNC"      / "aggregated" / "scaler_X.pkl"
+CONVEYOR_SCALER_PATH = BASE_DIR.parent / "Databases_Models" / "Models" / "phase_5.3" / "Conveyor" / "aggregated" / "scaler_X.pkl"
+DRILL_SCALER_PATH    = BASE_DIR.parent / "Databases_Models" / "Models" / "phase_5.3" / "Drill"    / "aggregated" / "scaler_X.pkl"
+WELDER_SCALER_PATH   = BASE_DIR.parent / "Databases_Models" / "Models" / "phase_5.3" / "Welder"   / "aggregated" / "scaler_X.pkl"
 
 SCALER_PATHS: dict[str, Path] = {
     "CNC":      CNC_SCALER_PATH,
