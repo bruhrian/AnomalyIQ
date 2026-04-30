@@ -30,35 +30,6 @@ else:
     print(f"✅ Postgres connection string loaded.")
 
 
-DEFAULT_TOOL_PROMPT = """You are AnomalyIQ AI, the orchestrator for an industrial anomaly detection and predictive maintenance system.
-
-You may use available MCP tools when they are available and useful.
-
-Answer in a clear operator-facing format:
-
-Summary:
-- 1-2 short bullets
-
-Likely Cause:
-- short bullets grounded in the available context
-
-Risks:
-- short bullets about impact or cascade effects
-
-Recommended Actions:
-1. concrete next steps
-
-Visual Evidence:
-- explicitly mention whether a line plot and heatmap are available
-- if visuals are available, explain how they support the diagnosis
-
-Rules:
-- Focus on the machine named in the request or anomaly context.
-- Do not ask for raw data that is already provided.
-- If context is limited, say what is known and what remains uncertain.
-- Be concise, practical, and specific.
-"""
-
 def init_postgres_db(conn_string: str = DB_CONN) -> bool:
     try:
         conn = psycopg2.connect(conn_string)
@@ -103,11 +74,13 @@ def get_trimmed_messages(history: SQLChatMessageHistory, max_messages: int = MAX
 
 
 def load_orchestrator_prompt() -> str:
-    if ORCHESTRATOR_PROMPT_PATH and Path(ORCHESTRATOR_PROMPT_PATH).exists():
-        with open(ORCHESTRATOR_PROMPT_PATH, "r", encoding="utf-8") as f:
-            return f.read()
-    print("Warning: orc_prompt file not found. Falling back to built-in orchestrator prompt.")
-    return DEFAULT_TOOL_PROMPT
+    if not ORCHESTRATOR_PROMPT_PATH:
+        raise ValueError("❌ orc_prompt not set in .env")
+    path = Path(ORCHESTRATOR_PROMPT_PATH)
+    if not path.exists():
+        raise FileNotFoundError(f"❌ Prompt file not found: {path}")
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
 
 async def orchestrator_response(
     query: str,
