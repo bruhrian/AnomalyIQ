@@ -1,0 +1,118 @@
+services:
+
+  postgres:
+    image: postgres:15
+    container_name: anomalyiq-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  neo4j:
+    image: neo4j:5
+    container_name: anomalyiq-neo4j
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_AUTH: neo4j/neo4j123
+    volumes:
+      - neo4j_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p neo4j123 'RETURN 1' || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+
+  streaming:
+    build:
+      context: .
+      dockerfile: DockerFileStreaming
+    container_name: anomalyiq-streaming
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  cnn:
+    build:
+      context: .
+      dockerfile: DockerFileCNN
+    container_name: anomalyiq-cnn
+    ports:
+      - "8001:8001"
+    depends_on:
+      streaming:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      CA_URL: http://main:8005
+      CNN_MODEL: Databases_Models/Models/phase_5.3
+    volumes:
+      - graphs_data:/app/Data/Graphs    # ← added
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+
+  mcp:
+    build:
+      context: .
+      dockerfile: DockerFileMCP
+    container_name: anomalyiq-mcp
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/sse')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  main:
+    build:
+      context: .
+      dockerfile: DockerFileMain
+    container_name: anomalyiq-main
+    ports:
+      - "8005:8005"
+    depends_on:
+      streaming:
+        condition: service_healthy
+      cnn:
+        condition: service_healthy
+      mcp:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      CNN_URL: http://cnn:8001/predict
+    volumes:
+      - graphs_data:/app/Data/Graphs    # ← added
+
+volumes:
+  postgres_data:
+  neo4j_data:
+  graphs_data:    # ← added
